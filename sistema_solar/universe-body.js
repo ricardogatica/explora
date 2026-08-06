@@ -11,13 +11,6 @@ if(!object){
   shell.className = "hud";
   shell.innerHTML = `
     <section class="panel side-card">
-      <nav class="crumbs" aria-label="Ruta de navegación">
-        <a href="../index.html">Explora</a>
-        <i aria-hidden="true">›</i>
-        <a href="./index.html">Universo</a>
-        <i aria-hidden="true">›</i>
-        <span aria-current="page">No encontrado</span>
-      </nav>
       <p class="eyebrow">Archivo del universo</p>
       <h1>No encontramos ese objeto</h1>
       <p>El identificador <code id="slugEcho"></code> no corresponde a ninguna
