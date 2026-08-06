@@ -80,3 +80,15 @@ h1{margin:0;font-size:clamp(22px,3vw,36px);line-height:1.05;letter-spacing:-.04e
 .constellation-detail h2{margin:0 0 8px;font-size:26px}.constellation-detail .meta{font-size:13px;font-weight:800;color:var(--accent2);margin-bottom:10px}
 .constellation-detail p{margin:0 0 12px;color:#cbd5e1;font-size:14px;line-height:1.45}
 @media (max-width:780px){.title-panel,.legend{display:none}.info-panel{left:18px;right:88px;top:auto;bottom:190px;width:auto}.hint{display:none}.event{flex-basis:185px}.side-card{width:auto;right:18px}.orbit-note{display:none}}
+.atlas-back{display:inline-flex;align-items:center;gap:.5rem;min-height:40px;margin-bottom:10px;padding:7px 13px 7px 11px;border:1px solid rgba(56,189,248,.35);border-radius:999px;background:rgba(14,24,44,.9);color:#e2e8f0;font-size:12px;font-weight:700;text-decoration:none;pointer-events:auto}
+.atlas-back:hover{border-color:#38bdf8;color:#fff}
+.atlas-back:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 10px;font-size:12px;font-weight:700;pointer-events:auto}
+.crumbs a{color:#7dd3fc;text-decoration:none;padding:2px 4px;border-radius:6px}
+.crumbs a:hover{color:#fff;background:rgba(56,189,248,.16)}
+.crumbs a:focus-visible{outline:2px solid #38bdf8;outline-offset:1px}
+.crumbs span[aria-current]{color:#e2e8f0}
+.crumbs i{color:#64748b;font-style:normal}
+.siblings{display:flex;justify-content:space-between;gap:8px;width:100%;margin-top:10px;pointer-events:auto}
+.siblings .btn{flex:0 1 auto}
+.siblings .btn--next{margin-left:auto}
