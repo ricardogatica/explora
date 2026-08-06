@@ -29,13 +29,14 @@ node --test
 48 tests. Requiere Node 18 o superior. No hay dependencias que instalar.
 
 ## Uso
-Abre `index.html` en un navegador moderno.
+Este módulo usa módulos de JavaScript: abrir `index.html` con doble clic desde el disco no funciona.
 
-Si el navegador bloquea módulos desde `file://`, ejecuta en esta carpeta:
+Levanta el sitio desde la **raíz del repositorio** (no desde esta carpeta) con:
 
 ```bash
-python3 -m http.server 8000
+./run.sh
 ```
 
-Luego abre:
-`http://localhost:8000/index.html`
+y abre `http://localhost:6767/sistema_solar/index.html`. Servir importa desde la raíz: las migas de pan enlazan a `../index.html`, la portada del sitio, que queda un nivel por encima de `sistema_solar/`; si sirves desde aquí, ese enlace queda fuera de la raíz del servidor y da 404.
+
+`./run.sh 8080` usa otro puerto. Como alternativa manual, `python3 -m http.server` también debe ejecutarse desde la raíz del repositorio, abriendo `/sistema_solar/index.html`.
