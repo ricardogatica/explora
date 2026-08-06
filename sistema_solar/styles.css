@@ -54,7 +54,12 @@ h1{margin:0;font-size:clamp(22px,3vw,36px);line-height:1.05;letter-spacing:-.04e
 .legend{position:absolute;left:18px;top:140px;width:min(300px,calc(100vw - 36px));padding:14px}
 .legend ul{margin:10px 0 0;padding-left:18px;color:#cbd5e1;font-size:13px;line-height:1.45}
 .detail-wrap{position:fixed;inset:0}
-.side-card{position:absolute;left:18px;top:18px;width:min(420px,calc(100vw - 36px));max-height:calc(100vh - 36px);overflow:auto;padding:18px}
+/* .hud es pointer-events:none para dejar pasar el arrastre al canvas, pero las
+   tarjetas con overflow:auto necesitan recibir la rueda: si no, el scroll se lo
+   come el zoom de la escena y el final de la tarjeta queda inalcanzable. Los
+   manejadores de rueda de main.js, solar-scale.js, universe-body.js y
+   constellations-view.js solo hacen zoom cuando el evento cae en el canvas. */
+.side-card{position:absolute;left:18px;top:18px;width:min(420px,calc(100vw - 36px));max-height:calc(100vh - 36px);overflow:auto;padding:18px;pointer-events:auto}
 .scale-card{width:min(380px,calc(100vw - 36px))}
 .side-card h1{font-size:32px}.side-card p{font-size:14px;color:#cbd5e1;line-height:1.5}
 .table{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
@@ -76,7 +81,50 @@ h1{margin:0;font-size:clamp(22px,3vw,36px);line-height:1.05;letter-spacing:-.04e
 .constellation-btn{width:100%;text-align:left;color:var(--text);border:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.68);border-radius:12px;padding:10px 12px;cursor:pointer}
 .constellation-btn strong{display:block;font-size:14px;margin-bottom:3px}.constellation-btn span{display:block;color:var(--muted);font-size:12px}
 .constellation-btn:hover,.constellation-btn.active{border-color:rgba(56,189,248,.75);background:rgba(15,23,42,.95)}
+/* Deliberadamente sin pointer-events:auto: por debajo de ~380px este panel se
+   superpone entero a .side-card, y capturarle los eventos dejaría la lista de
+   88 constelaciones sin poder pulsarse ni desplazarse. */
 .constellation-detail{position:absolute;right:18px;top:18px;width:min(390px,calc(100vw - 36px));max-height:calc(100vh - 36px);overflow:auto;padding:16px}
 .constellation-detail h2{margin:0 0 8px;font-size:26px}.constellation-detail .meta{font-size:13px;font-weight:800;color:var(--accent2);margin-bottom:10px}
 .constellation-detail p{margin:0 0 12px;color:#cbd5e1;font-size:14px;line-height:1.45}
 @media (max-width:780px){.title-panel,.legend{display:none}.info-panel{left:18px;right:88px;top:auto;bottom:190px;width:auto}.hint{display:none}.event{flex-basis:185px}.side-card{width:auto;right:18px}.orbit-note{display:none}}
+.atlas-back{display:inline-flex;align-items:center;gap:.5rem;min-height:40px;margin-bottom:10px;padding:7px 13px 7px 11px;border:1px solid rgba(56,189,248,.35);border-radius:999px;background:rgba(14,24,44,.9);color:#e2e8f0;font-size:12px;font-weight:700;text-decoration:none;pointer-events:auto}
+.atlas-back:hover{border-color:#38bdf8;color:#fff}
+.atlas-back:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+/* Solo visible en el tramo donde se oculta .title-panel (mismo corte que el
+   @media de arriba): así index.html nunca se queda sin ruta a la portada y
+   tampoco la duplica en escritorio. El bloque va después de la regla display:none
+   a propósito, porque tienen la misma especificidad y gana el último. */
+.atlas-back--mobile{display:none}
+@media (max-width:780px){.atlas-back--mobile{display:inline-flex;position:fixed;left:18px;top:18px;z-index:4;margin:0}}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 10px;font-size:12px;font-weight:700;pointer-events:auto}
+/* Destino táctil de ~32px sin engordar la tira: el padding vertical sube de 2px
+   a 9px y el margen negativo de 7px lo descuenta del flujo, así que la altura
+   visible de .crumbs no cambia (medida: 18px antes y después). */
+.crumbs a{color:#7dd3fc;text-decoration:none;padding:9px 4px;margin:-7px 0;border-radius:6px}
+.crumbs a:hover{color:#fff;background:rgba(56,189,248,.16)}
+.crumbs a:focus-visible{outline:2px solid #38bdf8;outline-offset:1px}
+.crumbs span[aria-current]{color:#e2e8f0}
+.crumbs i{color:#64748b;font-style:normal}
+.siblings{display:flex;justify-content:space-between;gap:8px;width:100%;margin-top:10px;pointer-events:auto}
+.siblings .btn{flex:0 1 auto}
+/* Mismo tratamiento de foco que .atlas-back, .crumbs a, .indice__filter y
+   .indice__item: sin esto los hermanos eran el único salto sin foco visible. */
+.siblings .btn:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+.siblings .btn--next{margin-left:auto}
+
+.indice-page{margin:0;padding:0;background:#020617;overflow:auto}
+.indice{max-width:1100px;margin:0 auto;padding:24px 18px 60px;display:grid;gap:16px}
+.indice__head{position:static;width:auto;max-height:none}
+.indice__filter{width:100%;margin-top:12px;padding:10px 12px;border:1px solid rgba(56,189,248,.35);border-radius:12px;background:rgba(2,6,23,.85);color:#e2e8f0;font-size:14px}
+.indice__filter:focus-visible{outline:2px solid #38bdf8;outline-offset:1px}
+.indice__count{margin:8px 0 0;color:#94a3b8;font-size:12px;font-weight:700}
+.indice__group{padding:18px}
+.indice__group h2{margin:0 0 12px;font-size:18px}
+.indice__list{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.indice__item{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid rgba(148,163,184,.18);border-radius:12px;color:#e2e8f0;text-decoration:none}
+.indice__item:hover{border-color:#38bdf8;background:rgba(56,189,248,.08)}
+.indice__item:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+.indice__detail{color:#94a3b8;font-size:12px}
+.indice__badge{color:#fbbf24;font-size:11px;font-weight:700}
+.indice__empty{margin:0;padding:18px;color:#94a3b8;font-size:14px;text-align:center}

@@ -7,7 +7,21 @@ import { animateStellarObject, createQuasarObject, createStarObject } from "./st
 const params=new URLSearchParams(location.search),slug=document.body.dataset.universeSlug||params.get("slug"),object=KNOWN_STAR_BY_SLUG[slug]||KNOWN_GALAXY_BY_SLUG[slug];
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");
 if(!object){
-  title.textContent="Objeto no encontrado";meta.textContent="Archivo del universo";description.textContent="No existe una ficha para el identificador solicitado.";interaction.textContent="Vuelve al mapa y selecciona una estrella, galaxia o quásar del catálogo.";parentLink.style.display="none";
+  const shell = document.createElement("div");
+  shell.className = "hud";
+  shell.innerHTML = `
+    <section class="panel side-card">
+      <p class="eyebrow">Archivo del universo</p>
+      <h1>No encontramos ese objeto</h1>
+      <p>El identificador <code id="slugEcho"></code> no corresponde a ninguna
+      estrella ni galaxia de esta maqueta.</p>
+      <div class="bottom-actions">
+        <a class="btn" href="./indice.html">Ver el índice del universo</a>
+        <a class="btn" href="./index.html">Volver a la escena 3D</a>
+      </div>
+    </section>`;
+  shell.querySelector("#slugEcho").textContent = slug || "(vacío)";
+  document.body.replaceChildren(shell);
   throw new Error(`Universe object not found: ${slug}`);
 }
 title.textContent=object.name;meta.textContent=`${object.type} · ${object.constellation}`;description.textContent=object.description;interaction.textContent=object.behavior||"Objeto astronómico integrado en la vista ampliada del universo.";parentLink.style.display="none";

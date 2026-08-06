@@ -35,6 +35,7 @@ function generatedStarsFromConstellations(){
       items.push({
         slug:point.starSlug,
         kind:"star",
+        generated:true,
         name:point.name,
         type:point.type||"Estrella principal",
         constellation:constellation.name,

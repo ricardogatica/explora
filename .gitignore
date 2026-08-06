@@ -41,3 +41,12 @@ yarn-error.log*
 *.log
 tmp/
 .cache/
+
+# Andamiaje de ejecución de planes (scratch, no es parte del sitio)
+.superpowers/
+
+# Verificación en navegador: volcados de Playwright y capturas sueltas en la
+# raíz. Las imágenes del sitio viven en assets/ y en las carpetas de materia,
+# así que la regla se limita a la raíz y no las toca.
+.playwright-mcp/
+/*.png
