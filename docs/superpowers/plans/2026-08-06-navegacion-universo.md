@@ -1208,7 +1208,10 @@ Expected: PASS, 32 tests. El test «las páginas del universo cargan nav.js» ah
 
 En `http://localhost:6767/sistema_solar/indice.html`:
 - Cuatro grupos con 10, 108, 88 y 1 entradas; el contador dice «207 fichas».
-- Escribir `mar` en el filtro → aparecen Marte y Mercurio, el contador baja.
+- Escribir `mar` en el filtro → aparece Marte, y el contador baja. Ojo: NO aparece
+Mercurio (su texto de busqueda no contiene «mar»), y si aparecen estrellas cuyo tipo
+contiene «amarilla». Es coincidencia por subcadena, aceptada a proposito: exigir
+coincidencia al inicio de palabra romperia que «gigante» encuentre «supergigante».
 - Escribir `orión` → salen la constelación y sus estrellas (Betelgeuse, Rigel,
   Alnitak…), porque el filtro mira `search`, que incluye la constelación de
   cada estrella aunque la tarjeta no la muestre.
