@@ -135,4 +135,4 @@ function animate(ms){
   renderer.render(scene,camera);requestAnimationFrame(animate);
 }
 
-makeStars();makeMilkyWay();makeGrid();makeGuides();atlas.forEach(drawEntry);renderButtons();updateConstellationPanel(null);requestAnimationFrame(animate);
+makeStars();makeMilkyWay();makeGrid();makeGuides();atlas.forEach(drawEntry);updateConstellationPanel(null);renderButtons();requestAnimationFrame(animate);
