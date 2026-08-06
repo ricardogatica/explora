@@ -1,12 +1,14 @@
 import { breadcrumbFor, resolveContext, siblingsFor } from "./nav-model.js";
 
-const context = resolveContext({
-  dataset: document.body.dataset,
-  search: location.search,
-  filename: location.pathname.split("/").pop() || "index.html"
-});
+function currentContext() {
+  return resolveContext({
+    dataset: document.body.dataset,
+    search: location.search,
+    filename: location.pathname.split("/").pop() || "index.html"
+  });
+}
 
-function renderCrumbs() {
+function renderCrumbs(context) {
   const nav = document.createElement("nav");
   nav.className = "crumbs";
   nav.setAttribute("aria-label", "Ruta de navegación");
@@ -33,7 +35,7 @@ function renderCrumbs() {
   return nav;
 }
 
-function renderSiblings() {
+function renderSiblings(context) {
   const { prev, next } = siblingsFor(context.slug, { filename: context.filename });
   if (!prev && !next) return null;
 
@@ -58,15 +60,41 @@ function renderSiblings() {
   return nav;
 }
 
-// No inyectar en index.html: ya tiene su propio botón "← Explora" y recibirá
-// un botón "Índice del universo" en tarea posterior. Una miga ahí duplicaría función.
-if (context.page !== "index") {
+// Nodos ya inyectados, para poder repintar sin duplicar ni tener que buscarlos
+// otra vez en un DOM que la vista de turno puede haber tocado.
+let crumbsNode = null;
+let siblingsNode = null;
+
+// Repinta la navegación desde la URL actual. Las vistas que cambian el ?slug=
+// con replaceState (constellations-view.js) la llaman para que la miga no se
+// quede en el cuerpo con el que se entró; así la construcción de migas vive en
+// un solo sitio y no hay que duplicarla en cada vista.
+export function renderNav() {
+  const context = currentContext();
+
+  // No inyectar en index.html: ya tiene su propio botón "← Explora" (uno para
+  // escritorio en el panel de título y otro flotante para móvil, donde ese
+  // panel se oculta). Una miga ahí duplicaría función.
+  if (context.page === "index") return;
+
   // Preferir .side-card (fichas y la mayoría de páginas).
   // Si no existe, usar el primer .panel (referencias.html y similares).
   const card = document.querySelector(".side-card") || document.querySelector(".panel");
-  if (card) {
-    card.insertBefore(renderCrumbs(), card.firstChild);
-    const siblings = renderSiblings();
-    if (siblings) (card.querySelector(".bottom-actions") || card).appendChild(siblings);
+  if (!card) return;
+
+  const crumbs = renderCrumbs(context);
+  if (crumbsNode?.isConnected) crumbsNode.replaceWith(crumbs);
+  else card.insertBefore(crumbs, card.firstChild);
+  crumbsNode = crumbs;
+
+  const siblings = renderSiblings(context);
+  if (siblingsNode?.isConnected) {
+    if (siblings) siblingsNode.replaceWith(siblings);
+    else siblingsNode.remove();
+  } else if (siblings) {
+    (card.querySelector(".bottom-actions") || card).appendChild(siblings);
   }
+  siblingsNode = siblings;
 }
+
+renderNav();
