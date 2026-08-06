@@ -45,10 +45,9 @@ function showOverview(){selected=null;controls.target.set(10,0,0);targetDistance
 function updateWheelZoom(){if(Math.abs(zoomVelocity)<.001)return;targetDistance=clampTargetDistance(targetDistance+zoomVelocity);zoomVelocity*=.78}
 
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
-window.addEventListener("pointerdown",event=>{if(event.target!==renderer.domElement)return;pointer.x=event.clientX/innerWidth*2-1;pointer.y=-(event.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(clickables);if(hits.length)focusOn(hits[0].object.userData.slug)});
+window.addEventListener("pointerdown",event=>{pointer.x=event.clientX/innerWidth*2-1;pointer.y=-(event.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(clickables);if(hits.length)focusOn(hits[0].object.userData.slug)});
 resetScale.addEventListener("click",()=>{zoomVelocity=0;showOverview()});
-// Igual que en main.js: la rueda sobre una tarjeta del HUD la desplaza, no hace zoom.
-window.addEventListener("wheel",event=>{if(event.target!==renderer.domElement)return;event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.025},{passive:false});
+window.addEventListener("wheel",event=>{event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.025},{passive:false});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 function animate(){updateWheelZoom();Object.values(objects).forEach(entry=>{entry.mesh.rotation.y+=entry.body.rotationSpeed*2.2});const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,.055);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate)}
 showOverview();requestAnimationFrame(animate);

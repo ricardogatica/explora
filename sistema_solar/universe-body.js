@@ -49,10 +49,7 @@ function updateGalaxyZoom(){
   const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));
   camera.position.lerp(desired,.06);
 }
-// Las fichas de estrella dejan el zoom a OrbitControls (que solo escucha en su
-// canvas); en galaxias el zoom es propio, así que hay que filtrar igual el
-// destino para no robarle la rueda a la tarjeta lateral.
-window.addEventListener("wheel",event=>{if(!isGalaxy)return;if(event.target!==renderer.domElement)return;event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.75},{passive:false});
+window.addEventListener("wheel",event=>{if(!isGalaxy)return;event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.75},{passive:false});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 function animate(ms){const time=ms*.001;if(isGalaxy){animateGalaxyObject(parts,time);updateGalaxyZoom()}else animateStellarObject(parts,time);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate)}
 requestAnimationFrame(animate);
