@@ -203,28 +203,27 @@ test("star.html sin slug no se hace pasar por la portada", () => {
   const crumbs = breadcrumbFor(
     resolveContext({ dataset: {}, search: "", filename: "star.html" })
   );
-  assert.equal(crumbs.length, 4, "star.html sin slug debe tener la miga larga");
-  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice");
-  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado");
-  assert(crumbs.length > 2, "no debe ser la miga colapsada de portada");
+  assert.equal(crumbs.length, 3, "star.html sin slug termina en Índice sin inventar etiqueta");
+  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice como elemento final");
+  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado (es el actual)");
 });
 
 test("slug irresoluble no se hace pasar por la portada", () => {
   const crumbs = breadcrumbFor(
     resolveContext({ dataset: { slug: "no-existe" }, search: "", filename: "earth.html" })
   );
-  assert.equal(crumbs.length, 4, "slug irresoluble debe tener la miga larga");
-  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice");
-  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado");
+  assert.equal(crumbs.length, 3, "slug irresoluble termina en Índice sin inventar etiqueta");
+  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice como elemento final");
+  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado (es el actual)");
 });
 
 test("página futura desconocida no se hace pasar por la portada", () => {
   const crumbs = breadcrumbFor(
     resolveContext({ dataset: {}, search: "", filename: "pagina-que-no-existe.html" })
   );
-  assert.equal(crumbs.length, 4, "página desconocida debe tener la miga larga");
-  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice");
-  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado");
+  assert.equal(crumbs.length, 3, "página desconocida termina en Índice sin inventar etiqueta");
+  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice como elemento final");
+  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado (es el actual)");
 });
 
 test("index.html exactamente 2 elementos en la miga", () => {
@@ -246,4 +245,57 @@ test("indice.html exactamente 3 elementos en la miga", () => {
   assert.equal(crumbs[1].label, "Universo", "segundo elemento es Universo");
   assert.equal(crumbs[2].label, "Índice", "tercer elemento es Índice sin enlace");
   assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado desde sí mismo");
+});
+
+test("última miga de star.html sin slug es Índice sin inventar", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "star.html" })
+  );
+  assert.equal(crumbs.at(-1).label, "Índice", "última etiqueta debe ser Índice, no Universo");
+  assert.equal(crumbs.at(-1).href, null, "no debe estar enlazada");
+});
+
+test("última miga de slug irresoluble es Índice sin inventar", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: { slug: "no-existe" }, search: "", filename: "earth.html" })
+  );
+  assert.equal(crumbs.at(-1).label, "Índice", "última etiqueta debe ser Índice, no Universo");
+  assert.equal(crumbs.at(-1).href, null, "no debe estar enlazada");
+});
+
+test("última miga de página inventada es Índice sin inventar", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "pagina-inventada.html" })
+  );
+  assert.equal(crumbs.at(-1).label, "Índice", "última etiqueta debe ser Índice, no pagina-inventada");
+  assert.equal(crumbs.at(-1).href, null, "no debe estar enlazada");
+});
+
+test("ninguna miga tiene etiquetas duplicadas", () => {
+  const testCases = [
+    { dataset: {}, search: "", filename: "index.html" },
+    { dataset: {}, search: "", filename: "indice.html" },
+    { dataset: { slug: "earth" }, search: "", filename: "earth.html" },
+    { dataset: {}, search: "", filename: "star.html" },
+    { dataset: { slug: "no-existe" }, search: "", filename: "earth.html" },
+    { dataset: {}, search: "", filename: "pagina-inventada.html" }
+  ];
+  for (const testCase of testCases) {
+    const crumbs = breadcrumbFor(resolveContext(testCase));
+    const labels = crumbs.map(c => c.label);
+    const uniqueLabels = new Set(labels);
+    assert.equal(
+      labels.length, uniqueLabels.size,
+      `${testCase.filename || "unknown"} tiene etiquetas duplicadas: ${labels.join(", ")}`
+    );
+  }
+});
+
+test("ficha válida sigue teniendo 4 elementos con nombre correcto", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: { slug: "earth" }, search: "", filename: "earth.html" })
+  );
+  assert.equal(crumbs.length, 4, "ficha válida debe tener 4 elementos");
+  assert.equal(crumbs[3].label, "Tierra", "último elemento es el nombre de la ficha");
+  assert.equal(crumbs[3].href, null, "no debe estar enlazado");
 });

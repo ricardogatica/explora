@@ -179,6 +179,16 @@ export function breadcrumbFor(context) {
     crumbs.push({ label: "Índice", href: null });
     return crumbs;
   }
+
+  // Si es una página desconocida (ni ficha resoluble ni página conocida),
+  // termina en "Índice" sin enlace y sin inventar etiqueta final.
+  const isUnknownPage = context.slug === null && context.page === null && context.kind === "page";
+  if (isUnknownPage) {
+    crumbs.push({ label: "Índice", href: null });
+    return crumbs;
+  }
+
+  // Páginas conocidas o fichas resoluble: Índice enlazado, luego elemento actual.
   crumbs.push({ label: "Índice", href: "./indice.html" });
   crumbs.push({ label: context.name, href: null });
   return crumbs;
