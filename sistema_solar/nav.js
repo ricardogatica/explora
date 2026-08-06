@@ -58,9 +58,15 @@ function renderSiblings() {
   return nav;
 }
 
-const card = document.querySelector(".side-card") || document.querySelector(".panel");
-if (card) {
-  card.insertBefore(renderCrumbs(), card.firstChild);
-  const siblings = renderSiblings();
-  if (siblings) (card.querySelector(".bottom-actions") || card).appendChild(siblings);
+// No inyectar en index.html: ya tiene su propio botón "← Explora" y recibirá
+// un botón "Índice del universo" en tarea posterior. Una miga ahí duplicaría función.
+if (context.page !== "index") {
+  // Preferir .side-card (fichas y la mayoría de páginas).
+  // Si no existe, usar el primer .panel (referencias.html y similares).
+  const card = document.querySelector(".side-card") || document.querySelector(".panel");
+  if (card) {
+    card.insertBefore(renderCrumbs(), card.firstChild);
+    const siblings = renderSiblings();
+    if (siblings) (card.querySelector(".bottom-actions") || card).appendChild(siblings);
+  }
 }
