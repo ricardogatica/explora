@@ -31,7 +31,144 @@ export function makePlanetTexture(kind,colorHex){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return tex;
 }
 
+/* ---------------------------------------------------------------------------
+   Luna procedural con relieve.
+
+   Sin descargar ninguna imagen: se dibuja un campo de alturas con mares,
+   cráteres y sus bordes, y de ahí se derivan el color y un mapa de normales.
+   El mapa de normales es lo que aporta el detalle de verdad — hace que cada
+   cráter reciba luz por un lado y sombra por el otro cuando el cuerpo gira—,
+   y sale gratis del mismo relieve que ya se ha calculado.
+--------------------------------------------------------------------------- */
+
+/* Generador reproducible: la Luna debe salir igual en cada carga. Con
+   Math.random() cambiaría de cara al recargar y sería intesteable. */
+function mulberry32(seed){
+  return function(){
+    seed=seed+0x6D2B79F5|0;
+    let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+
+export function makeMoonMaps({width=1024,height=512,seed=20260806}={}){
+  const rnd=mulberry32(seed);
+  const alturas=new Float32Array(width*height).fill(0.5);
+  const albedo=new Float32Array(width*height).fill(0.62);
+
+  const envolver=x=>((x%width)+width)%width;
+
+  /* Los cráteres se dibujan sobre la esfera, no sobre el rectángulo: cerca de
+     los polos una circunferencia ocupa más longitud, así que se ensancha en x.
+     Sin esto los cráteres polares saldrían aplastados. */
+  const estirado=(y)=>{
+    const lat=(y/height-0.5)*Math.PI;
+    return Math.min(6,1/Math.max(0.17,Math.cos(lat)));
+  };
+
+  const aplicar=(cx,cy,radio,fn)=>{
+    const ex=estirado(cy), rx=radio*ex;
+    for(let y=Math.max(0,Math.floor(cy-radio));y<Math.min(height,Math.ceil(cy+radio));y++){
+      for(let x=Math.floor(cx-rx);x<Math.ceil(cx+rx);x++){
+        const dx=(x-cx)/ex, dy=y-cy;
+        const d=Math.hypot(dx,dy)/radio;
+        if(d>1)continue;
+        fn(envolver(x)+y*width,d);
+      }
+    }
+  };
+
+  // Mares: llanuras basálticas, más oscuras y más lisas que las tierras altas.
+  const mares=[[300,150,95],[420,120,62],[520,180,54],[250,205,45],[380,215,38],[600,140,30]];
+  for(const [cx,cy,r] of mares){
+    aplicar(cx,cy,r,(i,d)=>{
+      const borde=1-d*d;
+      alturas[i]-=0.055*borde;
+      albedo[i]-=0.30*borde;
+    });
+  }
+
+  // Cráteres: muchos pequeños y pocos grandes, como en la realidad.
+  const CRATERES=1400;
+  const jovenes=[];
+  for(let n=0;n<CRATERES;n++){
+    const r=2+Math.pow(rnd(),3.1)*46;
+    const cx=rnd()*width, cy=rnd()*height;
+    aplicar(cx,cy,r,(i,d)=>{
+      // Suelo hundido, borde levantado: el perfil clásico de impacto.
+      const borde=Math.exp(-Math.pow((d-0.86)/0.17,2));
+      const suelo=d<0.78?-(1-d/0.78)*0.5:0;
+      alturas[i]+=(borde*0.85+suelo)*Math.min(1,r/26)*0.09;
+      albedo[i]+=(borde*0.16+suelo*0.10)*Math.min(1,r/26);
+    });
+    if(r>30&&jovenes.length<3)jovenes.push([cx,cy,r]);
+  }
+
+  // Sistemas de rayos: material claro expulsado por los impactos recientes.
+  for(const [cx,cy,r] of jovenes){
+    for(let k=0;k<48;k++){
+      const ang=rnd()*Math.PI*2, largo=r*(3+rnd()*7), grosor=0.5+rnd()*1.6;
+      for(let t=r;t<largo;t+=1){
+        const desvanece=1-(t-r)/(largo-r);
+        const x=cx+Math.cos(ang)*t*estirado(cy), y=cy+Math.sin(ang)*t;
+        if(y<0||y>=height)break;
+        for(let g=-grosor;g<=grosor;g++){
+          const i=envolver(Math.round(x+g))+Math.round(y)*width;
+          albedo[i]+=0.055*desvanece*(1-Math.abs(g)/(grosor+1));
+        }
+      }
+    }
+  }
+
+  // Grano fino: rugosidad del regolito.
+  for(let i=0;i<alturas.length;i++){
+    const n=(rnd()-0.5)*0.03;
+    alturas[i]+=n; albedo[i]+=n*0.8;
+  }
+
+  /* Color */
+  const cColor=document.createElement("canvas");cColor.width=width;cColor.height=height;
+  const dColor=cColor.getContext("2d").createImageData(width,height);
+  for(let i=0;i<albedo.length;i++){
+    const v=Math.max(0,Math.min(1,albedo[i]))*255;
+    dColor.data[i*4]=v*1.02; dColor.data[i*4+1]=v; dColor.data[i*4+2]=v*0.95; dColor.data[i*4+3]=255;
+  }
+  cColor.getContext("2d").putImageData(dColor,0,0);
+
+  /* Normales derivadas del relieve, por diferencias centrales. */
+  const cNormal=document.createElement("canvas");cNormal.width=width;cNormal.height=height;
+  const dNormal=cNormal.getContext("2d").createImageData(width,height);
+  const RELIEVE=2.6;
+  for(let y=0;y<height;y++){
+    const arriba=y>0?y-1:0, abajo=y<height-1?y+1:height-1;
+    for(let x=0;x<width;x++){
+      const dzdx=(alturas[envolver(x+1)+y*width]-alturas[envolver(x-1)+y*width])*RELIEVE;
+      const dzdy=(alturas[x+abajo*width]-alturas[x+arriba*width])*RELIEVE;
+      const len=Math.hypot(dzdx,dzdy,1);
+      const i=(x+y*width)*4;
+      dNormal.data[i]=(-dzdx/len*0.5+0.5)*255;
+      dNormal.data[i+1]=(-dzdy/len*0.5+0.5)*255;
+      dNormal.data[i+2]=(1/len*0.5+0.5)*255;
+      dNormal.data[i+3]=255;
+    }
+  }
+  cNormal.getContext("2d").putImageData(dNormal,0,0);
+
+  const map=new THREE.CanvasTexture(cColor);map.colorSpace=THREE.SRGBColorSpace;
+  const normalMap=new THREE.CanvasTexture(cNormal);
+  return {map,normalMap};
+}
+
 export function materialForBody(body,slug,stage="modern"){
+  if(slug==="moon"){
+    const {map,normalMap}=makeMoonMaps();
+    return new THREE.MeshStandardMaterial({
+      map,normalMap,
+      normalScale:new THREE.Vector2(1.5,1.5),
+      roughness:0.96,metalness:0
+    });
+  }
   if(slug==="sun")return new THREE.MeshBasicMaterial({map:makePlanetTexture("sun",body.color)});
   const kind=slug==="earth"?`earth-${stage}`:slug;
   return new THREE.MeshStandardMaterial({map:makePlanetTexture(kind,body.color),roughness:1});

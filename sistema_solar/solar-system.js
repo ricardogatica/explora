@@ -21,6 +21,17 @@ export const TIMELINE_EVENTS = [
   {id:"today",name:"Hoy",time:"Presente",zoom:5,earthStage:"modern",desc:"La Tierra actual presenta continentes, océanos, atmósfera oxigenada, clima activo y vida compleja."}
 ];
 
+/* Cuánto se frena el giro de los cuerpos sobre su eje.
+
+   Sin frenar, Júpiter daba una vuelta cada 19 segundos y la Tierra cada 31:
+   demasiado para observar la superficie, y mareante junto al giro de cámara.
+   Con 4 la Tierra tarda unos dos minutos, que deja mirar sin prisa y sigue
+   dejando claro que el planeta rota.
+
+   Las velocidades relativas entre cuerpos no se tocan: siguen ordenadas como
+   los días reales, con Júpiter el más rápido y Venus el más lento. */
+export const ROTATION_SLOWDOWN = 4;
+
 export const SOLAR_SYSTEM_BEHAVIOR = {
   zoomDistance:{min:6,max:2200,curve:2.2},
   initialZoom:18,

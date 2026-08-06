@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { BODY_DATA } from "./data.js";
+import { BODY_DATA, ROTATION_SLOWDOWN } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody } from "./body-renderer.js";
 
 const slug=document.body.dataset.slug,body=BODY_DATA[slug],parent=body.parent?BODY_DATA[body.parent]:null;
@@ -23,7 +23,7 @@ const maxAnisotropy=renderer.capabilities.getMaxAnisotropy();
 app.appendChild(renderer.domElement);
 
 const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;controls.autoRotate=true;controls.autoRotateSpeed=0.4;
+controls.enableDamping=true;controls.autoRotate=true;controls.autoRotateSpeed=0.4/ROTATION_SLOWDOWN;
 /* Dos esquemas de luz, porque cada uno sirve a un tipo de textura distinto.
 
    Las texturas procedurales necesitan luz de relleno generosa: son planas y sin
@@ -40,11 +40,14 @@ if(usaTexturasReales){
   scene.add(key);
   scene.add(new THREE.HemisphereLight(0x9cc7ff,0x020408,0.055));
 }else{
-  scene.add(new THREE.AmbientLight(0x91b4ff,0.6));
+  // El ambiente azulado del sitio funciona con los planetas de colores, pero
+  // sobre la Luna es falso: es roca gris, y el tinte la volvía celeste.
+  const esRocaGris=slug==="moon"||slug==="mercury";
+  scene.add(new THREE.AmbientLight(esRocaGris?0xbfc3cb:0x91b4ff,esRocaGris?0.42:0.6));
   key=new THREE.PointLight(0xffffff,slug==="sun"?4.0:2.4,0,2);
   key.position.copy(sunPosition);
   scene.add(key);
-  const fill=new THREE.DirectionalLight(0x7dd3fc,0.7);
+  const fill=new THREE.DirectionalLight(esRocaGris?0xcdd3dd:0x7dd3fc,esRocaGris?0.35:0.7);
   fill.position.set(-6,2,-4);
   scene.add(fill);
 }
@@ -106,17 +109,19 @@ if(body.satellites?.length){
   });
 }
 
-const focusDistance=Math.max(body.radius*(slug==="sun"?5:8),slug==="moon"?3.2:4.2);
+// La Luna se encuadraba a 23 radios mientras el resto a 8, asi que salia
+// diminuta. Ahora comparte proporcion con los demas cuerpos.
+const focusDistance=Math.max(body.radius*(slug==="sun"?5:8),slug==="moon"?1.2:4.2);
 camera.position.set(0,body.radius*1.15,focusDistance);
 controls.target.set(0,0,0);controls.minDistance=Math.max(body.radius*2.2,0.7);controls.maxDistance=Math.max(focusDistance*6,18);
 
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 function animate(){
-  group.rotation.y+=.0003;
-  bodyMesh.rotation.y+=body.rotationSpeed*(slug==="sun"?2.5:2.1);
+  group.rotation.y+=.0003/ROTATION_SLOWDOWN;
+  bodyMesh.rotation.y+=body.rotationSpeed*(slug==="sun"?2.5:2.1)/ROTATION_SLOWDOWN;
   // Las nubes van algo más rápido que la superficie: la atmósfera no rota
   // solidaria con el suelo.
-  if(cloudLayer)cloudLayer.rotation.y+=body.rotationSpeed*0.34;
+  if(cloudLayer)cloudLayer.rotation.y+=body.rotationSpeed*0.34/ROTATION_SLOWDOWN;
   satelliteObjects.forEach(entry=>{
     entry.angle+=entry.satellite.orbitSpeed;
     entry.group.position.set(Math.cos(entry.angle)*entry.satellite.orbitRadius,Math.sin(entry.angle)*entry.satellite.orbitRadius*.08,Math.sin(entry.angle)*entry.satellite.orbitRadius);
