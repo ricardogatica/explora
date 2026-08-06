@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { drawEpochLand } from "./earth-epochs.js";
 
 export function makePlanetTexture(kind,colorHex){
   const c=document.createElement("canvas");c.width=1024;c.height=512;
@@ -9,12 +10,14 @@ export function makePlanetTexture(kind,colorHex){
   }else if(kind.startsWith("earth-")){
     const oceanColors={"earth-modern":["#083c68","#1f7bbd"],"earth-pangaea":["#0b416d","#2d7cbe"],"earth-breakup1":["#0a3a64","#2d7bb8"],"earth-breakup2":["#0b436f","#3b91cf"],"earth-archaean":["#0c3b47","#1e7a7a"],"earth-proterozoic":["#114f6d","#298f96"],"earth-paleozoic":["#104a76","#2e86bc"],"earth-molten":["#2a0f05","#8b1f0e"]};
     grad.addColorStop(0,oceanColors[kind][0]);grad.addColorStop(1,oceanColors[kind][1]);ctx.fillStyle=grad;ctx.fillRect(0,0,c.width,c.height);
-    function drawMasses(masses,fill,stroke=null){ctx.fillStyle=fill;if(stroke)ctx.strokeStyle=stroke;masses.forEach(m=>{ctx.beginPath();ctx.moveTo(m[0][0],m[0][1]);for(let i=1;i<m.length;i++)ctx.lineTo(m[i][0],m[i][1]);ctx.closePath();ctx.fill();if(stroke)ctx.stroke()})}
     if(kind==="earth-molten"){
       for(let i=0;i<900;i++){ctx.fillStyle=`rgba(255, ${80+Math.random()*100}, 0, ${0.05+Math.random()*0.08})`;ctx.beginPath();ctx.arc(Math.random()*c.width,Math.random()*c.height,10+Math.random()*35,0,Math.PI*2);ctx.fill()}
     }else{
-      const pangea=[[[250,120],[380,90],[520,110],[660,140],[760,190],[770,260],[710,320],[640,350],[600,390],[500,410],[420,400],[340,360],[290,310],[240,250],[220,180]]],breakup1=[[[220,130],[340,100],[430,110],[470,180],[430,260],[330,260],[250,210],[210,170]],[[470,120],[610,140],[720,190],[710,290],[630,330],[540,310],[500,240],[500,170]],[[420,270],[520,300],[570,390],[470,420],[380,380],[370,310]]],breakup2=[[[170,145],[280,115],[330,150],[320,260],[240,300],[180,240]],[[360,100],[460,110],[515,150],[520,230],[470,280],[390,260],[350,200]],[[570,130],[665,180],[670,270],[620,320],[560,290],[540,210]],[[440,290],[520,325],[555,405],[505,455],[435,425],[395,355]],[[740,180],[790,220],[770,280],[725,250]]],modern=[[[110,120],[200,90],[250,115],[260,190],[210,245],[130,225],[95,170]],[[245,235],[315,275],[325,390],[275,465],[215,395],[220,300]],[[385,110],[460,105],[520,130],[550,190],[510,235],[430,210],[390,150]],[[530,145],[670,140],[770,190],[800,260],[710,330],[620,310],[590,240]],[[435,225],[520,255],[540,365],[470,425],[395,355],[390,270]],[[735,350],[810,380],[790,430],[710,415]],[[330,35],[380,20],[440,35],[420,70],[345,65]],[[50,430],[950,430],[910,485],[90,485]]],archaean=[[[220,145],[360,125],[470,145],[520,205],[465,300],[315,290],[215,230]],[[580,180],[710,210],[735,320],[630,350],[555,290]]],proterozoic=[[[180,130],[300,110],[410,125],[450,210],[395,275],[270,290],[180,235]],[[455,135],[600,145],[710,200],[720,300],[620,340],[500,290],[455,220]],[[380,300],[470,330],[500,410],[420,455],[350,390]]],paleozoic=[[[210,125],[350,95],[470,120],[555,175],[540,270],[440,320],[310,300],[225,245]],[[560,165],[700,195],[730,315],[640,350],[555,280]]],fills={"earth-pangaea":"#768f5f","earth-breakup1":"#879b65","earth-breakup2":"#8b9d67","earth-modern":"#6d915f","earth-archaean":"#6f7750","earth-proterozoic":"#7b8658","earth-paleozoic":"#7e915d"},mapping={"earth-pangaea":pangea,"earth-breakup1":breakup1,"earth-breakup2":breakup2,"earth-modern":modern,"earth-archaean":archaean,"earth-proterozoic":proterozoic,"earth-paleozoic":paleozoic};
-      drawMasses(mapping[kind],fills[kind],"rgba(0,0,0,.18)");
+      // Las costas salen de la máscara real de la textura, repartida en placas
+      // y movida según la época: Pangea tiene la forma de África y Sudamérica
+      // encajando de verdad, no un polígono aproximado a ojo.
+      const fills={"earth-pangaea":"#768f5f","earth-breakup1":"#879b65","earth-breakup2":"#8b9d67","earth-modern":"#6d915f","earth-archaean":"#6f7750","earth-proterozoic":"#7b8658","earth-paleozoic":"#7e915d"};
+      drawEpochLand(ctx,c.width,c.height,kind.replace("earth-",""),fills[kind]||"#6d915f");
       for(let i=0;i<600;i++){ctx.fillStyle=`rgba(255,255,255,${0.02+Math.random()*0.03})`;ctx.beginPath();ctx.arc(Math.random()*c.width,Math.random()*c.height,8+Math.random()*26,0,Math.PI*2);ctx.fill()}
       if(kind==="earth-modern"){ctx.fillStyle="rgba(245,248,255,.9)";ctx.fillRect(0,0,c.width,25);ctx.fillRect(0,c.height-25,c.width,25)}
     }
