@@ -849,7 +849,11 @@ la edición a mano no se aplicó.
 
 - [ ] **Step 4: Actualizar `index.html` a mano**
 
-En `sistema_solar/index.html` hay tres cambios. Primero, borrar el bloque `<style>` de las líneas 8-12 completo:
+En `sistema_solar/index.html` hay dos cambios. El botón «Índice del universo»
+**no** se añade aquí: `indice.html` no existe hasta la Task 8, y el test de
+enlaces rotos de la Task 3 fallaría. Lo añade la Task 8.
+
+Primero, borrar el bloque `<style>` de las líneas 8-12 completo:
 
 ```html
   <style>
@@ -859,13 +863,7 @@ En `sistema_solar/index.html` hay tres cambios. Primero, borrar el bloque `<styl
   </style>
 ```
 
-Segundo, añadir el enlace al índice entre los botones de la `info-panel`, después del enlace a `solar-scale.html`:
-
-```html
-        <a class="btn" href="./indice.html">Índice del universo</a>
-```
-
-Tercero, cargar `nav.js` tras `main.js`:
+Segundo, cargar `nav.js` tras `main.js`:
 
 ```html
   <script type="module" src="./main.js"></script>
@@ -984,8 +982,10 @@ Reemplazar el bloque que hoy lanza el error por:
 
 ```js
 if (!object) {
-  document.body.innerHTML = `
-    <div class="hud"><section class="panel side-card">
+  const shell = document.createElement("div");
+  shell.className = "hud";
+  shell.innerHTML = `
+    <section class="panel side-card">
       <nav class="crumbs" aria-label="Ruta de navegación">
         <a href="../index.html">Explora</a>
         <i aria-hidden="true">›</i>
@@ -995,20 +995,27 @@ if (!object) {
       </nav>
       <p class="eyebrow">Archivo del universo</p>
       <h1>No encontramos ese objeto</h1>
-      <p>El identificador <code>${slug ?? "(vacío)"}</code> no corresponde a ninguna
+      <p>El identificador <code id="slugEcho"></code> no corresponde a ninguna
       estrella ni galaxia de esta maqueta.</p>
       <div class="bottom-actions">
         <a class="btn" href="./indice.html">Ver el índice del universo</a>
         <a class="btn" href="./index.html">Volver a la escena 3D</a>
       </div>
-    </section></div>`;
+    </section>`;
+  shell.querySelector("#slugEcho").textContent = slug || "(vacío)";
+  document.body.replaceChildren(shell);
   throw new Error(`Universe object not found: ${slug}`);
 }
 ```
 
+**El slug se escribe con `textContent`, nunca interpolado en `innerHTML`.**
+Viene de la barra de direcciones: interpolarlo permitiría que
+`star.html?slug=<img src=x onerror=…>` inyectara HTML en la página. El resto
+de la plantilla es literal y no lleva datos, así que ahí `innerHTML` es seguro.
+
 El `throw` se mantiene después de pintar el mensaje: corta la ejecución del resto del módulo, que daría errores en cascada al intentar leer propiedades de `object`. La diferencia es que ahora el visitante ve algo útil antes de que se corte.
 
-La miga va escrita a mano y no por `nav.js` porque este código reemplaza `document.body` entero, borrando lo que `nav.js` hubiera inyectado.
+La miga va escrita a mano y no por `nav.js` porque este código reemplaza el `<body>` entero, borrando lo que `nav.js` hubiera inyectado.
 
 - [ ] **Step 3: Comprobar a mano**
 
@@ -1019,6 +1026,12 @@ La miga va escrita a mano y no por `nav.js` porque este código reemplaza `docum
 - `http://localhost:6767/sistema_solar/star.html?slug=inventada` → mensaje legible con los dos botones.
 - `http://localhost:6767/sistema_solar/star.html?slug=alpheratz` → ficha normal de Alpheratz.
 - `http://localhost:6767/sistema_solar/sirius.html` → ficha normal de Sirio.
+- `http://localhost:6767/sistema_solar/star.html?slug=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E`
+  → el mensaje muestra el texto `<img src=x onerror=alert(1)>` literal dentro
+  del `<code>`. **No debe aparecer ninguna alerta ni imagen rota**: si aparece,
+  el slug se está interpolando en `innerHTML` en vez de asignarse con
+  `textContent`.
+- El botón «Ver el índice del universo» da 404 hasta la Task 8. Es esperado.
 
 Ctrl+C.
 
@@ -1170,12 +1183,24 @@ Al final de `sistema_solar/styles.css`:
 .indice__badge{color:#fbbf24;font-size:11px;font-style:normal;font-weight:700}
 ```
 
-- [ ] **Step 4: Correr los tests**
+- [ ] **Step 4: Enlazar el índice desde la escena 3D**
+
+Ahora que `indice.html` existe, añadir el botón en `sistema_solar/index.html`,
+entre los botones de la `info-panel`, después del enlace a `solar-scale.html`:
+
+```html
+        <a class="btn" href="./indice.html">Índice del universo</a>
+```
+
+Va aquí y no en la Task 5 a propósito: añadirlo antes de que la página existiera
+habría roto el test de enlaces locales de la Task 3.
+
+- [ ] **Step 5: Correr los tests**
 
 Run: `node --test tests/`
-Expected: PASS, 32 tests. El test «las páginas del universo cargan nav.js» ahora cubre también `indice.html`, y el de enlaces locales valida los destinos de la nueva página.
+Expected: PASS, 32 tests. El test «las páginas del universo cargan nav.js» ahora cubre también `indice.html`, y el de enlaces locales valida tanto los destinos de la nueva página como el botón recién añadido.
 
-- [ ] **Step 5: Comprobar a mano**
+- [ ] **Step 6: Comprobar a mano**
 
 ```bash
 ./run.sh
@@ -1196,10 +1221,10 @@ En `http://localhost:6767/sistema_solar/indice.html`:
 
 Ctrl+C.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add sistema_solar/indice.html sistema_solar/indice.js sistema_solar/styles.css
+git add sistema_solar/indice.html sistema_solar/indice.js sistema_solar/styles.css sistema_solar/index.html
 git commit -m "feat(nav): índice filtrable de las 207 fichas del universo"
 ```
 

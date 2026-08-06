@@ -41,3 +41,6 @@ yarn-error.log*
 *.log
 tmp/
 .cache/
+
+# Andamiaje de ejecución de planes (scratch, no es parte del sitio)
+.superpowers/
