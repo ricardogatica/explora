@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA } from "./data.js";
-import { createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
+import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody } from "./body-renderer.js";
 
 const slug=document.body.dataset.slug,body=BODY_DATA[slug],parent=body.parent?BODY_DATA[body.parent]:null;
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");
@@ -14,13 +14,40 @@ const app=document.getElementById("app"),scene=new THREE.Scene();
 scene.fog=new THREE.FogExp2(0x020617,0.0022);
 const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.01,4000);
 const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;app.appendChild(renderer.domElement);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;
+// Gestión de color para las 10 fichas: sin tone mapping los colores salen
+// lavados y las texturas se emborronan al mirarlas en ángulo. Mejora también
+// a los nueve cuerpos que siguen con textura procedural, sin descargar nada.
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+const maxAnisotropy=renderer.capabilities.getMaxAnisotropy();
+app.appendChild(renderer.domElement);
 
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true;controls.autoRotate=true;controls.autoRotateSpeed=0.4;
-scene.add(new THREE.AmbientLight(0x91b4ff,0.6));
-const key=new THREE.PointLight(0xffffff,slug==="sun"?4.0:2.4,0,2);key.position.set(6,3,4);scene.add(key);
-const fill=new THREE.DirectionalLight(0x7dd3fc,0.7);fill.position.set(-6,2,-4);scene.add(fill);
+/* Dos esquemas de luz, porque cada uno sirve a un tipo de textura distinto.
+
+   Las texturas procedurales necesitan luz de relleno generosa: son planas y sin
+   ella no se lee el volumen. Las fotorrealistas necesitan lo contrario, un Sol
+   duro y casi nada de relleno, porque su realismo vive en el contraste del
+   terminador y en las luces de ciudad de la cara oscura. Iluminar una textura
+   fotográfica con el esquema plano la deja lechosa y borra la noche. */
+const usaTexturasReales=hasPhotorealTextures(body);
+const sunPosition=new THREE.Vector3(6,3,4);
+let key;
+if(usaTexturasReales){
+  key=new THREE.DirectionalLight(0xffffff,3.9);
+  key.position.copy(sunPosition);
+  scene.add(key);
+  scene.add(new THREE.HemisphereLight(0x9cc7ff,0x020408,0.055));
+}else{
+  scene.add(new THREE.AmbientLight(0x91b4ff,0.6));
+  key=new THREE.PointLight(0xffffff,slug==="sun"?4.0:2.4,0,2);
+  key.position.copy(sunPosition);
+  scene.add(key);
+  const fill=new THREE.DirectionalLight(0x7dd3fc,0.7);
+  fill.position.set(-6,2,-4);
+  scene.add(fill);
+}
 
 function starField(count,radius,size,opacity){
   const g=new THREE.BufferGeometry(),pos=new Float32Array(count*3);
@@ -44,6 +71,26 @@ const satelliteObjects=[];
 const detailStage=slug==="earth"?"modern":"modern";
 bodyMesh=createBodyMesh(body,slug,{stage:detailStage});
 group.add(bodyMesh);
+
+/* Carga progresiva: la procedural se ve desde el primer fotograma y la
+   fotorrealista la sustituye cuando sus mapas han llegado. Si la descarga
+   falla, se queda la procedural: nadie ve una esfera negra. */
+let cloudLayer=null;
+if(usaTexturasReales){
+  const sunDirection={value:sunPosition.clone().normalize()};
+  loadPhotorealBody(body,{radius:body.radius,sunDirection,anisotropy:maxAnisotropy})
+    .then(photoreal=>{
+      group.remove(bodyMesh);
+      bodyMesh.geometry.dispose();bodyMesh.material.dispose();
+      photoreal.group.rotation.copy(bodyMesh.rotation);
+      group.add(photoreal.group);
+      bodyMesh=photoreal.group;
+      cloudLayer=photoreal.cloudLayer;
+    })
+    .catch(error=>{
+      console.warn(`No se pudieron cargar las texturas de ${body.name}; se mantiene la vista procedural.`,error);
+    });
+}
 if(slug==="sun"){glow=createSunGlow(body.radius,1.16);group.add(glow)}
 if(slug==="saturn"){rings=createSaturnRings(body.radius);bodyMesh.add(rings)}
 if(body.satellites?.length){
@@ -67,6 +114,9 @@ window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camer
 function animate(){
   group.rotation.y+=.0003;
   bodyMesh.rotation.y+=body.rotationSpeed*(slug==="sun"?2.5:2.1);
+  // Las nubes van algo más rápido que la superficie: la atmósfera no rota
+  // solidaria con el suelo.
+  if(cloudLayer)cloudLayer.rotation.y+=body.rotationSpeed*0.34;
   satelliteObjects.forEach(entry=>{
     entry.angle+=entry.satellite.orbitSpeed;
     entry.group.position.set(Math.cos(entry.angle)*entry.satellite.orbitRadius,Math.sin(entry.angle)*entry.satellite.orbitRadius*.08,Math.sin(entry.angle)*entry.satellite.orbitRadius);
