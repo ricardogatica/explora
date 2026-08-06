@@ -101,9 +101,9 @@ function updateStarPanel(entry,point,starData){
   if(starData){starFile.href=starData.file||`${starData.slug}.html`;starFile.textContent=`Abrir archivo de ${starData.name}`;starFile.style.display="inline-flex"}else{starFile.style.display="none"}
 }
 function shortestAngleDelta(from,to){let delta=(to-from+Math.PI)%(Math.PI*2)-Math.PI;return delta<-Math.PI?delta+Math.PI*2:delta}
-function focusEntry(entry){if(!entry)return;updateConstellationPanel(entry);const ra=entry.ra/24*Math.PI*2,dec=THREE.MathUtils.degToRad(entry.dec);targetYaw+=shortestAngleDelta(targetYaw,-ra);targetPitch=dec;targetFov=Math.min(targetFov,46);history.replaceState(null,"",`?slug=${entry.slug}`)}
+function focusEntry(entry){if(!entry)return;updateConstellationPanel(entry);const ra=entry.ra/24*Math.PI*2,dec=THREE.MathUtils.degToRad(entry.dec);targetYaw+=shortestAngleDelta(targetYaw,-ra);targetPitch=dec;targetFov=Math.min(targetFov,46);history.replaceState(null,"",`?slug=${encodeURIComponent(entry.slug)}`)}
 function setZoom(delta){targetFov=THREE.MathUtils.clamp(targetFov+delta,24,104)}
-function resetView(){targetYaw=0;targetPitch=0;targetRoll=0;targetFov=76;updateConstellationPanel(null)}
+function resetView(){targetYaw=0;targetPitch=0;targetRoll=0;targetFov=76;updateConstellationPanel(null);const url=new URL(location.href);url.searchParams.delete("slug");history.replaceState(null,"",`${url.pathname}${url.search}${url.hash}`)}
 
 window.addEventListener("pointerdown",event=>{if(event.target!==renderer.domElement)return;dragging=true;dragMoved=false;lastX=event.clientX;lastY=event.clientY});
 window.addEventListener("pointermove",event=>{if(!dragging)return;const dx=event.clientX-lastX,dy=event.clientY-lastY;dragMoved=dragMoved||Math.abs(dx)+Math.abs(dy)>4;if(event.shiftKey){targetRoll+=dx*.006}else{targetYaw-=dx*.004;targetPitch-=dy*.004}lastX=event.clientX;lastY=event.clientY});
