@@ -63,9 +63,13 @@ test("las páginas del universo cargan nav.js", () => {
 // ← Explora de index.html vive dentro de .title-panel, oculto bajo 780px.
 const NAV_SKIPS = new Set(["index.html"]);
 
-test("las 26 páginas llegan a la portada: o enlazan ../index.html o cargan nav.js", () => {
+// El umbral es un suelo, no una igualdad: añadir una página al módulo es
+// legítimo y no debe romper este test. Lo que se comprueba es que TODAS
+// lleguen a la portada, no cuántas haya. El suelo solo protege de que el
+// glob deje de encontrar archivos y el bucle pase en vacío.
+test("todas las páginas llegan a la portada: o enlazan ../index.html o cargan nav.js", () => {
   const pages = readdirSync(UNIVERSE).filter(name => name.endsWith(".html"));
-  assert.equal(pages.length, 26, `esperaba 26 páginas, hay ${pages.length}`);
+  assert.ok(pages.length >= 26, `esperaba al menos 26 páginas, hay ${pages.length}`);
   for (const page of pages) {
     const html = readFileSync(join(UNIVERSE, page), "utf8");
     const linkToHome = html.includes('href="../index.html"');
