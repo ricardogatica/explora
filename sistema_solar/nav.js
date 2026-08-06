@@ -60,6 +60,38 @@ function renderSiblings(context) {
   return nav;
 }
 
+// .hud es pointer-events:none para dejar pasar el arrastre al canvas, pero
+// .side-card lo revierte (styles.css) porque con overflow:auto necesita recibir
+// la rueda. Los manejadores de la escena 3D (main.js, solar-scale.js,
+// universe-body.js, constellations-view.js) escuchan en window en fase de
+// burbujeo, así que cortar la propagación en la propia tarjeta basta para que no
+// los alcance: la escena no se toca.
+//
+//  - wheel: sin esto la rueda sobre la tarjeta la desplazaría y haría zoom a la
+//    vez. Al no llegar a window tampoco se llama a su preventDefault, y el
+//    navegador desplaza la tarjeta con normalidad. Solo se corta si la tarjeta
+//    desborda: cuando no hay nada que desplazar (solar-scale.html no desborda en
+//    ningún viewport probado) quitarle el zoom a la escena sería coste sin
+//    beneficio. Se comprueba en cada evento porque el desborde depende del
+//    viewport y de lo que la vista haya pintado dentro.
+//  - pointerdown: la tarjeta es pulsable en toda su superficie, no solo en
+//    .bottom-actions, así que sin esto cualquier pulsación lanzaría además el
+//    raycast y podría reenfocar el cuerpo que queda detrás.
+//
+// Se aplica antes de cualquier return de renderNav(): esa función se salta
+// index.html y las páginas sin tarjeta, pero el aislamiento tiene que valer para
+// cualquier página con .side-card, inyecte migas o no. Es idempotente, así que
+// los repintados de constellations-view.js no acumulan manejadores.
+function isolateCardFromScene() {
+  const card = document.querySelector(".side-card");
+  if (!card || card.dataset.sceneIsolated === "true") return;
+  card.dataset.sceneIsolated = "true";
+  card.addEventListener("wheel", event => {
+    if (card.scrollHeight > card.clientHeight) event.stopPropagation();
+  }, { passive: true });
+  card.addEventListener("pointerdown", event => event.stopPropagation());
+}
+
 // Nodos ya inyectados, para poder repintar sin duplicar ni tener que buscarlos
 // otra vez en un DOM que la vista de turno puede haber tocado.
 let crumbsNode = null;
@@ -70,6 +102,7 @@ let siblingsNode = null;
 // quede en el cuerpo con el que se entró; así la construcción de migas vive en
 // un solo sitio y no hay que duplicarla en cada vista.
 export function renderNav() {
+  isolateCardFromScene();
   const context = currentContext();
 
   // No inyectar en index.html: ya tiene su propio botón "← Explora" (uno para
