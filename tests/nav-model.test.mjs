@@ -198,3 +198,52 @@ test("toda página tiene la portada a un clic", () => {
     assert.equal(crumbs[0].href, "../index.html", `${filename} no llega a la portada`);
   }
 });
+
+test("star.html sin slug no se hace pasar por la portada", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "star.html" })
+  );
+  assert.equal(crumbs.length, 4, "star.html sin slug debe tener la miga larga");
+  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice");
+  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado");
+  assert(crumbs.length > 2, "no debe ser la miga colapsada de portada");
+});
+
+test("slug irresoluble no se hace pasar por la portada", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: { slug: "no-existe" }, search: "", filename: "earth.html" })
+  );
+  assert.equal(crumbs.length, 4, "slug irresoluble debe tener la miga larga");
+  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice");
+  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado");
+});
+
+test("página futura desconocida no se hace pasar por la portada", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "pagina-que-no-existe.html" })
+  );
+  assert.equal(crumbs.length, 4, "página desconocida debe tener la miga larga");
+  assert.equal(crumbs[2].label, "Índice", "debe incluir Índice");
+  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado");
+});
+
+test("index.html exactamente 2 elementos en la miga", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "index.html" })
+  );
+  assert.equal(crumbs.length, 2, "index.html debe tener miga colapsada");
+  assert.equal(crumbs[0].label, "Explora", "primer elemento es Explora");
+  assert.equal(crumbs[1].label, "Universo", "segundo elemento es Universo sin enlace");
+  assert.equal(crumbs[1].href, null, "Universo no debe estar enlazado en portada");
+});
+
+test("indice.html exactamente 3 elementos en la miga", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "indice.html" })
+  );
+  assert.equal(crumbs.length, 3, "indice.html debe tener 3 elementos");
+  assert.equal(crumbs[0].label, "Explora", "primer elemento es Explora");
+  assert.equal(crumbs[1].label, "Universo", "segundo elemento es Universo");
+  assert.equal(crumbs[2].label, "Índice", "tercer elemento es Índice sin enlace");
+  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado desde sí mismo");
+});

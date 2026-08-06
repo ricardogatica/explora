@@ -141,6 +141,12 @@ const PAGE_NAMES = {
   "referencias.html": "Referencias"
 };
 
+// Mapping de filename a page id estructural. Ninguno ≠ ficha o página desconocida.
+const PAGE_IDS = {
+  "index.html": "index",
+  "indice.html": "indice"
+};
+
 export function resolveContext({ dataset = {}, search = "", filename = "" }) {
   const querySlug = new URLSearchParams(search).get("slug");
   const slug = dataset.slug ?? dataset.universeSlug ?? querySlug;
@@ -150,21 +156,26 @@ export function resolveContext({ dataset = {}, search = "", filename = "" }) {
     const kind = entry.group === "solar" ? "body"
       : entry.group === "constellations" ? "constellation"
       : "universe";
-    return { kind, slug: entry.slug, name: entry.name };
+    return { kind, slug: entry.slug, name: entry.name, page: null };
   }
-  return { kind: "page", slug: null, name: PAGE_NAMES[filename] ?? "Universo" };
+  return {
+    kind: "page",
+    slug: null,
+    name: PAGE_NAMES[filename] ?? "Universo",
+    page: PAGE_IDS[filename] ?? null
+  };
 }
 
 export function breadcrumbFor(context) {
   const crumbs = [{ label: "Explora", href: "../index.html" }];
 
-  if (context.kind === "page" && context.name === "Universo") {
+  if (context.page === "index") {
     crumbs.push({ label: "Universo", href: null });
     return crumbs;
   }
   crumbs.push({ label: "Universo", href: "./index.html" });
 
-  if (context.kind === "page" && context.name === "Índice") {
+  if (context.page === "indice") {
     crumbs.push({ label: "Índice", href: null });
     return crumbs;
   }
