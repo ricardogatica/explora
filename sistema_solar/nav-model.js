@@ -109,3 +109,66 @@ export function buildCatalog() {
 export function entryBySlug(slug) {
   return ENTRY_BY_SLUG.get(slug) ?? null;
 }
+
+const EMPTY_SIBLINGS = { prev: null, next: null };
+
+// Solo dos grupos encadenan. Las constelaciones tienen su lista de 88 botones
+// dentro de constellations.html, y la Luna llega a la Tierra por parentLink.
+const CHAINED_GROUPS = { solar: BODY_ORDER, stars: null };
+
+function chainFor(group) {
+  const catalog = buildCatalog().find(g => g.id === group);
+  if (!catalog) return [];
+  const allowed = CHAINED_GROUPS[group];
+  if (allowed === undefined) return [];
+  return allowed ? catalog.entries.filter(e => allowed.includes(e.slug)) : catalog.entries;
+}
+
+export function siblingsFor(slug) {
+  const entry = entryBySlug(slug);
+  if (!entry) return EMPTY_SIBLINGS;
+  const chain = chainFor(entry.group);
+  const index = chain.findIndex(e => e.slug === slug);
+  if (index === -1) return EMPTY_SIBLINGS;
+  return { prev: chain[index - 1] ?? null, next: chain[index + 1] ?? null };
+}
+
+const PAGE_NAMES = {
+  "index.html": "Universo",
+  "indice.html": "Índice",
+  "constellations.html": "Constelaciones",
+  "solar-scale.html": "Escala planetaria",
+  "referencias.html": "Referencias"
+};
+
+export function resolveContext({ dataset = {}, search = "", filename = "" }) {
+  const querySlug = new URLSearchParams(search).get("slug");
+  const slug = dataset.slug ?? dataset.universeSlug ?? querySlug;
+  const entry = slug ? entryBySlug(slug) : null;
+
+  if (entry) {
+    const kind = entry.group === "solar" ? "body"
+      : entry.group === "constellations" ? "constellation"
+      : "universe";
+    return { kind, slug: entry.slug, name: entry.name };
+  }
+  return { kind: "page", slug: null, name: PAGE_NAMES[filename] ?? "Universo" };
+}
+
+export function breadcrumbFor(context) {
+  const crumbs = [{ label: "Explora", href: "../index.html" }];
+
+  if (context.kind === "page" && context.name === "Universo") {
+    crumbs.push({ label: "Universo", href: null });
+    return crumbs;
+  }
+  crumbs.push({ label: "Universo", href: "./index.html" });
+
+  if (context.kind === "page" && context.name === "Índice") {
+    crumbs.push({ label: "Índice", href: null });
+    return crumbs;
+  }
+  crumbs.push({ label: "Índice", href: "./indice.html" });
+  crumbs.push({ label: context.name, href: null });
+  return crumbs;
+}

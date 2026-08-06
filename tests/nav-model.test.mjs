@@ -74,3 +74,127 @@ test("el texto de búsqueda cubre nombre, tipo y constelación", () => {
 test("entryBySlug devuelve null para lo desconocido", () => {
   assert.equal(entryBySlug("no-existe"), null);
 });
+
+import { siblingsFor, resolveContext, breadcrumbFor } from "../sistema_solar/nav-model.js";
+
+test("la Tierra enlaza con Venus y Marte, no con la Luna", () => {
+  const { prev, next } = siblingsFor("earth");
+  assert.equal(prev.slug, "venus");
+  assert.equal(next.slug, "mars");
+});
+
+test("los extremos del sistema solar tienen un solo vecino", () => {
+  assert.equal(siblingsFor("sun").prev, null);
+  assert.equal(siblingsFor("sun").next.slug, "mercury");
+  assert.equal(siblingsFor("neptune").prev.slug, "uranus");
+  assert.equal(siblingsFor("neptune").next, null);
+});
+
+test("la Luna no tiene hermanos: llega a la Tierra por el enlace de padre", () => {
+  assert.deepEqual(siblingsFor("moon"), { prev: null, next: null });
+});
+
+test("las estrellas encadenan por distancia", () => {
+  assert.equal(siblingsFor("proxima-centauri").prev, null);
+  assert.equal(siblingsFor("proxima-centauri").next.slug, "rigil-kentaurus");
+  assert.equal(siblingsFor("ton-618").next, null);
+});
+
+test("las constelaciones no usan hermanos: tienen su lista interna", () => {
+  assert.deepEqual(siblingsFor("orion"), { prev: null, next: null });
+});
+
+test("la galaxia única no tiene hermanos", () => {
+  assert.deepEqual(siblingsFor("milky-way"), { prev: null, next: null });
+});
+
+test("un slug desconocido no rompe", () => {
+  assert.deepEqual(siblingsFor("no-existe"), { prev: null, next: null });
+});
+
+test("el contexto sale del data-slug de los cuerpos", () => {
+  const context = resolveContext({
+    dataset: { slug: "earth" }, search: "", filename: "earth.html"
+  });
+  assert.equal(context.kind, "body");
+  assert.equal(context.slug, "earth");
+  assert.equal(context.name, "Tierra");
+});
+
+test("el contexto sale del data-universe-slug de las estrellas con ficha", () => {
+  const context = resolveContext({
+    dataset: { universeSlug: "sirius" }, search: "", filename: "sirius.html"
+  });
+  assert.equal(context.kind, "universe");
+  assert.equal(context.slug, "sirius");
+  assert.equal(context.name, "Sirio");
+});
+
+test("el contexto sale de ?slug= en la plantilla de estrellas", () => {
+  const context = resolveContext({
+    dataset: {}, search: "?slug=alpheratz", filename: "star.html"
+  });
+  assert.equal(context.kind, "universe");
+  assert.equal(context.slug, "alpheratz");
+  assert.equal(context.name, "Alpheratz");
+});
+
+test("constellations.html con ?slug= se reconoce como constelación", () => {
+  const context = resolveContext({
+    dataset: {}, search: "?slug=orion", filename: "constellations.html"
+  });
+  assert.equal(context.kind, "constellation");
+  assert.equal(context.slug, "orion");
+  assert.equal(context.name, "Orión");
+});
+
+test("las páginas sin ficha se reconocen por nombre de archivo", () => {
+  const context = resolveContext({ dataset: {}, search: "", filename: "referencias.html" });
+  assert.equal(context.kind, "page");
+  assert.equal(context.slug, null);
+  assert.equal(context.name, "Referencias");
+});
+
+test("la miga de una ficha llega hasta la portada", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: { slug: "earth" }, search: "", filename: "earth.html" })
+  );
+  assert.deepEqual(crumbs, [
+    { label: "Explora", href: "../index.html" },
+    { label: "Universo", href: "./index.html" },
+    { label: "Índice", href: "./indice.html" },
+    { label: "Tierra", href: null }
+  ]);
+});
+
+test("la miga del índice no se enlaza a sí misma", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "indice.html" })
+  );
+  assert.deepEqual(crumbs, [
+    { label: "Explora", href: "../index.html" },
+    { label: "Universo", href: "./index.html" },
+    { label: "Índice", href: null }
+  ]);
+});
+
+test("la miga de la escena 3D no se enlaza a sí misma", () => {
+  const crumbs = breadcrumbFor(
+    resolveContext({ dataset: {}, search: "", filename: "index.html" })
+  );
+  assert.deepEqual(crumbs, [
+    { label: "Explora", href: "../index.html" },
+    { label: "Universo", href: null }
+  ]);
+});
+
+test("toda página tiene la portada a un clic", () => {
+  const filenames = [
+    "index.html", "indice.html", "earth.html", "sirius.html",
+    "star.html", "constellations.html", "solar-scale.html", "referencias.html"
+  ];
+  for (const filename of filenames) {
+    const crumbs = breadcrumbFor(resolveContext({ dataset: {}, search: "", filename }));
+    assert.equal(crumbs[0].href, "../index.html", `${filename} no llega a la portada`);
+  }
+});
