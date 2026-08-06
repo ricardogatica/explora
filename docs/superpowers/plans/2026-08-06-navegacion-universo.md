@@ -640,7 +640,7 @@ de la Task 8 no le afecta.
 
 - [ ] **Step 3: Correr la suite completa**
 
-Run: `node --test tests/`
+Run: `node --test`
 Expected: PASS, 30 tests.
 
 - [ ] **Step 4: Commit**
@@ -874,7 +874,7 @@ El `<a class="atlas-back" href="../index.html">` del `title-panel` se queda: `na
 
 - [ ] **Step 5: Correr los tests y ver que pasan**
 
-Run: `node --test tests/`
+Run: `node --test`
 Expected: PASS, 32 tests.
 
 - [ ] **Step 6: Comprobar en el navegador que la escena sigue intacta**
@@ -947,7 +947,7 @@ Ctrl+C.
 
 - [ ] **Step 5: Correr los tests**
 
-Run: `node --test tests/`
+Run: `node --test`
 Expected: PASS, 32 tests.
 
 - [ ] **Step 6: Commit**
@@ -1197,7 +1197,7 @@ habría roto el test de enlaces locales de la Task 3.
 
 - [ ] **Step 5: Correr los tests**
 
-Run: `node --test tests/`
+Run: `node --test`
 Expected: PASS, 32 tests. El test «las páginas del universo cargan nav.js» ahora cubre también `indice.html`, y el de enlaces locales valida tanto los destinos de la nueva página como el botón recién añadido.
 
 - [ ] **Step 6: Comprobar a mano**
@@ -1241,7 +1241,7 @@ git commit -m "feat(nav): índice filtrable de las 207 fichas del universo"
 
 - [ ] **Step 1: Correr la suite completa**
 
-Run: `node --test tests/`
+Run: `node --test`
 Expected: PASS, 32 tests, 0 fallos.
 
 - [ ] **Step 2: Recorrido manual de los criterios del spec**
@@ -1286,7 +1286,7 @@ En `sistema_solar/README.md`, sustituir la sección `## Archivos` por:
 Desde la raíz del repositorio:
 
 ```bash
-node --test tests/
+node --test
 ```
 
 Requiere Node 18 o superior. No hay dependencias que instalar.
