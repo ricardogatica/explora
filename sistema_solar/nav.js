@@ -34,7 +34,7 @@ function renderCrumbs() {
 }
 
 function renderSiblings() {
-  const { prev, next } = siblingsFor(context.slug);
+  const { prev, next } = siblingsFor(context.slug, { filename: context.filename });
   if (!prev && !next) return null;
 
   const nav = document.createElement("nav");

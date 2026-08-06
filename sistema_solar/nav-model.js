@@ -124,6 +124,26 @@ export function entryBySlug(slug) {
   return ENTRY_BY_SLUG.get(slug) ?? null;
 }
 
+// Qué grupos del catálogo puede representar cada página. ENTRY_BY_SLUG es plano
+// y mira los 207 slugs a la vez; sin este filtro, constellations.html?slug=sirius
+// se pinta como la ficha de Sirio (miga «… › Sirio» y botones ‹ Rigil Kentaurus /
+// Procyon ›) encima de un panel que dice «Esfera celeste 3D». Una página que no
+// aparece aquí no restringe nada: las fichas individuales traen su slug en el
+// dataset, escrito en el propio HTML, y no hay ambigüedad que resolver.
+const PAGE_GROUPS = {
+  "constellations.html": ["constellations"],
+  "star.html": ["stars", "galaxies"]
+};
+
+// Resuelve un slug *en el contexto de una página*. Devuelve null cuando el slug
+// existe pero pertenece a otro grupo: para esa página, esa ficha no es suya.
+export function entryForPage(slug, filename = "") {
+  const entry = entryBySlug(slug);
+  if (!entry) return null;
+  const allowed = PAGE_GROUPS[filename];
+  return !allowed || allowed.includes(entry.group) ? entry : null;
+}
+
 const EMPTY_SIBLINGS = { prev: null, next: null };
 
 // Solo dos grupos encadenan. Las constelaciones tienen su lista de 88 botones
@@ -138,8 +158,8 @@ function chainFor(group) {
   return allowed ? catalog.entries.filter(e => allowed.includes(e.slug)) : catalog.entries;
 }
 
-export function siblingsFor(slug) {
-  const entry = entryBySlug(slug);
+export function siblingsFor(slug, { filename = "" } = {}) {
+  const entry = entryForPage(slug, filename);
   if (!entry) return EMPTY_SIBLINGS;
   const chain = chainFor(entry.group);
   const index = chain.findIndex(e => e.slug === slug);
@@ -169,19 +189,20 @@ const KNOWN_PAGE_NAMES = new Set(
 export function resolveContext({ dataset = {}, search = "", filename = "" }) {
   const querySlug = new URLSearchParams(search).get("slug");
   const slug = dataset.slug ?? dataset.universeSlug ?? querySlug;
-  const entry = slug ? entryBySlug(slug) : null;
+  const entry = slug ? entryForPage(slug, filename) : null;
 
   if (entry) {
     const kind = entry.group === "solar" ? "body"
       : entry.group === "constellations" ? "constellation"
       : "universe";
-    return { kind, slug: entry.slug, name: entry.name, page: null };
+    return { kind, slug: entry.slug, name: entry.name, page: null, filename };
   }
   return {
     kind: "page",
     slug: null,
     name: PAGE_NAMES[filename] ?? "Universo",
-    page: PAGE_IDS[filename] ?? null
+    page: PAGE_IDS[filename] ?? null,
+    filename
   };
 }
 

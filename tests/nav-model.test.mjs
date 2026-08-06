@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildCatalog, entryBySlug, normalizeSearch } from "../sistema_solar/nav-model.js";
+import { buildCatalog, entryBySlug, entryForPage, normalizeSearch } from "../sistema_solar/nav-model.js";
 
 test("el catálogo tiene los cuatro grupos en orden", () => {
   const catalog = buildCatalog();
@@ -189,6 +189,43 @@ test("constellations.html con ?slug= se reconoce como constelación", () => {
   assert.equal(context.kind, "constellation");
   assert.equal(context.slug, "orion");
   assert.equal(context.name, "Orión");
+});
+
+test("constellations.html no resuelve un slug estelar ni le da hermanos", () => {
+  // El mapa de slugs es plano sobre los 4 grupos; sin filtro por página,
+  // ?slug=sirius pintaba «… › Sirio» y los botones ‹ Rigil Kentaurus / Procyon ›
+  // sobre el mapa celeste, que según el spec no lleva salto entre hermanos.
+  const context = resolveContext({
+    dataset: {}, search: "?slug=sirius", filename: "constellations.html"
+  });
+  assert.equal(context.kind, "page", "una estrella no es una ficha de constellations.html");
+  assert.equal(context.slug, null, "el slug ajeno no debe adoptarse");
+  assert.equal(context.name, "Constelaciones", "la página sigue siendo el mapa celeste");
+  assert.deepEqual(
+    siblingsFor("sirius", { filename: "constellations.html" }), { prev: null, next: null },
+    "constellations.html no lleva salto entre hermanos"
+  );
+});
+
+test("star.html solo resuelve estrellas y galaxias, no constelaciones", () => {
+  const context = resolveContext({
+    dataset: {}, search: "?slug=orion", filename: "star.html"
+  });
+  assert.equal(context.kind, "page", "una constelación no es una ficha de star.html");
+  assert.equal(context.slug, null);
+  assert.deepEqual(siblingsFor("orion", { filename: "star.html" }), { prev: null, next: null });
+});
+
+test("cada página sigue resolviendo los slugs que sí son suyos", () => {
+  assert.equal(entryForPage("orion", "constellations.html")?.slug, "orion");
+  assert.equal(entryForPage("alpheratz", "star.html")?.slug, "alpheratz");
+  assert.equal(entryForPage("milky-way", "star.html")?.slug, "milky-way");
+  // Una página sin grupos declarados no restringe: su slug va en el dataset.
+  assert.equal(entryForPage("earth", "earth.html")?.slug, "earth");
+  assert.equal(entryForPage("sirius", "sirius.html")?.slug, "sirius");
+  // Y los hermanos siguen saliendo donde sí corresponden.
+  assert.equal(siblingsFor("earth", { filename: "earth.html" }).next?.slug, "mars");
+  assert.equal(siblingsFor("alpheratz", { filename: "star.html" }).next !== undefined, true);
 });
 
 test("las páginas sin ficha se reconocen por nombre de archivo", () => {
