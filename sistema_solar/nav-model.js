@@ -147,6 +147,11 @@ const PAGE_IDS = {
   "indice.html": "indice"
 };
 
+// Conjunto de nombres de página conocidos (excepto el valor por defecto "Universo").
+const KNOWN_PAGE_NAMES = new Set(
+  Object.values(PAGE_NAMES).filter(name => name !== "Universo")
+);
+
 export function resolveContext({ dataset = {}, search = "", filename = "" }) {
   const querySlug = new URLSearchParams(search).get("slug");
   const slug = dataset.slug ?? dataset.universeSlug ?? querySlug;
@@ -180,16 +185,14 @@ export function breadcrumbFor(context) {
     return crumbs;
   }
 
-  // Si es una página desconocida (ni ficha resoluble ni página conocida),
-  // termina en "Índice" sin enlace y sin inventar etiqueta final.
-  const isUnknownPage = context.slug === null && context.page === null && context.kind === "page";
-  if (isUnknownPage) {
-    crumbs.push({ label: "Índice", href: null });
-    return crumbs;
-  }
-
-  // Páginas conocidas o fichas resoluble: Índice enlazado, luego elemento actual.
   crumbs.push({ label: "Índice", href: "./indice.html" });
-  crumbs.push({ label: context.name, href: null });
+
+  // Si es una página desconocida (slug=null, y nombre no está en páginas conocidas),
+  // termina en "Índice" sin agregar elemento final inventado.
+  // Si es una ficha resoluble o una página conocida, agrega el nombre como elemento actual.
+  const isUnknownPage = context.slug === null && !KNOWN_PAGE_NAMES.has(context.name);
+  if (!isUnknownPage) {
+    crumbs.push({ label: context.name, href: null });
+  }
   return crumbs;
 }

@@ -205,7 +205,7 @@ test("star.html sin slug no se hace pasar por la portada", () => {
   );
   assert.equal(crumbs.length, 3, "star.html sin slug termina en Índice sin inventar etiqueta");
   assert.equal(crumbs[2].label, "Índice", "debe incluir Índice como elemento final");
-  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado (es el actual)");
+  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado para ruta de escape");
 });
 
 test("slug irresoluble no se hace pasar por la portada", () => {
@@ -214,7 +214,7 @@ test("slug irresoluble no se hace pasar por la portada", () => {
   );
   assert.equal(crumbs.length, 3, "slug irresoluble termina en Índice sin inventar etiqueta");
   assert.equal(crumbs[2].label, "Índice", "debe incluir Índice como elemento final");
-  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado (es el actual)");
+  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado para ruta de escape");
 });
 
 test("página futura desconocida no se hace pasar por la portada", () => {
@@ -223,7 +223,7 @@ test("página futura desconocida no se hace pasar por la portada", () => {
   );
   assert.equal(crumbs.length, 3, "página desconocida termina en Índice sin inventar etiqueta");
   assert.equal(crumbs[2].label, "Índice", "debe incluir Índice como elemento final");
-  assert.equal(crumbs[2].href, null, "Índice no debe estar enlazado (es el actual)");
+  assert.equal(crumbs[2].href, "./indice.html", "Índice debe estar enlazado para ruta de escape");
 });
 
 test("index.html exactamente 2 elementos en la miga", () => {
@@ -252,7 +252,7 @@ test("última miga de star.html sin slug es Índice sin inventar", () => {
     resolveContext({ dataset: {}, search: "", filename: "star.html" })
   );
   assert.equal(crumbs.at(-1).label, "Índice", "última etiqueta debe ser Índice, no Universo");
-  assert.equal(crumbs.at(-1).href, null, "no debe estar enlazada");
+  assert.equal(crumbs.at(-1).href, "./indice.html", "Índice debe estar enlazado como ruta de escape");
 });
 
 test("última miga de slug irresoluble es Índice sin inventar", () => {
@@ -260,7 +260,7 @@ test("última miga de slug irresoluble es Índice sin inventar", () => {
     resolveContext({ dataset: { slug: "no-existe" }, search: "", filename: "earth.html" })
   );
   assert.equal(crumbs.at(-1).label, "Índice", "última etiqueta debe ser Índice, no Universo");
-  assert.equal(crumbs.at(-1).href, null, "no debe estar enlazada");
+  assert.equal(crumbs.at(-1).href, "./indice.html", "Índice debe estar enlazado como ruta de escape");
 });
 
 test("última miga de página inventada es Índice sin inventar", () => {
@@ -268,7 +268,7 @@ test("última miga de página inventada es Índice sin inventar", () => {
     resolveContext({ dataset: {}, search: "", filename: "pagina-inventada.html" })
   );
   assert.equal(crumbs.at(-1).label, "Índice", "última etiqueta debe ser Índice, no pagina-inventada");
-  assert.equal(crumbs.at(-1).href, null, "no debe estar enlazada");
+  assert.equal(crumbs.at(-1).href, "./indice.html", "Índice debe estar enlazado como ruta de escape");
 });
 
 test("ninguna miga tiene etiquetas duplicadas", () => {
@@ -298,4 +298,133 @@ test("ficha válida sigue teniendo 4 elementos con nombre correcto", () => {
   assert.equal(crumbs.length, 4, "ficha válida debe tener 4 elementos");
   assert.equal(crumbs[3].label, "Tierra", "último elemento es el nombre de la ficha");
   assert.equal(crumbs[3].href, null, "no debe estar enlazado");
+});
+
+test("tabla completa de migas: etiquetas y enlaces exactos", () => {
+  // Tabla del coordinador: cada fila define un caso de prueba.
+  // { filename, dataset, search, expected: [{ label, href }, ...] }
+  const table = [
+    {
+      name: "index.html",
+      filename: "index.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: null }
+      ]
+    },
+    {
+      name: "indice.html",
+      filename: "indice.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: null }
+      ]
+    },
+    {
+      name: "earth.html con slug",
+      filename: "earth.html", dataset: { slug: "earth" }, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" },
+        { label: "Tierra", href: null }
+      ]
+    },
+    {
+      name: "sirius.html con universeSlug",
+      filename: "sirius.html", dataset: { universeSlug: "sirius" }, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" },
+        { label: "Sirio", href: null }
+      ]
+    },
+    {
+      name: "constellations.html con ?slug=orion",
+      filename: "constellations.html", dataset: {}, search: "?slug=orion",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" },
+        { label: "Orión", href: null }
+      ]
+    },
+    {
+      name: "solar-scale.html (página conocida)",
+      filename: "solar-scale.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" },
+        { label: "Escala planetaria", href: null }
+      ]
+    },
+    {
+      name: "constellations.html (página conocida)",
+      filename: "constellations.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" },
+        { label: "Constelaciones", href: null }
+      ]
+    },
+    {
+      name: "referencias.html (página conocida)",
+      filename: "referencias.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" },
+        { label: "Referencias", href: null }
+      ]
+    },
+    {
+      name: "pagina-inventada.html (desconocida)",
+      filename: "pagina-inventada.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" }
+      ]
+    },
+    {
+      name: "star.html sin slug (desconocida)",
+      filename: "star.html", dataset: {}, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" }
+      ]
+    },
+    {
+      name: "earth.html con slug irresoluble (desconocida)",
+      filename: "earth.html", dataset: { slug: "no-existe" }, search: "",
+      expected: [
+        { label: "Explora", href: "../index.html" },
+        { label: "Universo", href: "./index.html" },
+        { label: "Índice", href: "./indice.html" }
+      ]
+    }
+  ];
+
+  for (const { name, filename, dataset, search, expected } of table) {
+    const crumbs = breadcrumbFor(resolveContext({ dataset, search, filename }));
+    assert.equal(
+      crumbs.length, expected.length,
+      `${name}: longitud debe ser ${expected.length}, es ${crumbs.length}`
+    );
+    for (let i = 0; i < expected.length; i++) {
+      assert.equal(
+        crumbs[i].label, expected[i].label,
+        `${name}[${i}]: label debe ser "${expected[i].label}", es "${crumbs[i].label}"`
+      );
+      assert.equal(
+        crumbs[i].href, expected[i].href,
+        `${name}[${i}]: href debe ser "${expected[i].href}", es "${crumbs[i].href}"`
+      );
+    }
+  }
 });
