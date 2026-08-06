@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Constelaciones</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.185.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.185.0/examples/jsm/"}}</script>
+</head>
+<body>
+  <div id="app" class="detail-wrap"></div>
+  <div class="hud">
+    <section class="panel side-card constellation-card">
+      <p class="eyebrow">Mapa estelar</p>
+      <h1>Constelaciones</h1>
+      <div id="constellationList" class="constellation-list"></div>
+      <div class="bottom-actions">
+        <a class="btn" href="./index.html">Volver al universo</a>
+        <a class="btn" href="./referencias.html">Referencias</a>
+        <button id="zoomOutSky" class="btn" type="button">-</button>
+        <button id="zoomInSky" class="btn" type="button">+</button>
+        <button id="resetSky" class="btn" type="button">Reset</button>
+      </div>
+    </section>
+    <section class="panel constellation-detail">
+      <p class="eyebrow" id="detailEyebrow">Constelación</p>
+      <h2 id="constellationTitle">Orión</h2>
+      <div id="constellationMeta" class="meta"></div>
+      <p id="constellationText"></p>
+      <div id="starFacts" class="table"></div>
+      <div class="bottom-actions">
+        <a id="starFile" class="btn" href="./index.html">Abrir archivo</a>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="./constellations-view.js"></script>
+</body>
+</html>

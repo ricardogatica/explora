@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enciclopedia Interactiva de Matemáticas por Nivel y Edad</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css?v=diagnostico-drag">
+  <style>
+    .atlas-back{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;margin-bottom:14px;padding:8px 14px 8px 12px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.06);color:#e2e8f0;font-size:13px;font-weight:700;text-decoration:none}
+    .atlas-back:hover{background:rgba(255,255,255,.14);color:#fff}
+    .atlas-back:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="atlas-back" href="../index.html"><span aria-hidden="true">←</span> Explora</a>
+      <div class="brand">
+        <strong>Matemáticas por Nivel</strong>
+        <span>Edad · Habilidades · Diagnóstico</span>
+      </div>
+      <input id="search" class="search" placeholder="Buscar nivel, habilidad o eje...">
+      <nav id="nav"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <h1 id="heroTitle">Enciclopedia Interactiva</h1>
+        <p id="heroDescription">Matemáticas organizadas por edad, nivel y habilidades esperadas.</p>
+        <div class="toolbar">
+          <button id="homeBtn" class="btn">Inicio</button>
+          <button id="diagnosticBtn" class="btn primary">Diagnóstico</button>
+          <button id="practiceBtn" class="btn">Practicar</button>
+        </div>
+      </section>
+
+      <section id="browseGrid" class="grid">
+        <article id="content" class="card article">
+          <div id="article">Cargando...</div>
+        </article>
+
+        <aside class="card">
+          <h2>Niveles</h2>
+          <p class="small">Selecciona un rango para revisar habilidades esperadas.</p>
+          <div id="levelCards"></div>
+        </aside>
+      </section>
+
+      <section id="diagnostic" class="card hidden">
+        <div id="diagnosticIntro">
+          <h2>Prueba diagnóstica por nivel</h2>
+          <p>Selecciona el rango de edad o nivel que quieres evaluar.</p>
+          <select id="levelSelect" class="select"></select>
+          <div class="toolbar">
+            <button id="startDiagnostic" class="btn primary">Iniciar diagnóstico</button>
+          </div>
+        </div>
+
+        <div id="diagnosticRun" class="hidden">
+          <p id="diagnosticCounter" class="small"></p>
+          <div class="progress"><div id="diagnosticProgress"></div></div>
+          <div id="diagnosticBox" class="exercise"></div>
+          <div id="diagnosticFeedback" class="feedback"></div>
+          <div class="toolbar">
+            <button id="nextDiagnostic" class="btn primary" disabled>Siguiente</button>
+            <button id="resetDiagnostic" class="btn">Reiniciar diagnóstico</button>
+          </div>
+        </div>
+
+        <div id="diagnosticResult" class="hidden"></div>
+      </section>
+
+      <section id="practice" class="card hidden">
+        <h2>Práctica interactiva</h2>
+        <p id="practiceCounter" class="small"></p>
+        <p id="practiceScore" class="small">Puntaje: 0/0</p>
+        <div class="progress"><div id="practiceProgress"></div></div>
+        <div id="practiceBox" class="exercise"></div>
+        <div id="practiceFeedback" class="feedback"></div>
+        <div class="toolbar">
+          <button id="nextPractice" class="btn primary" disabled>Siguiente ejercicio</button>
+          <button id="resetPractice" class="btn">Reiniciar práctica</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="assets/app.js?v=diagnostico-drag"></script>
+</body>
+</html>

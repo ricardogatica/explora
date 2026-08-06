@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Referencias astronómicas</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="references-page">
+  <main class="references-shell">
+    <section class="panel references-hero">
+      <p class="eyebrow">Fuentes del atlas</p>
+      <h1>Referencias astronómicas</h1>
+      <p>Esta página documenta de dónde deben salir los datos para mejorar la precisión de constelaciones, estrellas, límites celestes, distancias y fichas educativas del proyecto.</p>
+      <div class="bottom-actions">
+        <a class="btn" href="./index.html">Volver al universo</a>
+        <a class="btn" href="./constellations.html">Ver constelaciones</a>
+        <a class="btn" href="./solar-scale.html">Ver escala planetaria</a>
+      </div>
+    </section>
+
+    <section class="references-grid">
+      <article class="panel reference-card">
+        <p class="eyebrow">Constelaciones oficiales</p>
+        <h2>IAU</h2>
+        <p>Define las 88 constelaciones como regiones oficiales del cielo. Sirve para nombres, abreviaturas y contexto histórico.</p>
+        <a class="reference-link" href="https://www.iau.org/public/themes/constellations/" target="_blank" rel="noreferrer">iau.org/public/themes/constellations</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Límites celestes</p>
+        <h2>CDS / VizieR VI/49</h2>
+        <p>Catálogo de límites de constelaciones. Sirve para dibujar regiones oficiales y determinar a qué constelación pertenece una coordenada RA/Dec.</p>
+        <a class="reference-link" href="https://cdsarc.u-strasbg.fr/viz-bin/Cat?cat=VI%2F49" target="_blank" rel="noreferrer">cdsarc.u-strasbg.fr/viz-bin/Cat?cat=VI/49</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Figuras y líneas</p>
+        <h2>Stellarium Sky Cultures</h2>
+        <p>Fuente recomendada para reemplazar trazos aproximados por líneas reales de constelaciones. Incluye culturas celestes modernas, occidentales y tradicionales.</p>
+        <a class="reference-link" href="https://github.com/Stellarium/stellarium/tree/master/skycultures" target="_blank" rel="noreferrer">github.com/Stellarium/stellarium/skycultures</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Cultura moderna</p>
+        <h2>Stellarium modern_iau</h2>
+        <p>Base práctica para este atlas: líneas modernas compatibles con las 88 constelaciones IAU. Debe transformarse a nuestro formato <code>points</code> y <code>lines</code>.</p>
+        <a class="reference-link" href="https://github.com/Stellarium/stellarium/tree/master/skycultures/modern_iau" target="_blank" rel="noreferrer">github.com/Stellarium/stellarium/skycultures/modern_iau</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Catálogo estelar simple</p>
+        <h2>HYG Database</h2>
+        <p>Catálogo cómodo para visualizaciones educativas: nombres comunes, coordenadas, magnitud, distancia, color aproximado y referencias cruzadas.</p>
+        <a class="reference-link" href="https://codeberg.org/astronexus/hyg" target="_blank" rel="noreferrer">codeberg.org/astronexus/hyg</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Fichas astronómicas</p>
+        <h2>SIMBAD / CDS</h2>
+        <p>Base de datos de referencia para objetos fuera del sistema solar. Útil para enriquecer fichas de estrellas, nebulosas, galaxias y quásares.</p>
+        <a class="reference-link" href="https://simbad.u-strasbg.fr/simbad/" target="_blank" rel="noreferrer">simbad.u-strasbg.fr/simbad</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Astrometría precisa</p>
+        <h2>Gaia Archive</h2>
+        <p>Fuente para posiciones, paralajes, movimientos propios y fotometría moderna. Es la opción más precisa para ubicar estrellas reales.</p>
+        <a class="reference-link" href="https://gea.esac.esa.int/archive/" target="_blank" rel="noreferrer">gea.esac.esa.int/archive</a>
+      </article>
+
+      <article class="panel reference-card">
+        <p class="eyebrow">Estrellas visibles</p>
+        <h2>Yale Bright Star Catalogue</h2>
+        <p>Catálogo clásico de estrellas visibles a simple vista, útil para poblar una esfera celeste educativa sin traer millones de objetos.</p>
+        <a class="reference-link" href="https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=V/50" target="_blank" rel="noreferrer">vizier.cds.unistra.fr V/50</a>
+      </article>
+    </section>
+
+    <section class="panel references-note">
+      <h2>Uso recomendado</h2>
+      <p>Usar Stellarium para las líneas visibles de cada constelación, HYG para estrellas principales y SIMBAD/Gaia para completar fichas de objetos importantes. Los límites oficiales de VizieR VI/49 son otra capa: sirven para regiones celestes, no para la silueta cultural.</p>
+    </section>
+  </main>
+</body>
+</html>

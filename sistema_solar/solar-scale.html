@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Solar a escala</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">
+    {"imports":{"three":"https://unpkg.com/three@0.185.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.185.0/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <div id="app" class="detail-wrap"></div>
+  <div class="hud">
+    <section class="panel side-card scale-card">
+      <p class="eyebrow">Vista comparativa</p>
+      <h1>Sistema Solar a escala</h1>
+      <p>Los planetas se muestran por tamaño relativo. Haz click en un planeta o satélite para enfocarlo y ver su detalle.</p>
+      <div id="scaleFacts" class="table"></div>
+      <div class="bottom-actions">
+        <a class="btn" href="./index.html">Volver al universo</a>
+        <a class="btn" href="./referencias.html">Referencias</a>
+        <button id="resetScale" class="btn" type="button">Reset</button>
+      </div>
+    </section>
+    <section class="panel orbit-note">
+      <h3 id="scaleTitle">Selecciona un cuerpo</h3>
+      <p id="scaleText">Los planetas rotan sobre su eje; la escena no representa distancias orbitales.</p>
+    </section>
+  </div>
+  <script type="module" src="./solar-scale.js"></script>
+</body>
+</html>

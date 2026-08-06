@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/settings.local.json
+
+# Empaquetados y respaldos (el sitio se sirve desde las carpetas, no desde zips)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.bak
+*.orig
+
+# Servidor local / Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node (por si más adelante entra alguna herramienta)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Logs y temporales
+*.log
+tmp/
+.cache/
