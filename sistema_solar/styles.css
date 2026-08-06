@@ -91,6 +91,12 @@ h1{margin:0;font-size:clamp(22px,3vw,36px);line-height:1.05;letter-spacing:-.04e
 .atlas-back{display:inline-flex;align-items:center;gap:.5rem;min-height:40px;margin-bottom:10px;padding:7px 13px 7px 11px;border:1px solid rgba(56,189,248,.35);border-radius:999px;background:rgba(14,24,44,.9);color:#e2e8f0;font-size:12px;font-weight:700;text-decoration:none;pointer-events:auto}
 .atlas-back:hover{border-color:#38bdf8;color:#fff}
 .atlas-back:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+/* Solo visible en el tramo donde se oculta .title-panel (mismo corte que el
+   @media de arriba): así index.html nunca se queda sin ruta a la portada y
+   tampoco la duplica en escritorio. El bloque va después de la regla display:none
+   a propósito, porque tienen la misma especificidad y gana el último. */
+.atlas-back--mobile{display:none}
+@media (max-width:780px){.atlas-back--mobile{display:inline-flex;position:fixed;left:18px;top:18px;z-index:4;margin:0}}
 .crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 10px;font-size:12px;font-weight:700;pointer-events:auto}
 .crumbs a{color:#7dd3fc;text-decoration:none;padding:2px 4px;border-radius:6px}
 .crumbs a:hover{color:#fff;background:rgba(56,189,248,.16)}

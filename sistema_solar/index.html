@@ -17,6 +17,10 @@
 <body>
   <div id="app"></div>
   <div class="hud">
+    <!-- Ruta a la portada para móvil: por debajo de 780px .title-panel se oculta
+         y con ella el único ← Explora de esta página. Solo se muestra en ese
+         tramo, así que en escritorio no hay Explora duplicado. -->
+    <a class="atlas-back atlas-back--mobile" href="../index.html"><span aria-hidden="true">←</span> Explora</a>
     <section class="panel title-panel">
       <a class="atlas-back" href="../index.html"><span aria-hidden="true">←</span> Explora</a>
       <p class="eyebrow">Explorador 3D educativo</p>
