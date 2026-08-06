@@ -82,6 +82,9 @@ function renderButtons(){
   listEl.innerHTML="";
   const all=document.createElement("button");all.type="button";all.className="constellation-btn active";all.innerHTML="<strong>Mapa completo</strong><span>Esfera celeste 3D solidaria</span>";all.addEventListener("click",resetView);listEl.appendChild(all);
   CONSTELLATIONS.forEach(constellation=>{const button=document.createElement("button");button.type="button";button.className="constellation-btn";button.innerHTML=`<strong>${constellation.name}</strong><span>${constellation.hemisphere}</span>`;button.addEventListener("click",()=>focusEntry(atlas.find(item=>item.slug===constellation.slug)));listEl.appendChild(button)});
+  const requestedSlug = new URLSearchParams(location.search).get("slug");
+  const requested = requestedSlug && atlas.find(item => item.slug === requestedSlug);
+  if (requested) focusEntry(requested);
 }
 function updateConstellationPanel(entry){
   active=entry;detailEyebrow.textContent=entry?"Constelación":"Atlas celeste";
@@ -98,7 +101,7 @@ function updateStarPanel(entry,point,starData){
   if(starData){starFile.href=starData.file||`${starData.slug}.html`;starFile.textContent=`Abrir archivo de ${starData.name}`;starFile.style.display="inline-flex"}else{starFile.style.display="none"}
 }
 function shortestAngleDelta(from,to){let delta=(to-from+Math.PI)%(Math.PI*2)-Math.PI;return delta<-Math.PI?delta+Math.PI*2:delta}
-function focusEntry(entry){if(!entry)return;updateConstellationPanel(entry);const ra=entry.ra/24*Math.PI*2,dec=THREE.MathUtils.degToRad(entry.dec);targetYaw+=shortestAngleDelta(targetYaw,-ra);targetPitch=dec;targetFov=Math.min(targetFov,46)}
+function focusEntry(entry){if(!entry)return;updateConstellationPanel(entry);const ra=entry.ra/24*Math.PI*2,dec=THREE.MathUtils.degToRad(entry.dec);targetYaw+=shortestAngleDelta(targetYaw,-ra);targetPitch=dec;targetFov=Math.min(targetFov,46);history.replaceState(null,"",`?slug=${entry.slug}`)}
 function setZoom(delta){targetFov=THREE.MathUtils.clamp(targetFov+delta,24,104)}
 function resetView(){targetYaw=0;targetPitch=0;targetRoll=0;targetFov=76;updateConstellationPanel(null)}
 
