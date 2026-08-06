@@ -53,11 +53,18 @@ Medido extrayéndolas y recomprimiéndolas:
 
 Frente a los 8402K que ocupa hoy el base64: **una reducción del 77%**.
 
-El mapa de nubes baja un 91% porque es un PNG guardando lo que en la práctica es
-una imagen en escala de grises. Verificado que se puede: `cloudMaterial` usa
-`map` y `alphaMap` sobre la misma textura, y en Three.js `alphaMap` **lee el
-canal verde, no el alfa**; el shader de sombra promedia `.rgb`. El canal alfa no
-se usa en ninguna parte, así que no hay transparencia que preservar.
+> **Corregido durante la implementación.** Esta tabla daba el mapa de nubes en
+> 415K y el total en 1945K. Era falso, y el error merece quedar escrito porque
+> ilustra un fallo de método: verifiqué cómo el shader **lee** la textura
+> (`alphaMap` en Three.js toma el canal verde, no el alfa) y di por hecho que el
+> alfa no se usaba. Nunca comprobé qué **contenía** el PNG. Al medirlo: el verde
+> es casi plano y muy claro (media 204/255), mientras la cobertura real vive en
+> el alfa (media 67/255, rango 7–245). Convertir a JPEG tiraba el alfa y dejaba
+> una máscara casi opaca que tapaba el planeta con una bola blanca.
+>
+> La solución es hornear el alfa en el RGB antes de comprimir. El mapa de nubes
+> queda en **904K** y el total en **2508K**, todavía un **70% menos** que los
+> 8402K del base64. Verificar la interfaz no basta: hay que verificar los datos.
 
 ### Procedencia de las texturas
 
