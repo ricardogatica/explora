@@ -47,3 +47,20 @@ test("ningún enlace local roto en los HTML del universo", () => {
     }
   }
 });
+
+test("las páginas del universo cargan nav.js", () => {
+  const pages = readdirSync(UNIVERSE).filter(name => name.endsWith(".html"));
+  assert.ok(pages.length >= 25, `esperaba al menos 25 páginas, hay ${pages.length}`);
+  for (const page of pages) {
+    const html = readFileSync(join(UNIVERSE, page), "utf8");
+    assert.match(html, /src="\.\/nav\.js"/, `${page} no carga nav.js`);
+  }
+});
+
+test("ninguna página duplica el CSS de .atlas-back en línea", () => {
+  const pages = readdirSync(UNIVERSE).filter(name => name.endsWith(".html"));
+  for (const page of pages) {
+    const html = readFileSync(join(UNIVERSE, page), "utf8");
+    assert.doesNotMatch(html, /\.atlas-back\{/, `${page} todavía lleva el CSS en línea`);
+  }
+});
