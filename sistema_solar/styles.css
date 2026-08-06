@@ -98,13 +98,19 @@ h1{margin:0;font-size:clamp(22px,3vw,36px);line-height:1.05;letter-spacing:-.04e
 .atlas-back--mobile{display:none}
 @media (max-width:780px){.atlas-back--mobile{display:inline-flex;position:fixed;left:18px;top:18px;z-index:4;margin:0}}
 .crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 10px;font-size:12px;font-weight:700;pointer-events:auto}
-.crumbs a{color:#7dd3fc;text-decoration:none;padding:2px 4px;border-radius:6px}
+/* Destino táctil de ~32px sin engordar la tira: el padding vertical sube de 2px
+   a 9px y el margen negativo de 7px lo descuenta del flujo, así que la altura
+   visible de .crumbs no cambia (medida: 18px antes y después). */
+.crumbs a{color:#7dd3fc;text-decoration:none;padding:9px 4px;margin:-7px 0;border-radius:6px}
 .crumbs a:hover{color:#fff;background:rgba(56,189,248,.16)}
 .crumbs a:focus-visible{outline:2px solid #38bdf8;outline-offset:1px}
 .crumbs span[aria-current]{color:#e2e8f0}
 .crumbs i{color:#64748b;font-style:normal}
 .siblings{display:flex;justify-content:space-between;gap:8px;width:100%;margin-top:10px;pointer-events:auto}
 .siblings .btn{flex:0 1 auto}
+/* Mismo tratamiento de foco que .atlas-back, .crumbs a, .indice__filter y
+   .indice__item: sin esto los hermanos eran el único salto sin foco visible. */
+.siblings .btn:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
 .siblings .btn--next{margin-left:auto}
 
 .indice-page{margin:0;padding:0;background:#020617;overflow:auto}
