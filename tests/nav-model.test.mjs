@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildCatalog, entryBySlug } from "../sistema_solar/nav-model.js";
+import { buildCatalog, entryBySlug, normalizeSearch } from "../sistema_solar/nav-model.js";
 
 test("el catálogo tiene los cuatro grupos en orden", () => {
   const catalog = buildCatalog();
@@ -67,8 +67,51 @@ test("el texto de búsqueda cubre nombre, tipo y constelación", () => {
   const betelgeuse = entryBySlug("betelgeuse");
   assert.match(betelgeuse.search, /betelgeuse/);
   assert.match(betelgeuse.search, /supergigante roja/);
-  assert.match(betelgeuse.search, /orión/, "filtrar por constelación debe encontrar sus estrellas");
+  // `search` se guarda sin tildes (ver normalizeSearch): "orion", no "orión".
+  assert.match(betelgeuse.search, /orion/, "filtrar por constelación debe encontrar sus estrellas");
   assert.equal(betelgeuse.search, betelgeuse.search.toLowerCase());
+});
+
+test("normalizeSearch quita tildes y pasa a minúsculas", () => {
+  assert.equal(normalizeSearch("Orión"), "orion");
+  assert.equal(normalizeSearch("ORIÓN"), "orion");
+  assert.equal(normalizeSearch("orion"), "orion");
+  assert.equal(normalizeSearch("Andrómeda"), "andromeda");
+});
+
+test("el campo search nunca lleva tildes, para que el filtro las ignore", () => {
+  for (const entry of buildCatalog().flatMap(g => g.entries)) {
+    assert.equal(
+      entry.search, normalizeSearch(entry.search),
+      `${entry.slug}: search debería estar ya normalizado`
+    );
+  }
+});
+
+test("buscar sin tildes encuentra entradas acentuadas: 'orion' encuentra Orión y Betelgeuse", () => {
+  const needle = normalizeSearch("orion");
+  const orion = entryBySlug("orion");
+  const betelgeuse = entryBySlug("betelgeuse");
+  assert.ok(orion.search.includes(needle), "Orión debe coincidir buscando 'orion' sin tilde");
+  assert.ok(betelgeuse.search.includes(needle), "Betelgeuse debe coincidir por su constelación");
+  // El nombre que ve el visitante conserva la tilde: solo se normaliza el texto de búsqueda.
+  assert.equal(orion.name, "Orión");
+  assert.equal(betelgeuse.name, "Betelgeuse");
+});
+
+test("buscar sin tildes con otra vocal acentuada: 'andromeda' encuentra Andrómeda", () => {
+  const needle = normalizeSearch("andromeda");
+  const andromeda = entryBySlug("andromeda");
+  assert.ok(andromeda.search.includes(needle), "Andrómeda debe coincidir buscando 'andromeda' sin tilde");
+  assert.equal(andromeda.name, "Andrómeda", "el nombre visible conserva la tilde");
+});
+
+test("buscar con la tilde puesta sigue funcionando igual que sin ella", () => {
+  const conTilde = normalizeSearch("Orión");
+  const sinTilde = normalizeSearch("orion");
+  const enMayus = normalizeSearch("ORION");
+  assert.equal(conTilde, sinTilde);
+  assert.equal(conTilde, enMayus);
 });
 
 test("entryBySlug devuelve null para lo desconocido", () => {

@@ -12,8 +12,22 @@ function solarSlugs() {
 
 // El índice filtra sobre `search`, no sobre `detail`: así se puede buscar
 // «Orión» y encontrar Betelgeuse, aunque la tarjeta no muestre la constelación.
+//
+// `search` se guarda sin tildes: en un sitio en español para niños, escribir
+// sin acentos es lo normal, y quedarse con la página vacía cuando la ficha
+// existe sería peor que perder la distinción entre "cañón" y "canon". El
+// filtro en indice.js normaliza la consulta con esta misma función antes de
+// comparar, así ambos lados coinciden sin importar los acentos que use quien
+// escribe.
+export function normalizeSearch(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 function searchText(...parts) {
-  return parts.filter(Boolean).join(" ").toLowerCase();
+  return normalizeSearch(parts.filter(Boolean).join(" "));
 }
 
 function bodyEntry(slug) {
