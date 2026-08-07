@@ -3,6 +3,7 @@ export const saturn = {
   description:"Saturno es famoso por su sistema de anillos, compuesto por hielo, roca y polvo distribuido en bandas.",
   interaction:"Los anillos y sus lunas se moldean mediante resonancias orbitales y la gravedad del planeta.",
   visibleFrom:"solar-system-formation",
+  textures:{day:"textures/saturn/day.jpg",ring:"textures/saturn/ring.png"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"Saturno aún no se ha condensado dentro del disco solar."},
     {from:"solar-system-formation",state:"gas-accretion",title:"Gigante exterior",description:"Crece en la región fría del disco, donde abundan hielos y gases."},

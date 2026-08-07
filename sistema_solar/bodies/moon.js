@@ -3,6 +3,7 @@ export const moon = {
   description:"La Luna es el satélite natural de la Tierra. Está acoplada por marea, por eso siempre muestra casi la misma cara a nuestro planeta.",
   interaction:"Su gravedad produce mareas oceánicas y ayuda a estabilizar la inclinación del eje terrestre.",
   visibleFrom:"moon-formation",
+  textures:{day:"textures/moon/day.jpg"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"La Luna aparece después de la Tierra temprana."},
     {from:"moon-formation",state:"forming",title:"Impacto gigante",description:"Escombros en órbita alrededor de la Tierra se agregan y forman la Luna."},

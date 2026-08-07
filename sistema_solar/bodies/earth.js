@@ -3,10 +3,6 @@ export const earth = {
   description:"La Tierra alberga agua líquida estable, una atmósfera protectora y una biosfera compleja. Su historia geológica incluye supercontinentes como Pangea.",
   interaction:"La gravedad del Sol mantiene la órbita terrestre. La Luna estabiliza parcialmente el eje terrestre y produce mareas.",
   visibleFrom:"earth-formation",
-  // Mapas equirectangulares 2048x1024. Cualquier cuerpo que declare `textures`
-  // recibe material fotorrealista en su ficha; el que no, sigue con la textura
-  // procedural de body-renderer.js. Añadir otro planeta es soltar los archivos
-  // y este campo, sin tocar código.
   textures:{
     day:"textures/earth/day.jpg",
     clouds:"textures/earth/clouds.jpg",
@@ -14,6 +10,7 @@ export const earth = {
     normal:"textures/earth/normal.jpg",
     specular:"textures/earth/specular.jpg"
   },
+  atmosphere:{day:0x1a7aff,sunset:0xff3809},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"La Tierra aparece mucho después, cuando el sistema solar ya está formándose."},
     {from:"earth-formation",state:"molten",title:"Tierra joven",description:"Planeta caliente, parcialmente fundido y golpeado por impactos frecuentes."},

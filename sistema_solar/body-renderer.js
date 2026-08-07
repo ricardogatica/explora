@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { drawEpochLand } from "./earth-epochs.js";
+import { getGlowTexture } from "./star-renderer.js";
 
 export function makePlanetTexture(kind,colorHex){
   const c=document.createElement("canvas");c.width=1024;c.height=512;
@@ -31,144 +32,7 @@ export function makePlanetTexture(kind,colorHex){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return tex;
 }
 
-/* ---------------------------------------------------------------------------
-   Luna procedural con relieve.
-
-   Sin descargar ninguna imagen: se dibuja un campo de alturas con mares,
-   cráteres y sus bordes, y de ahí se derivan el color y un mapa de normales.
-   El mapa de normales es lo que aporta el detalle de verdad — hace que cada
-   cráter reciba luz por un lado y sombra por el otro cuando el cuerpo gira—,
-   y sale gratis del mismo relieve que ya se ha calculado.
---------------------------------------------------------------------------- */
-
-/* Generador reproducible: la Luna debe salir igual en cada carga. Con
-   Math.random() cambiaría de cara al recargar y sería intesteable. */
-function mulberry32(seed){
-  return function(){
-    seed=seed+0x6D2B79F5|0;
-    let t=Math.imul(seed^seed>>>15,1|seed);
-    t=t+Math.imul(t^t>>>7,61|t)^t;
-    return ((t^t>>>14)>>>0)/4294967296;
-  };
-}
-
-export function makeMoonMaps({width=1024,height=512,seed=20260806}={}){
-  const rnd=mulberry32(seed);
-  const alturas=new Float32Array(width*height).fill(0.5);
-  const albedo=new Float32Array(width*height).fill(0.62);
-
-  const envolver=x=>((x%width)+width)%width;
-
-  /* Los cráteres se dibujan sobre la esfera, no sobre el rectángulo: cerca de
-     los polos una circunferencia ocupa más longitud, así que se ensancha en x.
-     Sin esto los cráteres polares saldrían aplastados. */
-  const estirado=(y)=>{
-    const lat=(y/height-0.5)*Math.PI;
-    return Math.min(6,1/Math.max(0.17,Math.cos(lat)));
-  };
-
-  const aplicar=(cx,cy,radio,fn)=>{
-    const ex=estirado(cy), rx=radio*ex;
-    for(let y=Math.max(0,Math.floor(cy-radio));y<Math.min(height,Math.ceil(cy+radio));y++){
-      for(let x=Math.floor(cx-rx);x<Math.ceil(cx+rx);x++){
-        const dx=(x-cx)/ex, dy=y-cy;
-        const d=Math.hypot(dx,dy)/radio;
-        if(d>1)continue;
-        fn(envolver(x)+y*width,d);
-      }
-    }
-  };
-
-  // Mares: llanuras basálticas, más oscuras y más lisas que las tierras altas.
-  const mares=[[300,150,95],[420,120,62],[520,180,54],[250,205,45],[380,215,38],[600,140,30]];
-  for(const [cx,cy,r] of mares){
-    aplicar(cx,cy,r,(i,d)=>{
-      const borde=1-d*d;
-      alturas[i]-=0.055*borde;
-      albedo[i]-=0.30*borde;
-    });
-  }
-
-  // Cráteres: muchos pequeños y pocos grandes, como en la realidad.
-  const CRATERES=1400;
-  const jovenes=[];
-  for(let n=0;n<CRATERES;n++){
-    const r=2+Math.pow(rnd(),3.1)*46;
-    const cx=rnd()*width, cy=rnd()*height;
-    aplicar(cx,cy,r,(i,d)=>{
-      // Suelo hundido, borde levantado: el perfil clásico de impacto.
-      const borde=Math.exp(-Math.pow((d-0.86)/0.17,2));
-      const suelo=d<0.78?-(1-d/0.78)*0.5:0;
-      alturas[i]+=(borde*0.85+suelo)*Math.min(1,r/26)*0.09;
-      albedo[i]+=(borde*0.16+suelo*0.10)*Math.min(1,r/26);
-    });
-    if(r>30&&jovenes.length<3)jovenes.push([cx,cy,r]);
-  }
-
-  // Sistemas de rayos: material claro expulsado por los impactos recientes.
-  for(const [cx,cy,r] of jovenes){
-    for(let k=0;k<48;k++){
-      const ang=rnd()*Math.PI*2, largo=r*(3+rnd()*7), grosor=0.5+rnd()*1.6;
-      for(let t=r;t<largo;t+=1){
-        const desvanece=1-(t-r)/(largo-r);
-        const x=cx+Math.cos(ang)*t*estirado(cy), y=cy+Math.sin(ang)*t;
-        if(y<0||y>=height)break;
-        for(let g=-grosor;g<=grosor;g++){
-          const i=envolver(Math.round(x+g))+Math.round(y)*width;
-          albedo[i]+=0.055*desvanece*(1-Math.abs(g)/(grosor+1));
-        }
-      }
-    }
-  }
-
-  // Grano fino: rugosidad del regolito.
-  for(let i=0;i<alturas.length;i++){
-    const n=(rnd()-0.5)*0.03;
-    alturas[i]+=n; albedo[i]+=n*0.8;
-  }
-
-  /* Color */
-  const cColor=document.createElement("canvas");cColor.width=width;cColor.height=height;
-  const dColor=cColor.getContext("2d").createImageData(width,height);
-  for(let i=0;i<albedo.length;i++){
-    const v=Math.max(0,Math.min(1,albedo[i]))*255;
-    dColor.data[i*4]=v*1.02; dColor.data[i*4+1]=v; dColor.data[i*4+2]=v*0.95; dColor.data[i*4+3]=255;
-  }
-  cColor.getContext("2d").putImageData(dColor,0,0);
-
-  /* Normales derivadas del relieve, por diferencias centrales. */
-  const cNormal=document.createElement("canvas");cNormal.width=width;cNormal.height=height;
-  const dNormal=cNormal.getContext("2d").createImageData(width,height);
-  const RELIEVE=2.6;
-  for(let y=0;y<height;y++){
-    const arriba=y>0?y-1:0, abajo=y<height-1?y+1:height-1;
-    for(let x=0;x<width;x++){
-      const dzdx=(alturas[envolver(x+1)+y*width]-alturas[envolver(x-1)+y*width])*RELIEVE;
-      const dzdy=(alturas[x+abajo*width]-alturas[x+arriba*width])*RELIEVE;
-      const len=Math.hypot(dzdx,dzdy,1);
-      const i=(x+y*width)*4;
-      dNormal.data[i]=(-dzdx/len*0.5+0.5)*255;
-      dNormal.data[i+1]=(-dzdy/len*0.5+0.5)*255;
-      dNormal.data[i+2]=(1/len*0.5+0.5)*255;
-      dNormal.data[i+3]=255;
-    }
-  }
-  cNormal.getContext("2d").putImageData(dNormal,0,0);
-
-  const map=new THREE.CanvasTexture(cColor);map.colorSpace=THREE.SRGBColorSpace;
-  const normalMap=new THREE.CanvasTexture(cNormal);
-  return {map,normalMap};
-}
-
 export function materialForBody(body,slug,stage="modern"){
-  if(slug==="moon"){
-    const {map,normalMap}=makeMoonMaps();
-    return new THREE.MeshStandardMaterial({
-      map,normalMap,
-      normalScale:new THREE.Vector2(1.5,1.5),
-      roughness:0.96,metalness:0
-    });
-  }
   if(slug==="sun")return new THREE.MeshBasicMaterial({map:makePlanetTexture("sun",body.color)});
   const kind=slug==="earth"?`earth-${stage}`:slug;
   return new THREE.MeshStandardMaterial({map:makePlanetTexture(kind,body.color),roughness:1});
@@ -227,13 +91,16 @@ function loadMap(loader,url,{color=false,anisotropy=1}={}){
    directo como specularMap; en Standard habría que invertirlo y reinterpretarlo
    como rugosidad, que no significa lo mismo. */
 function surfaceMaterial(maps){
+  /* El brillo especular azulado solo tiene sentido donde hay mapa que diga
+     dónde está el agua. En un planeta seco como Marte lo dejaría con reflejos
+     de charco, así que sin ese mapa la superficie va mate. */
   const material=new THREE.MeshPhongMaterial({
     map:maps.day,
-    normalMap:maps.normal,
+    normalMap:maps.normal||null,
     normalScale:new THREE.Vector2(0.62,0.62),
-    specularMap:maps.specular,
-    specular:new THREE.Color(0x7dbdff),
-    shininess:18
+    specularMap:maps.specular||null,
+    specular:new THREE.Color(maps.specular?0x7dbdff:0x0a0a0a),
+    shininess:maps.specular?18:4
   });
   material.onBeforeCompile=shader=>{
     shader.fragmentShader=shader.fragmentShader.replace(
@@ -296,9 +163,11 @@ function cloudShadowMaterial(map,sunDirection){
   });
 }
 
-function atmosphereMaterial(sunDirection){
+function atmosphereMaterial(sunDirection,ajustes={}){
+  const dia=new THREE.Color(ajustes.day??0x1a7aff);
+  const borde=new THREE.Color(ajustes.sunset??0xff3809);
   return new THREE.ShaderMaterial({
-    uniforms:{sunDirection},
+    uniforms:{sunDirection,colorDia:{value:dia},colorBorde:{value:borde}},
     vertexShader:`
       varying vec3 vWorldNormal; varying vec3 vWorldPosition;
       void main(){
@@ -308,7 +177,7 @@ function atmosphereMaterial(sunDirection){
         gl_Position=projectionMatrix*viewMatrix*wp;
       }`,
     fragmentShader:`
-      uniform vec3 sunDirection;
+      uniform vec3 sunDirection; uniform vec3 colorDia; uniform vec3 colorBorde;
       varying vec3 vWorldNormal; varying vec3 vWorldPosition;
       void main(){
         vec3 viewDir=normalize(cameraPosition-vWorldPosition);
@@ -316,7 +185,7 @@ function atmosphereMaterial(sunDirection){
         float sunAmount=dot(vWorldNormal,normalize(sunDirection));
         float day=smoothstep(-0.42,0.35,sunAmount);
         float sunsetBand=exp(-pow((sunAmount+0.08)*7.0,2.0));
-        vec3 color=mix(vec3(0.10,0.48,1.0)*(0.28+day*0.72),vec3(1.0,0.22,0.045),sunsetBand*0.55);
+        vec3 color=mix(colorDia*(0.28+day*0.72),colorBorde,sunsetBand*0.55);
         float alpha=rim*(0.18+day*0.72)+sunsetBand*rim*0.16;
         gl_FragColor=vec4(color*alpha*1.25,alpha);
       }`,
@@ -325,41 +194,86 @@ function atmosphereMaterial(sunDirection){
   });
 }
 
-/* Devuelve una promesa con el grupo montado. Rechaza si falta cualquier mapa,
-   para que quien llame pueda quedarse con la procedural sin dejar la escena
-   a medio construir. */
+/* Monta el cuerpo con los mapas que declare, que no tienen por qué ser los
+   cinco. Solo `day` es obligatorio: la Tierra trae el juego completo y el
+   resto de planetas solo su superficie. Cada capa se añade únicamente si
+   existe su mapa, así que Marte no arrastra nubes ni luces de ciudad.
+
+   Rechaza si falla alguna descarga, para que quien llame se quede con la
+   textura procedural en vez de una escena a medio construir. */
 export async function loadPhotorealBody(body,{radius=1,sunDirection,anisotropy=1,segments=160}={}){
   const loader=new THREE.TextureLoader();
   const t=body.textures;
-  const [day,clouds,lights,normal,specular]=await Promise.all([
+  const opcional=(url,color)=>url?loadMap(loader,url,{color,anisotropy}):Promise.resolve(null);
+  const [day,clouds,lights,normal,specular,ring]=await Promise.all([
     loadMap(loader,t.day,{color:true,anisotropy}),
-    loadMap(loader,t.clouds,{color:true,anisotropy}),
-    loadMap(loader,t.lights,{color:true,anisotropy}),
-    loadMap(loader,t.normal,{anisotropy}),
-    loadMap(loader,t.specular,{anisotropy})
+    opcional(t.clouds,true),
+    opcional(t.lights,true),
+    opcional(t.normal,false),
+    opcional(t.specular,false),
+    opcional(t.ring,true)
   ]);
 
   const sun=sunDirection||{value:new THREE.Vector3(1,0.1,0.5).normalize()};
   const group=new THREE.Group();
   const sphere=r=>new THREE.SphereGeometry(radius*r,segments,segments);
 
-  group.add(new THREE.Mesh(sphere(1),surfaceMaterial({day,normal,specular})));
-  group.add(new THREE.Mesh(sphere(1.0015),nightMaterial(lights,sun)));
-  group.add(new THREE.Mesh(sphere(1.0032),cloudShadowMaterial(clouds,sun)));
+  /* El Sol emite su propia luz: con un material que responda a la iluminación
+     saldría medio a oscuras, porque la única fuente de la escena es él mismo. */
+  const superficie=body.emissive
+    ? new THREE.MeshBasicMaterial({map:day})
+    : surfaceMaterial({day,normal,specular});
+  group.add(new THREE.Mesh(sphere(1),superficie));
 
-  const cloudLayer=new THREE.Mesh(sphere(1.0105),new THREE.MeshPhongMaterial({
-    map:clouds,alphaMap:clouds,transparent:true,opacity:0.82,depthWrite:false,
-    side:THREE.FrontSide,specular:new THREE.Color(0x334455),shininess:2
-  }));
-  group.add(cloudLayer);
+  if(lights)group.add(new THREE.Mesh(sphere(1.0015),nightMaterial(lights,sun)));
 
-  group.add(new THREE.Mesh(sphere(1.075),atmosphereMaterial(sun)));
+  let cloudLayer=null;
+  if(clouds){
+    group.add(new THREE.Mesh(sphere(1.0032),cloudShadowMaterial(clouds,sun)));
+    cloudLayer=new THREE.Mesh(sphere(1.0105),new THREE.MeshPhongMaterial({
+      map:clouds,alphaMap:clouds,transparent:true,
+      opacity:body.cloudOpacity??0.82,depthWrite:false,
+      side:THREE.FrontSide,specular:new THREE.Color(0x334455),shininess:2
+    }));
+    group.add(cloudLayer);
+  }
+
+  // Solo tienen halo atmosférico los cuerpos que lo declaran: la Tierra y Venus.
+  if(body.atmosphere)group.add(new THREE.Mesh(sphere(1.075),atmosphereMaterial(sun,body.atmosphere)));
+
+  /* Anillos de Saturno: la textura es una tira radial con transparencia, así
+     que se mapea sobre el anillo por distancia al centro en vez de con las UV
+     del RingGeometry, que van pensadas para otra cosa. */
+  if(ring){
+    const inner=radius*1.24,outer=radius*2.27;
+    const geometria=new THREE.RingGeometry(inner,outer,192);
+    const pos=geometria.attributes.position,uv=geometria.attributes.uv;
+    const v=new THREE.Vector3();
+    for(let i=0;i<pos.count;i++){
+      v.fromBufferAttribute(pos,i);
+      uv.setXY(i,(v.length()-inner)/(outer-inner),0.5);
+    }
+    const anillos=new THREE.Mesh(geometria,new THREE.MeshBasicMaterial({
+      map:ring,side:THREE.DoubleSide,transparent:true,opacity:0.94,depthWrite:false
+    }));
+    anillos.rotation.x=Math.PI/2;
+    group.add(anillos);
+  }
 
   return {group,cloudLayer};
 }
 
-export function createSunGlow(radius,scale=1.16){
-  return new THREE.Mesh(new THREE.SphereGeometry(radius*scale,48,48),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending,depthWrite:false}));
+/* El halo era una esfera sólida con mezcla aditiva: sin desvanecido se veía
+   como un disco plano recortado alrededor del Sol, y con tone mapping ACES
+   ese disco además salía verdoso. Un sprite con degradado radial sí se apaga
+   hacia el borde, que es lo que hace una corona. */
+export function createSunGlow(radius,scale=2.6){
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({
+    map:getGlowTexture(),color:0xffc978,transparent:true,opacity:0.55,
+    blending:THREE.AdditiveBlending,depthWrite:false
+  }));
+  halo.scale.set(radius*scale,radius*scale,1);
+  return halo;
 }
 
 export function createSaturnRings(radius,{inner=1.25,outer=2,segments=64}={}){
