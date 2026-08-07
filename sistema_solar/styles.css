@@ -21,7 +21,9 @@ h1{margin:0;font-size:clamp(22px,3vw,36px);line-height:1.05;letter-spacing:-.04e
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;pointer-events:auto}
 .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(56,189,248,.35);background:rgba(14,24,44,.95);color:var(--text);padding:10px 12px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer}
 .btn:hover{border-color:var(--accent);transform:translateY(-1px)}
-.zoom-panel{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:58px;height:min(500px,calc(100vh - 220px));min-height:280px;padding:14px 10px;display:flex;flex-direction:column;gap:12px;align-items:center;pointer-events:auto}
+/* La barra de zoom iba centrada verticalmente y se metía por detrás del panel
+   de la línea temporal. Ahora se ancla al hueco que queda por encima. */
+.zoom-panel{position:absolute;right:18px;top:96px;bottom:400px;width:58px;min-height:180px;padding:14px 10px;display:flex;flex-direction:column;gap:12px;align-items:center;pointer-events:auto}
 .zoom-label{writing-mode:vertical-rl;transform:rotate(180deg);color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:900}
 #zoomRange{writing-mode:vertical-lr;direction:rtl;width:32px;height:100%;accent-color:var(--accent)}
 .zoom-value{font-size:11px;color:var(--accent);font-weight:900}
