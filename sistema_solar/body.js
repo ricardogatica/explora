@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, ROTATION_SLOWDOWN } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody } from "./body-renderer.js";
+import { addStarfield } from "./starfield.js";
 
 const slug=document.body.dataset.slug,body=BODY_DATA[slug],parent=body.parent?BODY_DATA[body.parent]:null;
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");
@@ -12,7 +13,9 @@ table.innerHTML=`<div class="cell"><strong>Gravedad</strong><span>${body.gravity
 
 const app=document.getElementById("app"),scene=new THREE.Scene();
 scene.fog=new THREE.FogExp2(0x020617,0.0022);
-const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.01,4000);
+// 38 grados y no 55: el cuerpo llena el encuadre y se reduce la deformacion
+// de perspectiva. Es el mismo campo que usa el prototipo de la Tierra.
+const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,0.01,4000);
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;
 // Gestión de color para las 10 fichas: sin tone mapping los colores salen
@@ -52,13 +55,7 @@ if(usaTexturasReales){
   scene.add(fill);
 }
 
-function starField(count,radius,size,opacity){
-  const g=new THREE.BufferGeometry(),pos=new Float32Array(count*3);
-  for(let i=0;i<count;i++){const r=radius*(0.3+Math.random()*0.7),a=Math.random()*Math.PI*2,b=Math.acos(2*Math.random()-1);pos[i*3]=r*Math.sin(b)*Math.cos(a);pos[i*3+1]=r*Math.sin(b)*Math.sin(a);pos[i*3+2]=r*Math.cos(b)}
-  g.setAttribute("position",new THREE.BufferAttribute(pos,3));
-  return new THREE.Points(g,new THREE.PointsMaterial({color:0xdbeafe,size,transparent:true,opacity,depthWrite:false}));
-}
-scene.add(starField(4200,1800,1.2,0.85));
+const cielo=addStarfield(scene,body.radius);
 
 function makeLabel(text,{scale=[.72,.22,1]}={}){
   const canvas=document.createElement("canvas");canvas.width=384;canvas.height=96;
@@ -109,14 +106,19 @@ if(body.satellites?.length){
   });
 }
 
-// La Luna se encuadraba a 23 radios mientras el resto a 8, asi que salia
-// diminuta. Ahora comparte proporcion con los demas cuerpos.
-const focusDistance=Math.max(body.radius*(slug==="sun"?5:8),slug==="moon"?1.2:4.2);
-camera.position.set(0,body.radius*1.15,focusDistance);
-controls.target.set(0,0,0);controls.minDistance=Math.max(body.radius*2.2,0.7);controls.maxDistance=Math.max(focusDistance*6,18);
+/* Encuadre: 3,3 radios de distancia, como el prototipo de la Tierra. Antes
+   eran 8 y el cuerpo quedaba pequeño en el centro de la pantalla. Los limites
+   de zoom van tambien en radios, asi que la Luna y el Sol se encuadran igual
+   de bien pese a tener tamaños muy distintos. */
+const focusDistance=body.radius*(slug==="sun"?3.6:3.3);
+camera.position.set(0,body.radius*0.15,focusDistance);
+controls.target.set(0,0,0);controls.minDistance=body.radius*1.35;controls.maxDistance=body.radius*20;
 
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+let ultimoInstante=performance.now();
 function animate(){
+  const ahora=performance.now(),dt=ahora-ultimoInstante;ultimoInstante=ahora;
+  cielo.update(dt);
   group.rotation.y+=.0003/ROTATION_SLOWDOWN;
   bodyMesh.rotation.y+=body.rotationSpeed*(slug==="sun"?2.5:2.1)/ROTATION_SLOWDOWN;
   // Las nubes van algo más rápido que la superficie: la atmósfera no rota
