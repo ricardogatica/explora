@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { getGlowTexture } from "./star-renderer.js";
 
 /* Campo de estrellas de fondo, compartido por todas las vistas de detalle.
 
@@ -47,6 +48,9 @@ function capa(count, radioMin, radioMax, size, opacity) {
 
   return new THREE.Points(geometria, new THREE.PointsMaterial({
     size,
+    // Sin textura, un punto de WebGL es literalmente un cuadrado. Con el
+    // degradado radial pasa a ser un destello redondo con los bordes suaves.
+    map: getGlowTexture(),
     sizeAttenuation: true,
     vertexColors: true,
     transparent: true,
@@ -63,9 +67,18 @@ function capa(count, radioMin, radioMax, size, opacity) {
  *               igual con la Luna que con el Sol.
  * @returns {{update:(dt:number)=>void, setVisible:(v:boolean)=>void}}
  */
-export function addStarfield(scene, escala = 1) {
-  const cerca = capa(4500, 40 * escala, 120 * escala, 0.09 * escala, 0.88);
-  const lejos = capa(9000, 125 * escala, 320 * escala, 0.14 * escala, 0.62);
+export function addStarfield(scene, escala = 1, opciones = {}) {
+  /* Los radios se pueden forzar porque hay escenas con niebla: si las capas
+     caen más lejos de lo que la niebla deja ver, el cielo desaparece entero.
+     Le pasó a la vista de escala planetaria, que tiene FogExp2 a 0.0011 y se
+     comía por completo la capa lejana. */
+  const [cercaMin, cercaMax] = opciones.cerca ?? [40 * escala, 120 * escala];
+  const [lejosMin, lejosMax] = opciones.lejos ?? [125 * escala, 320 * escala];
+  const tamCerca = opciones.tamañoCerca ?? 0.09 * escala;
+  const tamLejos = opciones.tamañoLejos ?? 0.14 * escala;
+
+  const cerca = capa(4500, cercaMin, cercaMax, tamCerca, 0.88);
+  const lejos = capa(9000, lejosMin, lejosMax, tamLejos, 0.62);
   scene.add(cerca, lejos);
 
   return {

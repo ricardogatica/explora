@@ -49,13 +49,13 @@ function makeStars(){
   const count=8200,positions=new Float32Array(count*3);
   for(let i=0;i<count;i++){const ra=Math.random()*24,dec=THREE.MathUtils.radToDeg(Math.asin(Math.random()*2-1)),p=celestialPosition(ra,dec,radius*.995);positions[i*3]=p.x;positions[i*3+1]=p.y;positions[i*3+2]=p.z}
   const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
-  sky.add(new THREE.Points(geometry,new THREE.PointsMaterial({color:0xffffff,size:.12,transparent:true,opacity:.72,depthWrite:false})));
+  sky.add(new THREE.Points(geometry,new THREE.PointsMaterial({color:0xffffff,size:.12,map:getGlowTexture(),transparent:true,opacity:.72,depthWrite:false})));
 }
 function makeMilkyWay(){
   const count=5200,positions=new Float32Array(count*3),colors=new Float32Array(count*3);
   for(let i=0;i<count;i++){const ra=i/count*24,dec=Math.sin(i*.035)*9+(Math.random()-.5)*10,p=celestialPosition(ra,dec,radius*.99);positions[i*3]=p.x;positions[i*3+1]=p.y;positions[i*3+2]=p.z;colors[i*3]=.62;colors[i*3+1]=.78;colors[i*3+2]=1}
   const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));
-  sky.add(new THREE.Points(geometry,new THREE.PointsMaterial({size:.24,vertexColors:true,transparent:true,opacity:.32,blending:THREE.AdditiveBlending,depthWrite:false})));
+  sky.add(new THREE.Points(geometry,new THREE.PointsMaterial({size:.24,map:getGlowTexture(),vertexColors:true,transparent:true,opacity:.32,blending:THREE.AdditiveBlending,depthWrite:false})));
 }
 function makeCircle(points,material){const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),material);sky.add(line);return line}
 function makeGuides(){
