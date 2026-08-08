@@ -251,17 +251,10 @@ export async function loadPhotorealBody(body,{radius=1,sunDirection,anisotropy=1
      que se mapea sobre el anillo por distancia al centro en vez de con las UV
      del RingGeometry, que van pensadas para otra cosa. */
   if(ring){
-    const inner=radius*1.24,outer=radius*RING_OUTER_SCALE;
-    const geometria=new THREE.RingGeometry(inner,outer,192);
-    const pos=geometria.attributes.position,uv=geometria.attributes.uv;
-    const v=new THREE.Vector3();
-    for(let i=0;i<pos.count;i++){
-      v.fromBufferAttribute(pos,i);
-      uv.setXY(i,(v.length()-inner)/(outer-inner),0.5);
-    }
-    const anillos=new THREE.Mesh(geometria,new THREE.MeshBasicMaterial({
-      map:ring,side:THREE.DoubleSide,transparent:true,opacity:0.94,depthWrite:false
-    }));
+    const anillos=new THREE.Mesh(
+      ringGeometry(radius*1.24,radius*RING_OUTER_SCALE,192),
+      new THREE.MeshBasicMaterial({map:ring,side:THREE.DoubleSide,transparent:true,opacity:0.94,depthWrite:false})
+    );
     anillos.rotation.x=Math.PI/2;
     group.add(anillos);
   }
@@ -282,7 +275,38 @@ export function createSunGlow(radius,scale=2.6){
   return halo;
 }
 
-export function createSaturnRings(radius,{inner=1.25,outer=2,segments=64}={}){
-  const rings=new THREE.Mesh(new THREE.RingGeometry(radius*inner,radius*outer,segments),new THREE.MeshBasicMaterial({color:0xd6c6a0,side:THREE.DoubleSide,transparent:true,opacity:0.65}));
-  rings.rotation.x=Math.PI/2.6;return rings;
+/* Geometría de anillo con las UV mapeadas por distancia al centro.
+
+   La textura del anillo es una tira radial: un píxel de ancho por cada radio,
+   del borde interior al exterior. Las UV que genera RingGeometry van pensadas
+   para otra cosa, así que hay que reescribirlas o la imagen sale retorcida.
+   Esto lo usan tanto la ficha de detalle como las vistas de conjunto, para que
+   el anillo se vea igual en todas. */
+function ringGeometry(inner,outer,segments){
+  const geometria=new THREE.RingGeometry(inner,outer,segments);
+  const pos=geometria.attributes.position,uv=geometria.attributes.uv;
+  const v=new THREE.Vector3();
+  for(let i=0;i<pos.count;i++){
+    v.fromBufferAttribute(pos,i);
+    uv.setXY(i,(v.length()-inner)/(outer-inner),0.5);
+  }
+  return geometria;
+}
+
+export function createSaturnRings(radius,{inner=1.24,outer=RING_OUTER_SCALE,segments=192,texture=null}={}){
+  const material=new THREE.MeshBasicMaterial({
+    // Beige plano mientras llega la imagen, o si no llega nunca.
+    color:texture?0xffffff:0xd6c6a0,
+    side:THREE.DoubleSide,transparent:true,
+    opacity:texture?0.94:0.65,depthWrite:false
+  });
+  if(texture){
+    new THREE.TextureLoader().load(texture,mapa=>{
+      mapa.colorSpace=THREE.SRGBColorSpace;
+      material.map=mapa;material.needsUpdate=true;
+    },undefined,()=>{ material.color.setHex(0xd6c6a0);material.opacity=0.65; });
+  }
+  const anillos=new THREE.Mesh(ringGeometry(radius*inner,radius*outer,segments),material);
+  anillos.rotation.x=Math.PI/2;
+  return anillos;
 }

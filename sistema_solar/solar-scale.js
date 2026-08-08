@@ -39,7 +39,7 @@ layout.forEach(item=>{
   const body=BODY_DATA[item.slug],radius=relativeRadius[item.slug]*item.unit,group=new THREE.Group();group.position.set(item.x,0,0);group.userData.slug=item.slug;
   const mesh=createBodyMesh(body,item.slug,{scale:radius/body.radius,stage:"modern"});mesh.userData.slug=item.slug;mesh.userData.clickable=true;group.add(mesh);clickables.push(mesh);
   if(item.slug==="sun")group.add(createSunGlow(radius,1.08));
-  if(item.slug==="saturn")mesh.add(createSaturnRings(radius,{inner:1.2,outer:2.05,segments:96}));
+  if(item.slug==="saturn")mesh.add(createSaturnRings(radius,{texture:body.textures?.ring}));
   const label=makeLabel(body.name,radius);label.position.set(0,radius+item.labelOffset,0);label.userData.slug=item.slug;label.userData.clickable=true;group.add(label);clickables.push(label);
   scene.add(group);objects[item.slug]={group,mesh,body,radius,label};
 });

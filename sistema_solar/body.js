@@ -92,7 +92,7 @@ if(usaTexturasReales){
     });
 }
 if(slug==="sun"){glow=createSunGlow(body.radius,1.16);group.add(glow)}
-if(slug==="saturn"){rings=createSaturnRings(body.radius);bodyMesh.add(rings)}
+if(slug==="saturn"){rings=createSaturnRings(body.radius,{texture:body.textures?.ring});bodyMesh.add(rings)}
 if(body.satellites?.length){
   body.satellites.forEach((satellite,index)=>{
     const orbit=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({length:160},(_,i)=>{const a=i/160*Math.PI*2;return new THREE.Vector3(Math.cos(a)*satellite.orbitRadius,Math.sin(a)*satellite.orbitRadius*.08,Math.sin(a)*satellite.orbitRadius)})),new THREE.LineBasicMaterial({color:0x94a3b8,transparent:true,opacity:.26}));

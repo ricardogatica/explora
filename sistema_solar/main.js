@@ -2,7 +2,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, BODY_ORDER, ROTATION_SLOWDOWN, CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_GALAXIES, KNOWN_GALAXY_BY_SLUG, KNOWN_STARS, KNOWN_STAR_BY_SLUG, SOLAR_SYSTEM_BEHAVIOR, TIMELINE_EVENTS, TIMELINE_INDEX_BY_ID, getMoonOrbitPosition, getOrbitPosition } from "./data.js";
-import { createBodyMaterials } from "./body-renderer.js";
+import { createBodyMaterials, createSaturnRings } from "./body-renderer.js";
 import { createMilkyWayObject } from "./galaxy-renderer.js";
 import { animateStellarObject, createQuasarObject, createStarObject, getGlowTexture } from "./star-renderer.js";
 const app=document.getElementById("app"),timelineEl=document.getElementById("timeline"),timelineScrubber=document.getElementById("timelineScrubber"),timelineTicks=document.getElementById("timelineTicks"),cosmicMap=document.getElementById("cosmicMap"),zoomRange=document.getElementById("zoomRange"),zoomValue=document.getElementById("zoomValue"),infoTitle=document.getElementById("infoTitle"),infoMeta=document.getElementById("infoMeta"),infoText=document.getElementById("infoText"),factsEl=document.getElementById("facts"),openFile=document.getElementById("openFile"),focusEarth=document.getElementById("focusEarth");
@@ -47,7 +47,8 @@ const oceans=new THREE.Group();const water=new THREE.Mesh(new THREE.SphereGeomet
 const oxidation=new THREE.Group();oxidation.add(new THREE.Mesh(new THREE.SphereGeometry(BODY_DATA.earth.radius*1.18,64,64),new THREE.MeshBasicMaterial({color:0x8ddcff,transparent:true,opacity:.2,side:THREE.BackSide,blending:THREE.AdditiveBlending})));oxidation.add(makeSurfaceSprites(420,BODY_DATA.earth.radius,0x7dd3fc,.035));earthObj.group.add(oxidation);stageEffects.oxidation=oxidation;
 const life=new THREE.Group();life.add(makeSurfaceSprites(520,BODY_DATA.earth.radius,0x7cff8a,.04));life.add(new THREE.Mesh(new THREE.SphereGeometry(BODY_DATA.earth.radius*1.12,64,64),new THREE.MeshBasicMaterial({color:0x22c55e,transparent:true,opacity:.08,side:THREE.BackSide,blending:THREE.AdditiveBlending})));earthObj.group.add(life);stageEffects.life=life}
 createStageEffects();
-createPlanet("mars",materials.mars);createPlanet("jupiter",materials.jupiter);const saturnObj=createPlanet("saturn",materials.saturn);saturnRings=new THREE.Mesh(new THREE.RingGeometry(BODY_DATA.saturn.radius*1.25,BODY_DATA.saturn.radius*2.0,64),new THREE.MeshBasicMaterial({color:0xd6c6a0,side:THREE.DoubleSide,transparent:true,opacity:0.65}));saturnRings.rotation.x=Math.PI/2.6;saturnObj.group.add(saturnRings);createPlanet("uranus",materials.uranus);createPlanet("neptune",materials.neptune);
+createPlanet("mars",materials.mars);createPlanet("jupiter",materials.jupiter);const saturnObj=createPlanet("saturn",materials.saturn);// El anillo lo construye body-renderer, con su textura real y las UV radiales.
+saturnRings=createSaturnRings(BODY_DATA.saturn.radius,{texture:BODY_DATA.saturn.textures?.ring});saturnObj.group.add(saturnRings);createPlanet("uranus",materials.uranus);createPlanet("neptune",materials.neptune);
 function createKnownUniverse(){
   KNOWN_GALAXIES.forEach(item=>{
     const label=makeLabel(item.name,{color:"rgba(219,234,254,.96)",scale:[22,5.5,1],font:"900 46px Inter, sans-serif"});
