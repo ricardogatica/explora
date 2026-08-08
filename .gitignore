@@ -50,3 +50,7 @@ tmp/
 # así que la regla se limita a la raíz y no las toca.
 .playwright-mcp/
 /*.png
+
+# Next
+.next/
+out/

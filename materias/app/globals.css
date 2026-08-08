@@ -1,0 +1,32 @@
+/* Toma la paleta y las formas del portal (assets/styles.css) para que las dos
+   mitades de Explora se parezcan mientras conviven. Cuando el sistema visual sea
+   compartido de verdad, esto se sustituye por él. */
+:root{
+  --bg:#020617;--panel:rgba(7,12,28,.78);--text:#f8fafc;--muted:#94a3b8;
+  --line:rgba(148,163,184,.18);--accent:#38bdf8;--accent2:#a78bfa;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);line-height:1.55;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+a{color:#7dd3fc}
+.shell{max-width:1080px;margin:0 auto;padding:28px 20px 72px}
+.eyebrow{margin:0 0 6px;color:var(--accent);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.15em}
+h1{margin:0 0 8px;font-size:clamp(26px,4vw,40px);line-height:1.05;letter-spacing:-.03em}
+h2{margin:32px 0 12px;font-size:22px}
+.subtitle{margin:0 0 24px;color:var(--muted)}
+.crumbs{display:flex;gap:6px;align-items:center;margin:0 0 18px;font-size:13px;font-weight:700;color:#64748b}
+.crumbs a{text-decoration:none}
+.rejilla{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.tarjeta{display:block;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);text-decoration:none;color:var(--text)}
+.tarjeta:hover{border-color:rgba(56,189,248,.6)}
+.tarjeta strong{display:block;font-size:16px;margin-bottom:4px}
+.tarjeta span{font-size:13px;color:var(--muted)}
+.etiqueta{display:inline-block;margin-bottom:8px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2);background:rgba(167,139,250,.12)}
+.prosa{max-width:70ch}
+.prosa table{border-collapse:collapse;margin:16px 0;width:100%}
+.prosa th,.prosa td{border:1px solid var(--line);padding:8px 10px;text-align:left;font-size:14px}
+.prosa code{background:rgba(148,163,184,.14);padding:2px 5px;border-radius:6px;font-size:.92em}
+.prosa blockquote{margin:16px 0;padding:8px 16px;border-left:3px solid var(--accent);color:var(--muted)}
+.vacio{padding:14px 16px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px}

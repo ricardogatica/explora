@@ -164,14 +164,23 @@ sus pasos con código exacto sería inventar; el spec ya fija el **qué** y el
 
 ## Fase 2 — App de materias (Next.js 16)
 
-1. Andamiaje: `materias/` con Next 16, App Router, `output: 'export'`, sin `basePath`.
-2. Mover `lenguaje/pages/*` y `matematicas/pages/*` a `contenido/<materia>/`, con
-   el frontmatter que hoy vive en `manifest.json` (las páginas **no tienen**
-   frontmatter: la metadata está en el manifiesto, y hay que fusionarla).
-3. Lector de contenido en build, apoyado en el validador de la fase 1.
-4. Rutas: `/[materia]`, `/[materia]/[pagina]`, `/ruta`, `/ruta/[banda]`.
-5. Un solo visor de preguntas para los cinco tipos: aquí mueren los dos `app.js`.
-6. Borrar `lenguaje/` y `matematicas/` viejos y redirigir sus URLs.
+Corrección de secuencia hecha al empezar: el plan original movía el contenido a
+`contenido/` antes de construir la app. No se puede. Los dos sitios en producción
+leen de `lenguaje/pages` y `matematicas/pages`, así que moverlo los rompe, y
+copiarlo deja dos verdades que se separan en cuanto alguien edita una. La app
+nueva **lee del sitio actual** y el traslado ocurre en el mismo paso en que los
+sitios viejos se borran.
+
+1. Andamiaje: `materias/` con Next 16, App Router, `output: 'export'`, sin
+   `basePath` (la app posee `/matematicas`, `/lenguaje`… como rutas propias).
+2. Lector de contenido que, en build, lee las páginas y los manifiestos donde
+   están hoy y los adapta con `contenido/legado.js`.
+3. Rutas: `/[materia]`, `/[materia]/[pagina]`, `/ruta`, `/ruta/[banda]`.
+4. Un solo visor para los cinco tipos de pregunta: aquí mueren los dos `app.js`.
+5. Comparar la app nueva con las viejas página por página.
+6. **Recién entonces**: borrar `lenguaje/` y `matematicas/`, mover el contenido a
+   `contenido/<materia>/` con el frontmatter fusionado desde el manifiesto, y
+   apuntar el lector a la ubicación nueva. El adaptador de legado se borra aquí.
 
 ## Fase 3 — Andamiaje 3D compartido
 

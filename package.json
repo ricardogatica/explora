@@ -1,0 +1,14 @@
+{
+  "name": "explora",
+  "private": true,
+  "type": "module",
+  "description": "Base de conocimiento interactivo para niños y niñas",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  },
+  "workspaces": [
+    "contenido",
+    "materias"
+  ]
+}

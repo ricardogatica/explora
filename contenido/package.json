@@ -1,0 +1,10 @@
+{
+  "name": "@explora/contenido",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Contrato de contenido: bandas de edad, esquema y validador",
+  "exports": {
+    "./*": "./*"
+  }
+}
