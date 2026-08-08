@@ -144,11 +144,13 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
   return{group,disk,dust,core,glow,bar,solarMarker,solarSystemPosition,kind:"galaxy",detail};
 }
 
-export function animateGalaxyObject(entry,time){
+/* `avance` son cuadros de referencia transcurridos (ver tiempo.js): los
+   incrementos de abajo están escritos por cuadro y se corrigen con él. */
+export function animateGalaxyObject(entry,time,avance=1){
   const group=entry.group||entry.object||entry;
-  if(!group.userData.detail)group.rotation.y+=.0002;
+  if(!group.userData.detail)group.rotation.y+=.0002*avance;
   const disk=entry.disk||group.children.find(child=>child.isPoints),core=entry.core||group.children.find(child=>child.isMesh);
-  if(disk)disk.rotation.y+=group.userData.detail ? .00016 : .0005;
-  if(entry.dust)entry.dust.rotation.y+=group.userData.detail ? .00012 : .00035;
+  if(disk)disk.rotation.y+=(group.userData.detail ? .00016 : .0005)*avance;
+  if(entry.dust)entry.dust.rotation.y+=(group.userData.detail ? .00012 : .00035)*avance;
   if(core)core.scale.setScalar(1+Math.sin(time*1.6)*.035);
 }

@@ -382,21 +382,47 @@ test("las figuras se dibujan con la misma orientación que tienen en el cielo", 
   }
 });
 
-test("el giro de las estrellas y la órbita de la Luna van por tiempo, no por cuadro", () => {
+test("nada de lo que gira lo hace por cuadro", () => {
   /* Sumar un incremento fijo en cada cuadro ata la velocidad al refresco de la
      pantalla. Medido en el navegador de pruebas, que va a 122 cuadros por
-     segundo, el Sol de la escala de soles daba la vuelta en 17 segundos en lugar
-     de los 34 previstos, y la Luna orbitaba en 20 en vez de 40; en un monitor de
-     60 Hz habrían ido a la mitad. Los dos incrementos tienen que multiplicarse
-     por el tiempo transcurrido. */
-  const casos = [
-    { archivo: "star-scale.js", linea: /malla\.rotation\.y\+=[^;\n]*\bsegundos\b/, que: "el giro de las estrellas" },
-    { archivo: "solar-scale.js", linea: /pivoteLuna\.rotation\.y\+=[^;\n]*\btranscurrido\b/, que: "la órbita de la Luna" }
-  ];
-  for (const { archivo, linea, que } of casos) {
-    const source = readFileSync(join(UNIVERSE, archivo), "utf8");
-    assert.match(source, linea,
-      `${que} (${archivo}) debe avanzar según el tiempo transcurrido, no una cantidad fija por cuadro`);
+     segundo: el Sol de la escala de soles daba la vuelta en 17 segundos en vez de
+     los 34 previstos y la Luna orbitaba en 20 en vez de 40; en un monitor de
+     60 Hz el módulo entero iba a la mitad de velocidad que en uno de 120.
+
+     Cada giro tiene que llevar como factor uno de los tres nombres del tiempo
+     transcurrido: `avance` (cuadros de referencia, ver tiempo.js), `segundos` o
+     `dt`. El barrido cubre los archivos que existan, no una lista escrita a mano,
+     así que una escena nueva que gire por cuadro también lo rompe. */
+  const FACTORES = /\bavance\b|\bsegundos\b|\bdt\b/;
+  const archivos = readdirSync(UNIVERSE).filter(nombre => nombre.endsWith(".js"));
+  let revisados = 0;
+  for (const archivo of archivos) {
+    const lineas = readFileSync(join(UNIVERSE, archivo), "utf8").split("\n");
+    lineas.forEach((linea, indice) => {
+      if (linea.trimStart().startsWith("//") || linea.trimStart().startsWith("*")) return;
+      /* Por sentencia y no por línea: main.js encadena veinte sentencias en una
+         sola, así que mirar la línea entera dejaba pasar un giro por cuadro
+         mientras cualquier otra sentencia de la misma línea llevara el factor.
+         Se comprobó quitándole el factor a los anillos de Saturno: el test pasaba. */
+      for (const sentencia of linea.split(";")) {
+        if (!/rotation\.[xyz]\s*[+-]=/.test(sentencia)) continue;
+        revisados++;
+        assert.match(sentencia, FACTORES,
+          `${archivo}:${indice + 1} gira una cantidad fija por cuadro, así que su ` +
+          `velocidad depende del refresco de la pantalla:\n    ${sentencia.trim()}`);
+      }
+    });
+  }
+  assert.ok(revisados >= 20, `esperaba al menos 20 giros que revisar, hubo ${revisados}`);
+});
+
+test("las escenas 3D miden el tiempo con el reloj compartido", () => {
+  // Un reloj propio por escena es como se colaron los dos primeros defectos.
+  const escenas = ["main.js", "body.js", "solar-scale.js", "star-scale.js", "universe-body.js", "constellations-view.js"];
+  for (const escena of escenas) {
+    const source = readFileSync(join(UNIVERSE, escena), "utf8");
+    assert.match(source, /from "\.\/tiempo\.js"/, `${escena} debe usar el reloj compartido`);
+    assert.match(source, /reloj\.paso\(/, `${escena} debe pedirle el intervalo al reloj`);
   }
 });
 

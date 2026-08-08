@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, ROTATION_SLOWDOWN, SATELLITE_SLOWDOWN } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody, RING_OUTER_SCALE } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
+import { crearReloj } from "./tiempo.js";
 
 const slug=document.body.dataset.slug,body=BODY_DATA[slug],parent=body.parent?BODY_DATA[body.parent]:null;
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");
@@ -164,22 +165,25 @@ camera.position.set(desplazamiento,focusDistance*(alcance?0.34:0.06),focusDistan
 controls.target.set(desplazamiento,0,0);controls.minDistance=body.radius*1.35;controls.maxDistance=Math.max(body.radius,alcance)*20;
 
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-let ultimoInstante=performance.now();
-function animate(){
-  const ahora=performance.now(),dt=ahora-ultimoInstante;ultimoInstante=ahora;
-  cielo.update(dt);
-  group.rotation.y+=.0003/ROTATION_SLOWDOWN;
-  bodyMesh.rotation.y+=body.rotationSpeed*(slug==="sun"?2.5:2.1)/ROTATION_SLOWDOWN;
+const reloj=crearReloj();
+/* `avance` son cuadros de referencia transcurridos: 1 a 120 Hz, 2 a 60. Las
+   velocidades de abajo están escritas por cuadro, así que todas lo llevan como
+   factor y el giro no depende del refresco de la pantalla. Ver tiempo.js. */
+function animate(ms){
+  const {segundos,avance}=reloj.paso(ms);
+  cielo.update(segundos*1000);
+  group.rotation.y+=.0003/ROTATION_SLOWDOWN*avance;
+  bodyMesh.rotation.y+=body.rotationSpeed*(slug==="sun"?2.5:2.1)/ROTATION_SLOWDOWN*avance;
   // Las nubes van algo más rápido que la superficie: la atmósfera no rota
   // solidaria con el suelo.
-  if(cloudLayer)cloudLayer.rotation.y+=body.rotationSpeed*0.34/ROTATION_SLOWDOWN;
+  if(cloudLayer)cloudLayer.rotation.y+=body.rotationSpeed*0.34/ROTATION_SLOWDOWN*avance;
   satelliteObjects.forEach(entry=>{
-    entry.angle+=entry.satellite.orbitSpeed/SATELLITE_SLOWDOWN;
+    entry.angle+=entry.satellite.orbitSpeed/SATELLITE_SLOWDOWN*avance;
     entry.group.position.set(Math.cos(entry.angle)*entry.satellite.orbitRadius,Math.sin(entry.angle)*entry.satellite.orbitRadius*.08,Math.sin(entry.angle)*entry.satellite.orbitRadius);
-    entry.mesh.rotation.y+=.003/SATELLITE_SLOWDOWN;
+    entry.mesh.rotation.y+=.003/SATELLITE_SLOWDOWN*avance;
   });
-  if(glow)glow.rotation.y-=0.0006;
-  if(rings)rings.rotation.z+=0.0008;
+  if(glow)glow.rotation.y-=0.0006*avance;
+  if(rings)rings.rotation.z+=0.0008*avance;
   controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
