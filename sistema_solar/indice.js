@@ -7,6 +7,13 @@ const countEl = document.getElementById("conteo");
 
 const total = catalog.reduce((n, group) => n + group.entries.length, 0);
 
+/* El número iba escrito a mano en el HTML y quedaba desfasado en cuanto
+   cambiaba el catálogo. Se escribe desde aquí, que es donde se sabe. */
+const resumen = document.getElementById("resumen");
+if (resumen) {
+  resumen.textContent = `${total} fichas entre cuerpos del sistema solar, estrellas, constelaciones y galaxias.`;
+}
+
 function render(query = "") {
   const trimmed = query.trim();
   // `search` ya está normalizado sin tildes en nav-model.js: aquí se aplica

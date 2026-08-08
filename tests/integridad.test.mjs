@@ -271,3 +271,43 @@ test("la superficie estelar emite por encima de 1", () => {
   assert.ok(factor > 1.2 && factor < 2.4,
     `el factor de emisión es ${factor}: por debajo de 1,2 la estrella sale apagada y por encima de 2,4 se quema y borra la granulación`);
 });
+
+test("el catálogo del cielo trae datos medidos, no inventados", async () => {
+  const { KNOWN_STARS } = await import("../sistema_solar/universe/stars.js");
+  const { CONSTELLATIONS } = await import("../sistema_solar/universe/constellations.js");
+
+  assert.ok(KNOWN_STARS.length > 700, `esperaba más de 700 estrellas, hay ${KNOWN_STARS.length}`);
+  assert.equal(CONSTELLATIONS.length, 88);
+
+  /* El defecto que esto vino a arreglar: todas las estrellas de una
+     constelación compartían su coordenada. Si vuelve, dos estrellas de Orión
+     tendrían la misma ascensión recta. */
+  const orion = CONSTELLATIONS.find(c => c.slug === "orion");
+  const ras = new Set(orion.points.map(p => p.starSlug));
+  assert.ok(orion.points.length > 10, `Orión debería trazar más de 10 estrellas, traza ${orion.points.length}`);
+  assert.equal(ras.size, orion.points.length, "Orión no puede repetir estrellas en su figura");
+
+  const posiciones = new Set(orion.points.map(p => `${p.x},${p.y}`));
+  assert.equal(posiciones.size, orion.points.length,
+    "cada estrella de la figura debe caer en un punto distinto");
+
+  // Las líneas solo pueden unir estrellas que estén en la figura.
+  const enFigura = new Set(orion.points.map(p => p.id));
+  for (const [a, b] of orion.lines) {
+    assert.ok(enFigura.has(a) && enFigura.has(b), `la línea ${a}-${b} apunta fuera de la figura`);
+  }
+});
+
+test("las estrellas conocidas conservan su ficha y sus datos reales", async () => {
+  const { KNOWN_STAR_BY_SLUG } = await import("../sistema_solar/universe/stars.js");
+  // Sus slugs y sus páginas HTML existían antes del catálogo: no pueden cambiar.
+  for (const slug of ["sirius", "vega", "betelgeuse", "rigel", "polaris", "antares", "acrux", "proxima-centauri", "ton-618"]) {
+    const s = KNOWN_STAR_BY_SLUG[slug];
+    assert.ok(s, `falta ${slug}`);
+    assert.ok(!s.file.includes("?"), `${slug} debería tener archivo propio, tiene ${s.file}`);
+  }
+  // Y sus números ahora son los medidos.
+  assert.equal(KNOWN_STAR_BY_SLUG.rigel.type, "Supergigante azul-blanca");
+  assert.equal(KNOWN_STAR_BY_SLUG.betelgeuse.type, "Supergigante roja");
+  assert.ok(Math.abs(KNOWN_STAR_BY_SLUG.sirius.distanceLy - 8.6) < 0.2);
+});
