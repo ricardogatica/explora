@@ -5,7 +5,15 @@ import { BODY_DATA, BODY_ORDER, ROTATION_SLOWDOWN, CONSTELLATIONS, CONSTELLATION
 import { createBodyMaterials, createSaturnRings } from "./body-renderer.js";
 import { createMilkyWayObject } from "./galaxy-renderer.js";
 import { animateStellarObject, createQuasarObject, createStarObject, getGlowTexture } from "./star-renderer.js";
-const app=document.getElementById("app"),timelineEl=document.getElementById("timeline"),timelineScrubber=document.getElementById("timelineScrubber"),timelineTicks=document.getElementById("timelineTicks"),cosmicMap=document.getElementById("cosmicMap"),zoomRange=document.getElementById("zoomRange"),zoomValue=document.getElementById("zoomValue"),infoTitle=document.getElementById("infoTitle"),infoMeta=document.getElementById("infoMeta"),infoText=document.getElementById("infoText"),factsEl=document.getElementById("facts"),openFile=document.getElementById("openFile"),focusEarth=document.getElementById("focusEarth");
+const app=document.getElementById("app"),timelineEl=document.getElementById("timeline"),timelineScrubber=document.getElementById("timelineScrubber"),timelineTicks=document.getElementById("timelineTicks"),cosmicMap=document.getElementById("cosmicMap"),zoomRange=document.getElementById("zoomRange"),zoomValue=document.getElementById("zoomValue"),infoTitle=document.getElementById("infoTitle"),infoMeta=document.getElementById("infoMeta"),infoText=document.getElementById("infoText"),factsEl=document.getElementById("facts"),openFile=document.getElementById("openFile"),focusEarth=document.getElementById("focusEarth"),focusSystem=document.getElementById("focusSystem"),infoPanel=document.getElementById("infoPanel"),closeInfo=document.getElementById("closeInfo");
+
+/* La ficha aparece cuando se elige un cuerpo y no antes.
+
+   updateInfoPanel() sigue corriendo con la ficha cerrada —al mover la línea
+   temporal, por ejemplo— para que su contenido esté al día cuando se abra; lo
+   que no hace es abrirla. Abrir es una decisión de quien mira, no un efecto
+   secundario de que el reloj cósmico avance. */
+function mostrarFicha(visible){infoPanel.hidden=!visible}
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.00135);
 const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.01,9000);camera.position.set(0,6,42);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;app.appendChild(renderer.domElement);
@@ -113,9 +121,36 @@ function bodyPosition(slug){if(!slug)return new THREE.Vector3();if(slug==="moon"
 function setZoom(value){zoomRange.value=value;zoomValue.textContent=`${Math.round(value)}%`;const t=value/100;targetDistance=THREE.MathUtils.lerp(SOLAR_SYSTEM_BEHAVIOR.zoomDistance.min,SOLAR_SYSTEM_BEHAVIOR.zoomDistance.max,Math.pow(t,SOLAR_SYSTEM_BEHAVIOR.zoomDistance.curve))}
 function focusTimelineEvent(distance=null,{remember=true}={}){if(remember)preferredFocus=null;selectedBody=null;controls.target.set(0,0,0);const eventDistance={["big-bang"]:58,inflation:74,["cosmic-background"]:92,["dark-ages"]:118,["first-stars"]:135,["early-galaxies"]:150,["early-milky-way"]:155};targetDistance=distance??eventDistance[currentEvent().id]??120;updateInfoPanel(null)}
 function focusOn(slug,distance=null,{remember=true}={}){if(!slug){focusTimelineEvent(distance,{remember});return}if(remember)preferredFocus=slug;const resolved=fallbackFocusForPreferred(slug);if(!resolved){focusTimelineEvent(distance,{remember:false});return}slug=resolved;selectedBody=slug;const p=bodyPosition(slug);controls.target.copy(p);if(distance==null){const body=BODY_DATA[slug],universeEntry=universeObjects[slug];if(body){distance=Math.max(body.radius*8,slug==="sun"?12:5);if(slug==="jupiter"||slug==="saturn")distance*=1.4;if(slug==="moon")distance=2.5}else if(universeEntry){distance=universeEntry.focusDistance||150}else{distance=180}}targetDistance=distance;updateInfoPanel(slug)}
+/* Porcentaje de la barra de zoom que corresponde a una distancia: es la inversa
+   de setZoom(). Sin esto, mover la cámara a mano deja la barra marcando otra cosa
+   y el primer golpe de rueda salta de vuelta a lo que dice la barra. */
+function zoomParaDistancia(distancia){
+  const {min,max,curve}=SOLAR_SYSTEM_BEHAVIOR.zoomDistance;
+  return Math.pow(THREE.MathUtils.clamp((distancia-min)/(max-min),0,1),1/curve)*100;
+}
+
+/* Encuadra el sistema completo: la órbita de Neptuno, que es la que manda, con
+   el factor por el que las órbitas se separan al enfocar un cuerpo y un margen
+   para que no quede pegada al borde. Sale del dato, así que añadir un planeta
+   más lejos reencuadra solo. */
+function enfocarSistemaSolar(){
+  const alcance=Math.max(...BODY_ORDER.map(slug=>BODY_DATA[slug].orbitRadius))*SOLAR_SYSTEM_BEHAVIOR.focusedOrbitScale*1.28;
+  focusOn("sun",alcance);
+  // Antes de que exista el Sol no hay sistema que encuadrar: focusOn ya ha
+  // caído en el evento cósmico y mover la barra encima solo despistaría.
+  if(existsAt("sun"))setZoom(zoomParaDistancia(alcance));
+}
+
 function applyInitialLayout(){selectedEvent=TIMELINE_EVENTS.length-1;timelineProgress=selectedEvent;setZoom(SOLAR_SYSTEM_BEHAVIOR.initialZoom);earthMesh.material=getEarthMaterialByStage("modern");renderTimeline();updateTemporalVisibility();focusOn("earth",SOLAR_SYSTEM_BEHAVIOR.initialFocusDistance)}
 openFile.addEventListener("click",()=>{const star=KNOWN_STAR_BY_SLUG[selectedBody];if(star?.file)openFile.href=star.file});
-focusEarth.addEventListener("click",()=>focusOn("earth",7));zoomRange.addEventListener("input",()=>{zoomVelocity=0;setZoom(Number(zoomRange.value));updateTemporalVisibility()});timelineScrubber.addEventListener("input",()=>selectTimelineProgress(Number(timelineScrubber.value),{focusMode:"preserve",zoom:true}));
+closeInfo.addEventListener("click",()=>mostrarFicha(false));
+/* Enfocar la Tierra también abre la ficha: el botón elige un cuerpo, que es
+   exactamente lo que la abre al pulsar en la escena. */
+focusEarth.addEventListener("click",()=>{focusOn("earth",7);mostrarFicha(true)});
+/* Encuadrar el sistema no es elegir un cuerpo, así que no abre la ficha; si ya
+   estaba abierta se queda, mostrando el Sol, que es lo que pasa a estar
+   enfocado. */
+focusSystem.addEventListener("click",enfocarSistemaSolar);zoomRange.addEventListener("input",()=>{zoomVelocity=0;setZoom(Number(zoomRange.value));updateTemporalVisibility()});timelineScrubber.addEventListener("input",()=>selectTimelineProgress(Number(timelineScrubber.value),{focusMode:"preserve",zoom:true}));
 /* Una rueda vertical no desplaza nativamente un contenedor que desborda en
    horizontal, y ademas el manejador global de abajo hace preventDefault, que
    cancelaria cualquier desplazamiento. Aqui se traduce a mano y se corta la
@@ -128,7 +163,12 @@ timelineEl.addEventListener("wheel",e=>{
 },{passive:false});
 
 window.addEventListener("wheel",e=>{e.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(e.deltaY,-160,160)*0.006},{passive:false});
-window.addEventListener("pointerdown",e=>{pointer.x=e.clientX/innerWidth*2-1;pointer.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const clickable=[];Object.values(planetObjects).forEach(group=>group.traverse(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)}));Object.values(universeObjects).forEach(entry=>{entry.object.traverse?.(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)});entry.label?.traverse?.(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)});entry.parts?.forEach(part=>part.traverse?.(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)}))});const hits=raycaster.intersectObjects(clickable);if(hits.length){focusOn(hits[0].object.userData.slug)}});
+/* Solo las pulsaciones sobre el lienzo cuentan como elegir un cuerpo. Sin este
+   filtro, pulsar un botón del panel lanzaba además un raycast: no acertaba
+   nada, y con la ficha condicionada al acierto eso la cerraba justo cuando se
+   pulsaba «Enfocar la Tierra». El lienzo es el destino real de las pulsaciones
+   sobre la escena porque .hud es pointer-events:none. */
+window.addEventListener("pointerdown",e=>{if(e.target!==renderer.domElement)return;pointer.x=e.clientX/innerWidth*2-1;pointer.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const clickable=[];Object.values(planetObjects).forEach(group=>group.traverse(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)}));Object.values(universeObjects).forEach(entry=>{entry.object.traverse?.(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)});entry.label?.traverse?.(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)});entry.parts?.forEach(part=>part.traverse?.(obj=>{if(obj.userData.clickable&&isActuallyVisible(obj))clickable.push(obj)}))});const hits=raycaster.intersectObjects(clickable);if(hits.length){focusOn(hits[0].object.userData.slug);mostrarFicha(true)}else{mostrarFicha(false)}});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 function updatePlanetPositions(time){BODY_ORDER.forEach((slug,index)=>{const body=BODY_DATA[slug],group=planetObjects[slug];if(slug==="sun"){group.rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN;return}const position=getOrbitPosition(body,time,index,currentOrbitScale);group.position.set(position.x,position.y,position.z);group.children[0].rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN});const moonPosition=getMoonOrbitPosition(BODY_DATA.moon,time);planetObjects.moon.position.set(moonPosition.x,moonPosition.y,moonPosition.z);moonMesh.rotation.y+=BODY_DATA.moon.rotationSpeed/ROTATION_SLOWDOWN;earthClouds.rotation.y+=0.0012;atmosphere.rotation.y-=0.0003;saturnRings.rotation.z+=0.0008}
 function animateStageEffects(time){eventVisuals.bigBang.rotation.y+=0.0014;eventVisuals.firstStars.rotation.y+=0.00055;eventVisuals.earlyGalaxy.rotation.y+=0.0012;primordialTransition.stageStar.rotation.y+=0.003;primordialTransition.stageSupernova.rotation.z+=0.004;primordialTransition.stageQuasar.rotation.z+=0.002;primordialTransition.group.rotation.y+=0.00025;stageEffects.proto.rotation.y+=0.0035;stageEffects.proto.children.forEach(child=>{if(child.userData.spin)child.rotation.z+=child.userData.spin;if(child.userData.orbitRadius){child.userData.orbitAngle+=child.userData.orbitSpeed;child.position.x=Math.cos(child.userData.orbitAngle)*child.userData.orbitRadius;child.position.z=Math.sin(child.userData.orbitAngle)*child.userData.orbitRadius}});if(stageEffects.proto.userData.shock)stageEffects.proto.userData.shock.scale.setScalar(1+Math.sin(time*1.5)*.08);if(stageEffects.proto.userData.protoSun)stageEffects.proto.userData.protoSun.scale.setScalar(1+Math.sin(time*4.2)*.055);stageEffects.earthDust.rotation.y+=0.015;stageEffects.earthDust.scale.setScalar(1+Math.sin(time*2.4)*0.055);stageEffects.moonDebris.rotation.y+=0.02;stageEffects.moonDebris.rotation.z+=0.006;stageEffects.oceans.rotation.y+=0.006;stageEffects.oceans.scale.setScalar(1+Math.sin(time*1.8)*0.025);stageEffects.oxidation.rotation.y+=0.004;stageEffects.oxidation.scale.setScalar(1+Math.sin(time*2.2)*0.035);stageEffects.life.rotation.y+=0.0055;stageEffects.life.scale.setScalar(1+Math.sin(time*3.1)*0.045)}

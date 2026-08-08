@@ -66,6 +66,29 @@ export function direccionDesdeRaDec(raHoras, decGrados) {
   return [Math.cos(dec) * Math.sin(ra), Math.sin(dec), -Math.cos(dec) * Math.cos(ra)];
 }
 
+/* Base local del cielo en un punto: hacia dónde quedan el este y el norte
+   celestes mirando desde el centro de la esfera. La usa la vista de
+   constelaciones para pegar cada figura proyectada sobre su trozo de cielo.
+
+   Vive aquí, y no en la vista, por el orden del producto vectorial: es lo único
+   que hay que acertar y no se ve al mirar el código. `east × center` apunta al
+   norte; `center × east` apunta al sur, y con él todas las figuras salían boca
+   abajo —la Cruz del Sur con Acrux arriba, Orión con Betelgeuse por debajo de
+   Rigel—. Estando aquí, un test puede comprobar que avanzar hacia el norte
+   aumenta la declinación, que es lo que significa «norte». */
+export function baseLocal(raHoras, decGrados) {
+  const center = direccionDesdeRaDec(raHoras, decGrados);
+  const ra = raHoras / 24 * Math.PI * 2;
+  const east = [Math.cos(ra), 0, Math.sin(ra)];
+  const norte = [
+    east[1] * center[2] - east[2] * center[1],
+    east[2] * center[0] - east[0] * center[2],
+    east[0] * center[1] - east[1] * center[0]
+  ];
+  const modulo = Math.hypot(...norte) || 1;
+  return { center, east, north: norte.map(v => v / modulo) };
+}
+
 /* La escala radial es logarítmica en años luz: sin ella, Sirio a 8,6 y una
    supergigante a 860 no cabrían en la misma escena. */
 export function radioDesdeDistancia(aniosLuz) {

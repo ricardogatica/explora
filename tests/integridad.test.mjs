@@ -5,6 +5,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildCatalog, siblingsFor } from "../sistema_solar/nav-model.js";
 import { KNOWN_STAR_BY_SLUG, CONSTELLATION_BY_SLUG } from "../sistema_solar/data.js";
+import { baseLocal } from "../sistema_solar/universe/sky.js";
 
 const UNIVERSE = join(dirname(fileURLToPath(import.meta.url)), "..", "sistema_solar");
 const entries = buildCatalog().flatMap(group => group.entries);
@@ -226,19 +227,40 @@ test("nav.js corta wheel y pointerdown en .side-card", () => {
   }
 });
 
-// Los guardas por destino vivían dentro de la escena 3D, que el plan declaraba
-// intocable, y dejaban sin zoom todo lo que no fuera el canvas: en index.html
-// eso era .timeline-wrap, que ocupa el 46% del viewport a 1366x768 y no
-// desplaza nada, así que la rueda ahí no hacía absolutamente nada.
+// El guarda por destino en la RUEDA dejaba sin zoom todo lo que no fuera el
+// canvas: en index.html eso era .timeline-wrap, que ocupa el 46% del viewport a
+// 1366x768 y no desplaza nada, así que la rueda ahí no hacía absolutamente nada.
+// Sigue prohibido. El de pointerdown es otra cosa y se comprueba justo debajo.
 const SIN_GUARDA = ["main.js", "solar-scale.js", "universe-body.js"];
 
-test("la escena 3D no filtra la rueda ni el pointerdown por destino", () => {
+test("la escena 3D no filtra la rueda por destino", () => {
   for (const archivo of SIN_GUARDA) {
     const source = readFileSync(join(UNIVERSE, archivo), "utf8");
+    const wheel = source.match(/addEventListener\("wheel",[\s\S]{0,320}/);
+    assert.ok(wheel, `${archivo} debería seguir escuchando la rueda`);
     assert.doesNotMatch(
-      source, /\.target\s*!==\s*renderer\.domElement/,
-      `${archivo} vuelve a llevar el guarda e.target !== renderer.domElement: ` +
-      "aislar la tarjeta es cosa de nav.js, no de la escena"
+      wheel[0], /\.target\s*!==\s*renderer\.domElement/,
+      `${archivo} vuelve a filtrar la RUEDA por destino: eso deja sin zoom ` +
+      "todo lo que quede bajo el HUD, que es casi la mitad de la pantalla"
+    );
+  }
+});
+
+// El pointerdown sí se filtra, y por un motivo que la rueda no tiene: desde que
+// la ficha del cuerpo se abre al acertar y se cierra al fallar, un raycast
+// lanzado por pulsar un botón del panel cerraba la ficha que ese mismo botón
+// acababa de abrir. nav.js no puede resolverlo solo: aísla .side-card, y
+// index.html no tiene ninguna.
+const CON_GUARDA_POINTERDOWN = ["main.js", "solar-scale.js", "star-scale.js"];
+
+test("elegir un cuerpo solo cuenta si la pulsación cae en el lienzo", () => {
+  for (const archivo of CON_GUARDA_POINTERDOWN) {
+    const source = readFileSync(join(UNIVERSE, archivo), "utf8");
+    const pointerdown = source.match(/addEventListener\("pointerdown",[\s\S]{0,200}/);
+    assert.ok(pointerdown, `${archivo} debería escuchar pointerdown`);
+    assert.match(
+      pointerdown[0], /\.target\s*!==\s*renderer\.domElement\)\s*return/,
+      `${archivo} tiene que descartar las pulsaciones que no caen en el lienzo`
     );
   }
 });
@@ -310,4 +332,52 @@ test("las estrellas conocidas conservan su ficha y sus datos reales", async () =
   assert.equal(KNOWN_STAR_BY_SLUG.rigel.type, "Supergigante azul-blanca");
   assert.equal(KNOWN_STAR_BY_SLUG.betelgeuse.type, "Supergigante roja");
   assert.ok(Math.abs(KNOWN_STAR_BY_SLUG.sirius.distanceLy - 8.6) < 0.2);
+});
+
+test("el norte del cielo apunta al norte", () => {
+  /* La base local de una figura se armaba con center × east, que apunta al SUR:
+     todas las constelaciones se dibujaban boca abajo. Con cuatro puntos
+     inventados por figura era invisible; con las figuras reales, la Cruz del Sur
+     salía con Acrux arriba en vez de abajo.
+
+     La comprobación es la definición de norte: avanzar un poco hacia el norte
+     desde un punto del cielo tiene que aumentar la declinación. Se prueba en los
+     dos hemisferios y a varias ascensiones rectas, porque un signo equivocado en
+     el producto vectorial puede acertar por casualidad en un solo punto. */
+  const puntos = [[0, 0], [6, 30], [12.4, -60.3], [18, -20], [5.6, 7.4], [23.5, 75]];
+  for (const [ra, dec] of puntos) {
+    const { center, north } = baseLocal(ra, dec);
+    const avanzado = center.map((valor, i) => valor + north[i] * 0.02);
+    const modulo = Math.hypot(...avanzado);
+    const decAvanzada = Math.asin(avanzado[1] / modulo) * 180 / Math.PI;
+    assert.ok(
+      decAvanzada > dec + 0.5,
+      `en ra ${ra}h dec ${dec}°, ir hacia el norte lleva a dec ${decAvanzada.toFixed(2)}°: ` +
+      "el vector apunta al sur y la figura sale boca abajo"
+    );
+  }
+});
+
+test("las figuras se dibujan con la misma orientación que tienen en el cielo", () => {
+  // Dos casos que cualquiera puede comprobar mirando al cielo: en la Cruz del
+  // Sur, Gacrux queda al norte de Acrux; en Orión, Betelgeuse por encima de
+  // Rigel. Se recorre el mismo camino que la vista: proyectar y volver a pegar.
+  const ESCALA = 0.032;
+  const alturaDibujada = (figura, slug) => {
+    const punto = figura.points.find(p => p.starSlug === slug);
+    const { center, east, north } = baseLocal(figura.ra, figura.dec);
+    return center.map((valor, i) => valor + east[i] * punto.x * ESCALA + north[i] * punto.y * ESCALA)[1];
+  };
+  const casos = [
+    ["crux", "gacrux", "acrux"],
+    ["orion", "betelgeuse", "rigel"],
+    ["orion", "bellatrix", "saiph"]
+  ];
+  for (const [slug, arriba, abajo] of casos) {
+    const figura = CONSTELLATION_BY_SLUG[slug];
+    assert.ok(
+      alturaDibujada(figura, arriba) > alturaDibujada(figura, abajo),
+      `en ${figura.name}, ${arriba} debe dibujarse por encima de ${abajo}`
+    );
+  }
 });

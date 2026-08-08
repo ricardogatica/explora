@@ -19,16 +19,28 @@ import { SKY, SKY_BY_SLUG, radioDesdeDistancia } from "./sky.js";
 /* Texto propio de las que ya tenían ficha. Los datos numéricos se toman del
    catálogo salvo en las dos que no aparecen en ninguna figura: Próxima
    Centauri es de magnitud 11, invisible a simple vista, y TON 618 es un quásar
-   a diez mil millones de años luz. Esas dos conservan sus valores. */
+   a diez mil millones de años luz. Esas dos conservan sus valores.
+
+   `radioSolar` es el radio en radios solares (1 R☉ = 696.340 km, valor nominal
+   de la IAU) y lo usa la vista de escala de soles. No está en el catálogo HYG,
+   que trae posición y brillo pero no tamaño: son medidas publicadas estrella
+   por estrella, la mayoría por interferometría, y solo se ponen las de las nueve
+   con ficha propia. No se estima el radio de las otras 735 a partir del tipo
+   espectral: eso daría una cifra con pinta de dato que nadie ha medido.
+
+   Los radios de las supergigantes son los que más varían entre publicaciones
+   —Betelgeuse va de 640 a 900 R☉ según el método y la longitud de onda, y su
+   atmósfera no tiene un borde nítido que medir—. Por eso llevan `radioNota`, que
+   la ficha muestra tal cual en lugar de fingir una precisión que no existe. */
 const PROPIAS = [
-  {slug:"sirius",kind:"star",name:"Sirio",age:"≈242 Ma",visibleFrom:"first-stars",description:"La estrella más brillante del cielo nocturno vista desde la Tierra; en realidad es un sistema binario.",behavior:"En la vista de universo actúa como referencia cercana y brillante: al acercarte se muestra como sistema estelar y no como planeta."},
-  {slug:"vega",kind:"star",name:"Vega",age:"≈455 Ma",visibleFrom:"first-stars",description:"Estrella brillante del hemisferio norte y referencia histórica para calibraciones fotométricas.",behavior:"Se muestra como estrella blanca-azulada, útil para comparar brillo y color con otras estrellas conocidas."},
-  {slug:"betelgeuse",kind:"star",name:"Betelgeuse",age:"≈8–10 Ma",visibleFrom:"first-stars",description:"Supergigante roja evolucionada de Orión, mucho más grande que el Sol y en una etapa avanzada de vida estelar.",behavior:"Debe verse grande y rojiza: representa una estrella masiva envejecida con atmósfera extendida y variación de brillo."},
-  {slug:"rigel",kind:"star",name:"Rigel",age:"≈8 Ma",visibleFrom:"first-stars",description:"Una de las estrellas más luminosas visibles a simple vista, ubicada en la constelación de Orión.",behavior:"Se visualiza como supergigante azul, más caliente en color que Betelgeuse y parte de la referencia de Orión."},
-  {slug:"proxima-centauri",kind:"star",name:"Próxima Centauri",age:"≈4.850 Ma",visibleFrom:"first-stars",description:"La estrella más cercana al Sol, parte del sistema Alfa Centauri y con al menos un planeta confirmado.",behavior:"Se presenta como enana roja cercana; su escala visual se amplifica para poder seleccionarla sin perder su detalle.",type:"Enana roja",constellation:"Centauro",distance:"4,24 años luz",distanceLy:4.24,color:16751469,size:4.2,direction:[0.31, -0.24, -0.92]},
-  {slug:"polaris",kind:"star",name:"Polaris",age:"≈70 Ma",visibleFrom:"first-stars",description:"La Estrella Polar actual, cercana al polo norte celeste y útil para orientación.",behavior:"Funciona como marcador de orientación celeste y estrella variable de tipo cefeida."},
-  {slug:"antares",kind:"star",name:"Antares",age:"≈11 Ma",visibleFrom:"first-stars",description:"Estrella rojiza muy luminosa en Escorpio, con un tamaño enorme comparado con el Sol.",behavior:"Se muestra como supergigante roja, comparable visualmente con Betelgeuse por color y evolución."},
-  {slug:"acrux",kind:"star",name:"Acrux",age:"≈10–20 Ma",visibleFrom:"first-stars",description:"La estrella más brillante de la Cruz del Sur, visible desde latitudes australes.",behavior:"Representa un sistema múltiple: se muestra como punto azul intenso asociado a la Cruz del Sur."},
+  {slug:"sirius",kind:"star",radioSolar:1.711,name:"Sirio",age:"≈242 Ma",visibleFrom:"first-stars",description:"La estrella más brillante del cielo nocturno vista desde la Tierra; en realidad es un sistema binario.",behavior:"En la vista de universo actúa como referencia cercana y brillante: al acercarte se muestra como sistema estelar y no como planeta."},
+  {slug:"vega",kind:"star",radioSolar:2.362,radioNota:"Gira tan rápido que está achatada: 2,3 R☉ por los polos y 2,8 por el ecuador.",name:"Vega",age:"≈455 Ma",visibleFrom:"first-stars",description:"Estrella brillante del hemisferio norte y referencia histórica para calibraciones fotométricas.",behavior:"Se muestra como estrella blanca-azulada, útil para comparar brillo y color con otras estrellas conocidas."},
+  {slug:"betelgeuse",kind:"star",radioSolar:764,radioNota:"Las medidas publicadas van de 640 a 900 R☉: su atmósfera no tiene un borde nítido que medir.",name:"Betelgeuse",age:"≈8–10 Ma",visibleFrom:"first-stars",description:"Supergigante roja evolucionada de Orión, mucho más grande que el Sol y en una etapa avanzada de vida estelar.",behavior:"Debe verse grande y rojiza: representa una estrella masiva envejecida con atmósfera extendida y variación de brillo."},
+  {slug:"rigel",kind:"star",radioSolar:78.9,name:"Rigel",age:"≈8 Ma",visibleFrom:"first-stars",description:"Una de las estrellas más luminosas visibles a simple vista, ubicada en la constelación de Orión.",behavior:"Se visualiza como supergigante azul, más caliente en color que Betelgeuse y parte de la referencia de Orión."},
+  {slug:"proxima-centauri",kind:"star",radioSolar:0.1542,name:"Próxima Centauri",age:"≈4.850 Ma",visibleFrom:"first-stars",description:"La estrella más cercana al Sol, parte del sistema Alfa Centauri y con al menos un planeta confirmado.",behavior:"Se presenta como enana roja cercana; su escala visual se amplifica para poder seleccionarla sin perder su detalle.",type:"Enana roja",constellation:"Centauro",distance:"4,24 años luz",distanceLy:4.24,color:16751469,size:4.2,direction:[0.31, -0.24, -0.92]},
+  {slug:"polaris",kind:"star",radioSolar:37.5,name:"Polaris",age:"≈70 Ma",visibleFrom:"first-stars",description:"La Estrella Polar actual, cercana al polo norte celeste y útil para orientación.",behavior:"Funciona como marcador de orientación celeste y estrella variable de tipo cefeida."},
+  {slug:"antares",kind:"star",radioSolar:680,radioNota:"Supergigante roja de borde difuso; las medidas rondan los 680 R☉.",name:"Antares",age:"≈11 Ma",visibleFrom:"first-stars",description:"Estrella rojiza muy luminosa en Escorpio, con un tamaño enorme comparado con el Sol.",behavior:"Se muestra como supergigante roja, comparable visualmente con Betelgeuse por color y evolución."},
+  {slug:"acrux",kind:"star",radioSolar:7.8,radioNota:"Es un sistema múltiple: el radio es el de Acrux A, la componente principal.",name:"Acrux",age:"≈10–20 Ma",visibleFrom:"first-stars",description:"La estrella más brillante de la Cruz del Sur, visible desde latitudes australes.",behavior:"Representa un sistema múltiple: se muestra como punto azul intenso asociado a la Cruz del Sur."},
   {slug:"ton-618",kind:"quasar",name:"TON 618",age:"Luz emitida cuando el universo era joven",visibleFrom:"early-galaxies",description:"TON 618 es un quásar extremadamente distante alimentado por un agujero negro ultramasivo. Su energía proviene de gas caliente en acreción alrededor del agujero negro central.",behavior:"En la vista del universo aparece como núcleo activo: disco de acreción brillante, halo y chorros relativistas. No pertenece al sistema solar; se activa al abrir el zoom cósmico.",type:"Quásar hiperluminoso",constellation:"Canes Venatici / Coma Berenices",distance:">10.000 millones de años luz de tiempo de viaje de la luz",distanceLy:10400000000,color:16765834,size:14,direction:[0.66, 0.27, -0.7],mass:"Más de 60.000 millones de masas solares",redshift:"z ≈ 2,219"}
 ];
 
@@ -71,7 +83,9 @@ function desdeCatalogo(estrella, propia) {
     behavior: propia?.behavior ??
       `Se dibuja en su posición real del cielo, con el color que le corresponde por temperatura y un tamaño proporcional a su brillo aparente.`,
     ...(propia?.mass ? { mass: propia.mass } : {}),
-    ...(propia?.redshift ? { redshift: propia.redshift } : {})
+    ...(propia?.redshift ? { redshift: propia.redshift } : {}),
+    ...(propia?.radioSolar ? { radioSolar: propia.radioSolar } : {}),
+    ...(propia?.radioNota ? { radioNota: propia.radioNota } : {})
   };
 }
 

@@ -26,19 +26,25 @@
       <p class="eyebrow">Explorador 3D educativo</p>
       <h1>Universo, Tierra y Sistema Solar</h1>
       <p class="subtitle">La vista principal muestra la evolución desde el Big Bang, la formación del sistema solar, la historia de la Tierra y la transición de Pangea hacia los continentes actuales.</p>
+      <!-- Los botones a las demás vistas los inyecta nav.js desde una sola
+           lista (nav-model.js), así ninguna vista se queda sin salidas. -->
+      <div class="actions">
+        <span class="destinos" data-destinos></span>
+        <button id="focusEarth" class="btn" type="button">Enfocar la Tierra</button>
+        <button id="focusSystem" class="btn" type="button">Enfocar el sistema solar</button>
+      </div>
     </section>
-    <section class="panel info-panel">
+    <!-- Ficha del cuerpo: oculta hasta que se pulse uno en la escena. Antes
+         ocupaba la esquina desde el primer segundo con la Tierra dentro, y
+         tapaba parte del cielo sin que nadie la hubiera pedido. -->
+    <section class="panel info-panel" id="infoPanel" hidden>
+      <button id="closeInfo" class="panel-close" type="button" aria-label="Cerrar la ficha">×</button>
       <h2 id="infoTitle">Tierra</h2>
       <div id="infoMeta" class="meta">Planeta rocoso · Hoy</div>
       <p id="infoText">La Tierra actual presenta continentes, océanos y una biosfera compleja.</p>
       <div id="facts" class="facts"></div>
       <div class="actions">
         <a id="openFile" class="btn" href="./earth.html">Abrir archivo de la Tierra</a>
-        <a class="btn" href="./solar-scale.html">Ver escala planetaria</a>
-        <a class="btn" href="./indice.html">Índice del universo</a>
-        <a class="btn" href="./constellations.html">Ver constelaciones</a>
-        <a class="btn" href="./referencias.html">Referencias</a>
-        <button id="focusEarth" class="btn" type="button">Enfocar la Tierra</button>
       </div>
     </section>
     <aside class="panel zoom-panel">

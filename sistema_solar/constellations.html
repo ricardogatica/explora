@@ -15,8 +15,7 @@
       <h1>Constelaciones</h1>
       <div id="constellationList" class="constellation-list"></div>
       <div class="bottom-actions">
-        <a class="btn" href="./index.html">Volver al universo</a>
-        <a class="btn" href="./referencias.html">Referencias</a>
+        <span class="destinos" data-destinos></span>
         <button id="zoomOutSky" class="btn" type="button">-</button>
         <button id="zoomInSky" class="btn" type="button">+</button>
         <button id="resetSky" class="btn" type="button">Reset</button>
@@ -28,6 +27,10 @@
       <div id="constellationMeta" class="meta"></div>
       <p id="constellationText"></p>
       <div id="starFacts" class="table"></div>
+      <!-- Las estrellas que componen la figura. Cada una abre su propia ficha
+           en este mismo panel. -->
+      <h3 id="starListTitle" class="star-list__title" hidden>Estrellas de la figura</h3>
+      <div id="starList" class="star-list"></div>
       <div class="bottom-actions">
         <a id="starFile" class="btn" href="./index.html">Abrir archivo</a>
       </div>
