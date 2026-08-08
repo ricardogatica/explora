@@ -381,3 +381,33 @@ test("las figuras se dibujan con la misma orientación que tienen en el cielo", 
     );
   }
 });
+
+test("el giro de las estrellas y la órbita de la Luna van por tiempo, no por cuadro", () => {
+  /* Sumar un incremento fijo en cada cuadro ata la velocidad al refresco de la
+     pantalla. Medido en el navegador de pruebas, que va a 122 cuadros por
+     segundo, el Sol de la escala de soles daba la vuelta en 17 segundos en lugar
+     de los 34 previstos, y la Luna orbitaba en 20 en vez de 40; en un monitor de
+     60 Hz habrían ido a la mitad. Los dos incrementos tienen que multiplicarse
+     por el tiempo transcurrido. */
+  const casos = [
+    { archivo: "star-scale.js", linea: /malla\.rotation\.y\+=[^;\n]*\bsegundos\b/, que: "el giro de las estrellas" },
+    { archivo: "solar-scale.js", linea: /pivoteLuna\.rotation\.y\+=[^;\n]*\btranscurrido\b/, que: "la órbita de la Luna" }
+  ];
+  for (const { archivo, linea, que } of casos) {
+    const source = readFileSync(join(UNIVERSE, archivo), "utf8");
+    assert.match(source, linea,
+      `${que} (${archivo}) debe avanzar según el tiempo transcurrido, no una cantidad fija por cuadro`);
+  }
+});
+
+test("la Luna no está en la fila de la escala planetaria", () => {
+  // Estaba entre la Tierra y Marte como si fuera un planeta más. Ahora orbita
+  // a la Tierra: cuelga de un pivote dentro del grupo de la Tierra.
+  const source = readFileSync(join(UNIVERSE, "solar-scale.js"), "utf8");
+  const fila = source.match(/const layout=\[[\s\S]*?\];/);
+  assert.ok(fila, "no se encontró la fila de cuerpos de la escala planetaria");
+  assert.doesNotMatch(fila[0], /slug:"moon"/,
+    "la Luna no es un planeta: no va en la fila que compara planetas");
+  assert.match(source, /objects\.earth\.group\.add\(pivoteLuna\)/,
+    "la Luna tiene que orbitar dentro del grupo de la Tierra");
+});
