@@ -236,3 +236,43 @@ y en los demás no aporta.
   unifica en la versión que ya usa el sitio.
 - Los datos educativos no se tocan. Añadir el campo `textures` es metadato de
   presentación, no contenido.
+
+---
+
+## Addendum: lo que el ciclo acabó siendo
+
+Escrito al cerrar el ciclo, porque el alcance creció mucho por encima de lo que
+este documento decía y conviene que el registro no mienta.
+
+El spec prometía **solo la Tierra**, con los demás cuerpos procedurales y la
+escena principal intacta. Se entregó eso y bastante más, todo a petición del
+usuario sobre la marcha:
+
+| Lo que decía el spec | Lo que se hizo |
+|---|---|
+| Texturas solo para la Tierra | Los diez cuerpos, con Solar System Scope bajo CC BY 4.0 |
+| Procedencia de texturas sin resolver | Resuelta: se sustituyeron las de origen desconocido |
+| La escena principal intacta | Sus ocho etapas dibujan continentes reales movidos por placas |
+| Nada sobre encuadre | Campo de 38° y encuadre del prototipo en todas las fichas |
+| Nada sobre lunas | Las de Saturno y la Tierra, con períodos que respetan a Kepler |
+| Nada sobre el cielo | Campo de estrellas compartido, con paralaje y puntos redondos |
+| Nada sobre la galaxia | Cabe entera, con rótulos, y su barra dejó de parecer un tubo |
+| Nada sobre rotación | Frenada cuatro veces; las lunas, ocho |
+| Nada sobre estrellas | Shader de granulación y oscurecimiento del limbo |
+
+**Decisiones que contradicen el spec, y por qué:**
+
+- **La Luna procedural se retiró.** El spec no la contemplaba; se construyó a
+  petición del usuario («sin imagen») y luego se sustituyó por su textura real,
+  también a petición suya, porque la generada «se veía rara».
+- **La vista de escala planetaria conserva sus texturas dibujadas.** Se probaron
+  las fotográficas y se revirtieron: a ese tamaño un mapa de 2048 px se reduce a
+  una mancha, así que se pierde el detalle y se gana suciedad.
+- **`run.sh` cambió**, lo que el spec no preveía. No enviaba cabeceras de caché,
+  así que el navegador servía módulos viejos tras editar sin avisar. Costó varios
+  intentos de depuración sobre código que ya era correcto.
+
+**Lo que sigue sin resolver:** las posiciones de las placas de `earth-epochs.js`
+son aproximaciones de conocimiento general y convendría que las validara alguien
+con formación en geología. Está advertido en el propio archivo y en
+`referencias.html`.

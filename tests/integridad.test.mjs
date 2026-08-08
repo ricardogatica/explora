@@ -250,3 +250,24 @@ test("ninguna página duplica el CSS de .atlas-back en línea", () => {
     assert.doesNotMatch(html, /\.atlas-back\{/, `${page} todavía lleva el CSS en línea`);
   }
 });
+
+test("el shader estelar solo se usa en las fichas, no en la vista amplia", () => {
+  // 108 estrellas con shader propio en la vista del universo serían 108 programas
+  // compilados para cuerpos de pocos píxeles. El código debe elegir según `detail`.
+  const src = readFileSync(join(UNIVERSE, "star-renderer.js"), "utf8");
+  assert.match(src, /detail\s*\?\s*starSurfaceMaterial/,
+    "createStarObject debe elegir el shader solo cuando detail es true");
+  assert.match(src, /:\s*new THREE\.MeshBasicMaterial\(\{color:star\.color\}\)/,
+    "sin detail debe quedarse con el material plano, que es el barato");
+});
+
+test("la superficie estelar emite por encima de 1", () => {
+  // Con tone mapping ACES un valor de 1 se comprime a gris claro: una estrella
+  // saldría como una luna. El empuje es lo que la hace brillar.
+  const src = readFileSync(join(UNIVERSE, "star-renderer.js"), "utf8");
+  const m = src.match(/gl_FragColor=vec4\(color\*([\d.]+),1\.0\)/);
+  assert.ok(m, "falta el factor de emisión en el shader estelar");
+  const factor = Number(m[1]);
+  assert.ok(factor > 1.2 && factor < 2.4,
+    `el factor de emisión es ${factor}: por debajo de 1,2 la estrella sale apagada y por encima de 2,4 se quema y borra la granulación`);
+});
