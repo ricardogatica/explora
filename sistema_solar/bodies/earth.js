@@ -3,6 +3,21 @@ export const earth = {
   description:"La Tierra alberga agua líquida estable, una atmósfera protectora y una biosfera compleja. Su historia geológica incluye supercontinentes como Pangea.",
   interaction:"La gravedad del Sol mantiene la órbita terrestre. La Luna estabiliza parcialmente el eje terrestre y produce mareas.",
   visibleFrom:"earth-formation",
+  /* La Luna en la ficha de la Tierra. La distancia real son unos 60 radios
+     terrestres: a esa escala la Tierra sería un punto, así que se comprime a
+     algo más de dos radios, igual que en la escena principal. La textura es la
+     misma que usa su propia ficha.
+
+     La velocidad es más baja que la de las lunas de Júpiter a propósito: la
+     Luna tarda 27 días en dar la vuelta y Ío 1,8, así que debe ser la más
+     lenta de todos los satélites del sitio. Con 0.028, heredado de la escena
+     principal, salía más rápida que Ío: justo al revés que la realidad. */
+  satellites:[
+    {name:"Luna",type:"Satélite natural",diameter:"3.474 km",distance:"384.400 km",
+     radius:0.14,orbitRadius:1.05,orbitSpeed:0.0042,color:0xbfc3cb,
+     texture:"textures/moon/day.jpg",
+     description:"Acoplada por marea: muestra siempre casi la misma cara a la Tierra."}
+  ],
   textures:{
     day:"textures/earth/day.jpg",
     clouds:"textures/earth/clouds.jpg",

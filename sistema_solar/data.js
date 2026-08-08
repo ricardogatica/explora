@@ -8,7 +8,7 @@ import { jupiter } from "./bodies/jupiter.js";
 import { saturn } from "./bodies/saturn.js";
 import { uranus } from "./bodies/uranus.js";
 import { neptune } from "./bodies/neptune.js";
-import { BODY_ORDER, ROTATION_SLOWDOWN, SOLAR_SYSTEM_BEHAVIOR, TIMELINE_EVENTS, TIMELINE_INDEX_BY_ID, getMoonOrbitPosition, getOrbitPosition } from "./solar-system.js";
+import { BODY_ORDER, ROTATION_SLOWDOWN, SATELLITE_SLOWDOWN, SOLAR_SYSTEM_BEHAVIOR, TIMELINE_EVENTS, TIMELINE_INDEX_BY_ID, getMoonOrbitPosition, getOrbitPosition } from "./solar-system.js";
 import { CONSTELLATIONS, CONSTELLATION_BY_SLUG } from "./universe/constellations.js";
 import { KNOWN_STARS, KNOWN_STAR_BY_SLUG } from "./universe/stars.js";
 import { KNOWN_GALAXIES, KNOWN_GALAXY_BY_SLUG } from "./universe/galaxies.js";
@@ -24,6 +24,7 @@ export {
   KNOWN_GALAXIES,
   KNOWN_GALAXY_BY_SLUG,
   ROTATION_SLOWDOWN,
+  SATELLITE_SLOWDOWN,
   SOLAR_SYSTEM_BEHAVIOR,
   TIMELINE_EVENTS,
   TIMELINE_INDEX_BY_ID,

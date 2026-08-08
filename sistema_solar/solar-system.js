@@ -32,6 +32,15 @@ export const TIMELINE_EVENTS = [
    los días reales, con Júpiter el más rápido y Venus el más lento. */
 export const ROTATION_SLOWDOWN = 4;
 
+/* Las lunas se frenan el doble que la rotación de los cuerpos.
+
+   Con solo el factor de rotación, Ío daba una vuelta a Júpiter en 23 segundos:
+   una luna cruzando la pantalla a esa velocidad se lee como un satélite
+   artificial, no como un mundo. Con 8, Ío tarda unos 46 segundos y Calisto
+   casi tres minutos, que además conserva el orden real —las interiores más
+   rápidas que las exteriores, como manda Kepler—. */
+export const SATELLITE_SLOWDOWN = 8;
+
 export const SOLAR_SYSTEM_BEHAVIOR = {
   zoomDistance:{min:6,max:2200,curve:2.2},
   initialZoom:18,

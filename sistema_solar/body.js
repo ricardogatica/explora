@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { BODY_DATA, ROTATION_SLOWDOWN } from "./data.js";
+import { BODY_DATA, ROTATION_SLOWDOWN, SATELLITE_SLOWDOWN } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
 
@@ -98,7 +98,17 @@ if(body.satellites?.length){
     const orbit=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({length:160},(_,i)=>{const a=i/160*Math.PI*2;return new THREE.Vector3(Math.cos(a)*satellite.orbitRadius,Math.sin(a)*satellite.orbitRadius*.08,Math.sin(a)*satellite.orbitRadius)})),new THREE.LineBasicMaterial({color:0x94a3b8,transparent:true,opacity:.26}));
     group.add(orbit);
     const moonGroup=new THREE.Group();
-    const moon=new THREE.Mesh(new THREE.SphereGeometry(satellite.radius,32,32),new THREE.MeshStandardMaterial({color:satellite.color,roughness:1}));
+    const materialLuna=new THREE.MeshStandardMaterial({color:satellite.texture?0xffffff:satellite.color,roughness:1});
+    if(satellite.texture){
+      // Si el satélite declara mapa, se carga igual que los cuerpos mayores.
+      new THREE.TextureLoader().load(satellite.texture,textura=>{
+        textura.colorSpace=THREE.SRGBColorSpace;
+        textura.anisotropy=maxAnisotropy;
+        materialLuna.map=textura;
+        materialLuna.needsUpdate=true;
+      },undefined,()=>{ materialLuna.color.setHex(satellite.color); });
+    }
+    const moon=new THREE.Mesh(new THREE.SphereGeometry(satellite.radius,48,48),materialLuna);
     moonGroup.add(moon);
     const label=makeLabel(satellite.name);label.position.set(0,satellite.radius+.22,0);moonGroup.add(label);
     group.add(moonGroup);
@@ -106,13 +116,27 @@ if(body.satellites?.length){
   });
 }
 
-/* Encuadre: 3,3 radios de distancia, como el prototipo de la Tierra. Antes
-   eran 8 y el cuerpo quedaba pequeño en el centro de la pantalla. Los limites
-   de zoom van tambien en radios, asi que la Luna y el Sol se encuadran igual
-   de bien pese a tener tamaños muy distintos. */
-const focusDistance=body.radius*(slug==="sun"?3.6:3.3);
-camera.position.set(0,body.radius*0.15,focusDistance);
-controls.target.set(0,0,0);controls.minDistance=body.radius*1.35;controls.maxDistance=body.radius*20;
+/* Encuadre.
+
+   Sin lunas: 3,3 radios, como el prototipo de la Tierra, de forma que el cuerpo
+   llene la pantalla.
+
+   Con lunas manda la órbita más lejana, no el planeta. Antes no: Calisto orbita
+   Júpiter a 3,8 y la cámara se quedaba a 3,13, así que las cuatro lunas
+   galileanas caían fuera del encuadre y no había manera de verlas. El planeta
+   sale más pequeño, que es el precio de ver su sistema. */
+const alcance=body.satellites?.length
+  ? Math.max(...body.satellites.map(s=>s.orbitRadius+s.radius))
+  : 0;
+const focusDistance=alcance
+  ? alcance*3.4
+  : body.radius*(slug==="sun"?3.6:3.3);
+/* Con lunas la cámara se eleva sobre el plano orbital. A ras de plano las
+   órbitas se ven como líneas rectas y las lunas parecen una fila de bolas;
+   desde arriba se leen como órbitas. Sin lunas se mantiene casi frontal, que
+   es el mejor angulo para mirar una superficie. */
+camera.position.set(0,focusDistance*(alcance?0.34:0.06),focusDistance);
+controls.target.set(0,0,0);controls.minDistance=body.radius*1.35;controls.maxDistance=Math.max(body.radius,alcance)*20;
 
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 let ultimoInstante=performance.now();
@@ -125,9 +149,9 @@ function animate(){
   // solidaria con el suelo.
   if(cloudLayer)cloudLayer.rotation.y+=body.rotationSpeed*0.34/ROTATION_SLOWDOWN;
   satelliteObjects.forEach(entry=>{
-    entry.angle+=entry.satellite.orbitSpeed;
+    entry.angle+=entry.satellite.orbitSpeed/SATELLITE_SLOWDOWN;
     entry.group.position.set(Math.cos(entry.angle)*entry.satellite.orbitRadius,Math.sin(entry.angle)*entry.satellite.orbitRadius*.08,Math.sin(entry.angle)*entry.satellite.orbitRadius);
-    entry.mesh.rotation.y+=.003;
+    entry.mesh.rotation.y+=.003/SATELLITE_SLOWDOWN;
   });
   if(glow)glow.rotation.y-=0.0006;
   if(rings)rings.rotation.z+=0.0008;
