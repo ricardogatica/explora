@@ -72,6 +72,12 @@ export function createBodyMesh(body,slug,{scale=1,stage="modern"}={}){
    arriba. Añadir otro planeta es soltar los archivos y declarar el campo.
 --------------------------------------------------------------------------- */
 
+/* Hasta dónde llega el borde exterior del anillo, en radios del cuerpo. El
+   valor real de Saturno son unos 2,3 radios, así que está a escala. Se exporta
+   porque el encuadre de la ficha necesita saberlo para que los anillos quepan,
+   y tenerlo en dos sitios distintos acabaría en que uno se queda atrás. */
+export const RING_OUTER_SCALE=2.27;
+
 export function hasPhotorealTextures(body){
   return Boolean(body?.textures?.day);
 }
@@ -245,7 +251,7 @@ export async function loadPhotorealBody(body,{radius=1,sunDirection,anisotropy=1
      que se mapea sobre el anillo por distancia al centro en vez de con las UV
      del RingGeometry, que van pensadas para otra cosa. */
   if(ring){
-    const inner=radius*1.24,outer=radius*2.27;
+    const inner=radius*1.24,outer=radius*RING_OUTER_SCALE;
     const geometria=new THREE.RingGeometry(inner,outer,192);
     const pos=geometria.attributes.position,uv=geometria.attributes.uv;
     const v=new THREE.Vector3();

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, ROTATION_SLOWDOWN, SATELLITE_SLOWDOWN } from "./data.js";
-import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody } from "./body-renderer.js";
+import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody, RING_OUTER_SCALE } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
 
 const slug=document.body.dataset.slug,body=BODY_DATA[slug],parent=body.parent?BODY_DATA[body.parent]:null;
@@ -125,18 +125,43 @@ if(body.satellites?.length){
    Júpiter a 3,8 y la cámara se quedaba a 3,13, así que las cuatro lunas
    galileanas caían fuera del encuadre y no había manera de verlas. El planeta
    sale más pequeño, que es el precio de ver su sistema. */
-const alcance=body.satellites?.length
+/* Lo que tiene que caber: las lunas y, si los hay, los anillos. Sin contar los
+   anillos, Saturno se encuadraba por su radio y el sistema ocupaba el doble de
+   lo que abarca la cámara: se veían cortados por arriba y por abajo. */
+const alcanceLunas=body.satellites?.length
   ? Math.max(...body.satellites.map(s=>s.orbitRadius+s.radius))
   : 0;
-const focusDistance=alcance
-  ? alcance*3.4
-  : body.radius*(slug==="sun"?3.6:3.3);
+const alcanceAnillos=body.textures?.ring?body.radius*RING_OUTER_SCALE:0;
+const alcance=Math.max(alcanceLunas,alcanceAnillos);
+/* Un sistema de lunas se extiende sobre el plano orbital, o sea a lo ancho,
+   y la pantalla es más ancha que alta. Encuadrarlo como si creciera en vertical
+   dejaba la mitad del cuadro en negro. Así que se calculan las dos
+   restricciones y manda la que aprieta:
+
+   - a lo ancho hay que meter el radio de la órbita mayor;
+   - a lo alto, solo su proyección, porque con la cámara elevada unos 19 grados
+     el círculo se ve como una elipse achatada.  */
+const MEDIA_FOV=Math.tan(38/2*Math.PI/180);
+const proporcion=innerWidth/innerHeight;
+const focusDistance=(()=>{
+  if(!alcance)return body.radius*(slug==="sun"?3.6:3.3);
+  const necesarioAlto=Math.max(body.radius,alcance*0.34);
+  const distanciaAlto=necesarioAlto/MEDIA_FOV;
+  const distanciaAncho=alcance/(MEDIA_FOV*proporcion);
+  return Math.max(distanciaAlto,distanciaAncho)*1.16;   // margen para los rótulos
+})();
 /* Con lunas la cámara se eleva sobre el plano orbital. A ras de plano las
    órbitas se ven como líneas rectas y las lunas parecen una fila de bolas;
    desde arriba se leen como órbitas. Sin lunas se mantiene casi frontal, que
    es el mejor angulo para mirar una superficie. */
-camera.position.set(0,focusDistance*(alcance?0.34:0.06),focusDistance);
-controls.target.set(0,0,0);controls.minDistance=body.radius*1.35;controls.maxDistance=Math.max(body.radius,alcance)*20;
+/* El panel de información ocupa el tercio izquierdo, y un sistema de lunas se
+   extiende hacia los dos lados: el rótulo de Europa acababa medio tapado. Se
+   desplaza el conjunto a la derecha lo justo para librarlo, moviendo también el
+   centro de giro para que orbitar la cámara siga sintiéndose natural. */
+const desplazamiento=alcance?alcance*0.20:0;
+group.position.x=desplazamiento;
+camera.position.set(desplazamiento,focusDistance*(alcance?0.34:0.06),focusDistance);
+controls.target.set(desplazamiento,0,0);controls.minDistance=body.radius*1.35;controls.maxDistance=Math.max(body.radius,alcance)*20;
 
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 let ultimoInstante=performance.now();

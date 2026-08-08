@@ -78,6 +78,34 @@ test("solo tienen halo atmosférico los cuerpos con nubes", async () => {
   }
 });
 
+test("las lunas interiores orbitan más rápido que las exteriores", async () => {
+  // Tercera ley de Kepler. Los números están escritos a mano, así que conviene
+  // que algo vigile que nadie los desordene al añadir una luna.
+  const { BODY_DATA } = await import("../sistema_solar/data.js");
+  let comprobados = 0;
+  for (const [slug, body] of Object.entries(BODY_DATA)) {
+    const lunas = [...(body.satellites ?? [])].sort((a, b) => a.orbitRadius - b.orbitRadius);
+    for (let i = 1; i < lunas.length; i++) {
+      comprobados++;
+      assert.ok(lunas[i].orbitSpeed < lunas[i - 1].orbitSpeed,
+        `en ${slug}, ${lunas[i].name} orbita más lejos que ${lunas[i - 1].name} pero no más despacio`);
+    }
+  }
+  assert.ok(comprobados >= 8, `esperaba al menos 8 pares que comparar, hubo ${comprobados}`);
+});
+
+test("las lunas no orbitan dentro del planeta ni dentro de los anillos", async () => {
+  const { BODY_DATA } = await import("../sistema_solar/data.js");
+  const RING_OUTER = 2.27;   // igual que RING_OUTER_SCALE en body-renderer.js
+  for (const [slug, body] of Object.entries(BODY_DATA)) {
+    const limite = body.textures?.ring ? body.radius * RING_OUTER : body.radius;
+    for (const luna of body.satellites ?? []) {
+      assert.ok(luna.orbitRadius - luna.radius > limite,
+        `en ${slug}, ${luna.name} orbitaría por dentro de ${body.textures?.ring ? "los anillos" : "el planeta"}`);
+    }
+  }
+});
+
 test("las páginas del universo cargan nav.js", () => {
   const pages = readdirSync(UNIVERSE).filter(name => name.endsWith(".html"));
   assert.ok(pages.length >= 25, `esperaba al menos 25 páginas, hay ${pages.length}`);
