@@ -89,7 +89,12 @@ function makeCatalog() {
     {
       id: "stars",
       title: "Estrellas",
+      /* Solo las que tienen nombre propio. El cielo se dibuja con las 744 que
+         forman las figuras de las constelaciones, pero listar en el índice
+         cuatrocientas entradas llamadas "Beta Hydri" no ayuda a nadie: se
+         listan las 316 que tienen nombre y el resto se descubre mirando. */
       entries: [...KNOWN_STARS]
+        .filter(star => star.named)
         .sort((a, b) => a.distanceLy - b.distanceLy)
         .map(starEntry)
     },

@@ -7,9 +7,11 @@ test("el catálogo tiene los cuatro grupos en orden", () => {
   assert.deepEqual(catalog.map(g => g.id), ["solar", "stars", "constellations", "galaxies"]);
 });
 
-test("el catálogo suma 207 entradas", () => {
+test("el catálogo suma 415 entradas", () => {
+  // Eran 207 cuando 183 se generaban con datos aproximados. Ahora las estrellas
+  // salen de un catálogo real y se listan las 316 que tienen nombre propio.
   const total = buildCatalog().reduce((n, g) => n + g.entries.length, 0);
-  assert.equal(total, 207);
+  assert.equal(total, 415);
 });
 
 test("el sistema solar lista 10 cuerpos con la Luna tras la Tierra", () => {
@@ -22,7 +24,7 @@ test("el sistema solar lista 10 cuerpos con la Luna tras la Tierra", () => {
 
 test("las estrellas van de la más cercana a la más lejana", () => {
   const stars = buildCatalog().find(g => g.id === "stars");
-  assert.equal(stars.entries.length, 108);
+  assert.equal(stars.entries.length, 316);
   assert.equal(stars.entries[0].slug, "proxima-centauri");
   assert.equal(stars.entries[1].slug, "rigil-kentaurus");
   assert.equal(stars.entries.at(-1).slug, "ton-618");
@@ -43,11 +45,17 @@ test("cada entrada apunta a su destino real", () => {
   assert.equal(entryBySlug("milky-way").href, "milky-way.html");
 });
 
-test("183 entradas están marcadas como aproximadas", () => {
+test("ninguna entrada tiene ya datos aproximados", () => {
+  /* Este test decía lo contrario: comprobaba que 183 de 207 entradas estaban
+     marcadas como aproximadas, porque 99 estrellas y 84 constelaciones se
+     generaban con coordenadas heredadas y descripciones de plantilla. Al
+     sustituirlas por catálogos reales, la marca dejó de tener a quién señalar.
+     El mecanismo se conserva por si vuelve a entrar contenido aproximado. */
   const approximate = buildCatalog()
     .flatMap(g => g.entries)
     .filter(e => e.approximate);
-  assert.equal(approximate.length, 183);
+  assert.equal(approximate.length, 0,
+    `siguen marcadas como aproximadas: ${approximate.map(e => e.slug).join(", ")}`);
 });
 
 test("los cuerpos, la galaxia y las estrellas curadas no son aproximados", () => {
@@ -57,10 +65,13 @@ test("los cuerpos, la galaxia y las estrellas curadas no son aproximados", () =>
   assert.equal(entryBySlug("orion").approximate, false);
 });
 
-test("lo generado sí está marcado como aproximado", () => {
-  assert.equal(entryBySlug("alpheratz").approximate, true);
-  assert.equal(entryBySlug("aquarius").approximate, true);
+test("las estrellas del catálogo traen datos medidos", () => {
+  // Alpheratz era una de las inventadas: heredaba la coordenada de Andrómeda.
+  const a = entryBySlug("alpheratz");
+  assert.equal(a.approximate, false, "ya no es una aproximación");
+  assert.match(a.detail, /años luz/, "su detalle debe incluir la distancia real");
   assert.equal(entryBySlug("aquarius").name, "Acuario");
+  assert.equal(entryBySlug("aquarius").approximate, false);
 });
 
 test("el texto de búsqueda cubre nombre, tipo y constelación", () => {
