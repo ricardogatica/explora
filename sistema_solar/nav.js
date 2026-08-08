@@ -1,4 +1,4 @@
-import { breadcrumbFor, resolveContext, siblingsFor } from "./nav-model.js";
+import { breadcrumbFor, destinationsFor, resolveContext, siblingsFor } from "./nav-model.js";
 
 function currentContext() {
   return resolveContext({
@@ -92,6 +92,26 @@ function isolateCardFromScene() {
   card.addEventListener("pointerdown", event => event.stopPropagation());
 }
 
+// Botones a las demás vistas generales, en la ranura que la página declare con
+// data-destinos. La ranura es explícita en lugar de adivinada: cada vista decide
+// dónde caben sus botones, y las fichas —que ya tienen migas y hermanos— no la
+// declaran, así que no reciben nada.
+//
+// Se rellena una sola vez: dataset.destinos marca la ranura ya servida para que
+// los repintados de constellations-view.js no acumulen botones.
+function renderDestinations(filename) {
+  const slot = document.querySelector("[data-destinos]");
+  if (!slot || slot.dataset.destinos === "listo") return;
+  slot.dataset.destinos = "listo";
+  destinationsFor(filename).forEach(destination => {
+    const link = document.createElement("a");
+    link.className = "btn";
+    link.href = destination.href;
+    link.textContent = destination.label;
+    slot.appendChild(link);
+  });
+}
+
 // Nodos ya inyectados, para poder repintar sin duplicar ni tener que buscarlos
 // otra vez en un DOM que la vista de turno puede haber tocado.
 let crumbsNode = null;
@@ -104,6 +124,10 @@ let siblingsNode = null;
 export function renderNav() {
   isolateCardFromScene();
   const context = currentContext();
+
+  // Antes del return de index.html: esa página no lleva migas pero sí los
+  // botones a las demás vistas.
+  renderDestinations(context.filename);
 
   // No inyectar en index.html: ya tiene su propio botón "← Explora" (uno para
   // escritorio en el panel de título y otro flotante para móvil, donde ese

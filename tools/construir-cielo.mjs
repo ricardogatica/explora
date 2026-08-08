@@ -71,20 +71,37 @@ await new Promise((resolve, reject) => {
 });
 
 /* --- color a partir del índice B-V ---
+
    B-V es la diferencia de brillo entre dos filtros y equivale a temperatura:
-   negativo es azul y caliente, positivo rojo y frío. La conversión es una
-   aproximación buena para ojo humano, no fotometría. */
+   negativo es azul y caliente, positivo rojo y frío. El camino es el físico, en
+   dos pasos, en lugar de interpolar tres canales a ojo:
+
+   1. B-V a temperatura, con la fórmula de Ballesteros (2012).
+   2. Temperatura a RGB, con la aproximación de cuerpo negro de Helland.
+
+   La versión anterior mezclaba los canales con curvas inventadas y le daba al
+   verde su máximo en las estrellas amarillas, así que a las azules les quitaba
+   verde y las dejaba lavanda: Sirio salía #baaada y Rigel #b7a8df. En la vista
+   del universo, donde cada estrella ocupa tres píxeles, no se notaba; en la
+   escala de soles, con Sirio a media pantalla, era imposible no verlo. */
+function temperaturaDesdeIndice(bv) {
+  return 4600 * (1 / (0.92 * bv + 1.7) + 1 / (0.92 * bv + 0.62));
+}
+
 function colorDesdeIndice(ci, spect) {
   if (ci == null || Number.isNaN(ci)) {
     // Sin índice, se deduce de la clase espectral, que es la letra inicial.
     const clase = (spect[0] || "G").toUpperCase();
     ci = { O: -0.32, B: -0.20, A: 0.02, F: 0.36, G: 0.66, K: 1.05, M: 1.60 }[clase] ?? 0.66;
   }
-  const t = Math.max(0, Math.min(1, (ci + 0.35) / 2.0));   // 0 azul .. 1 rojo
-  const r = Math.round(255 * Math.min(1, 0.62 + t * 0.62));
-  const g = Math.round(255 * (0.78 - Math.abs(t - 0.45) * 0.42));
-  const b = Math.round(255 * Math.max(0.32, 1.06 - t * 1.15));
-  return (r << 16) | (g << 8) | b;
+  const k = temperaturaDesdeIndice(Math.max(-0.4, Math.min(2.5, ci))) / 100;
+  const r = k <= 66 ? 255 : 329.698727446 * Math.pow(k - 60, -0.1332047592);
+  const g = k <= 66
+    ? 99.4708025861 * Math.log(k) - 161.1195681661
+    : 288.1221695283 * Math.pow(k - 60, -0.0755148492);
+  const b = k >= 66 ? 255 : k <= 19 ? 0 : 138.5177312231 * Math.log(k - 10) - 305.0447927307;
+  const canal = v => Math.max(0, Math.min(255, Math.round(v)));
+  return (canal(r) << 16) | (canal(g) << 8) | canal(b);
 }
 
 /* --- nombres ---

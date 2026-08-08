@@ -4,7 +4,7 @@ import { BODY_DATA } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
 
-const app=document.getElementById("app"),facts=document.getElementById("scaleFacts"),scaleTitle=document.getElementById("scaleTitle"),scaleText=document.getElementById("scaleText"),resetScale=document.getElementById("resetScale");
+const app=document.getElementById("app"),facts=document.getElementById("scaleFacts"),scaleTitle=document.getElementById("scaleTitle"),scaleText=document.getElementById("scaleText"),resetScale=document.getElementById("resetScale"),scalePanel=document.getElementById("scalePanel"),scaleFile=document.getElementById("scaleFile"),closeScale=document.getElementById("closeScale");
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0011);
 const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.01,5000);camera.position.set(16,20,142);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;app.appendChild(renderer.domElement);
@@ -44,16 +44,35 @@ layout.forEach(item=>{
   scene.add(group);objects[item.slug]={group,mesh,body,radius,label};
 });
 
-function updatePanel(slug){const entry=objects[slug],body=entry.body;scaleTitle.textContent=body.name;scaleText.textContent=`${body.type}. Diámetro: ${body.diameter}. Esta vista compara tamaños relativos, no distancias orbitales.`;facts.innerHTML=`<div class="cell"><strong>Cuerpo</strong><span>${body.name}</span></div><div class="cell"><strong>Tipo</strong><span>${body.type}</span></div><div class="cell"><strong>Diámetro</strong><span>${body.diameter}</span></div><div class="cell"><strong>Satélites</strong><span>${body.moons}</span></div><div class="cell wide"><strong>Escala</strong><span>Radios relativos respecto a la Tierra; el Sol queda parcialmente fuera de cuadro para conservar comparación visual.</span></div>`}
+/* La ficha del cuerpo. Antes se repartía entre las dos tarjetas —el título en la
+   nota de la derecha y la tabla dentro de la tarjeta de navegación—, así que la
+   tarjeta izquierda mezclaba dos cosas: cómo moverse por el sitio y qué es
+   Marte. Ahora la ficha está entera aquí y solo aparece al pulsar un cuerpo. */
+function updatePanel(slug){
+  const entry=objects[slug],body=entry.body;
+  scaleTitle.textContent=body.name;
+  scaleText.textContent=`${body.type}. Diámetro: ${body.diameter}.`;
+  facts.innerHTML=`<div class="cell"><strong>Tipo</strong><span>${body.type}</span></div><div class="cell"><strong>Diámetro</strong><span>${body.diameter}</span></div><div class="cell"><strong>Radio comparado</strong><span>${relativeRadius[slug].toLocaleString("es")} veces la Tierra</span></div><div class="cell"><strong>Satélites</strong><span>${body.moons}</span></div>`;
+  scaleFile.href=`${slug}.html`;
+  scaleFile.textContent=`Abrir archivo de ${body.name}`;
+  scalePanel.hidden=false;
+}
 function minZoomDistance(){if(!selected)return 58;const entry=objects[selected];return Math.max(entry.radius*(selected==="sun"?1.55:3.2),selected==="sun"?52:3.2)}
 function clampTargetDistance(value){return THREE.MathUtils.clamp(value,minZoomDistance(),380)}
 function focusOn(slug){selected=slug;const entry=objects[slug];controls.target.copy(entry.group.position);targetDistance=clampTargetDistance(Math.max(entry.radius*4.8,slug==="sun"?86:7));updatePanel(slug)}
-function showOverview(){selected=null;controls.target.set(10,0,0);targetDistance=142;scaleTitle.textContent="Sistema Solar a escala";scaleText.textContent="Vista comparativa por tamaño relativo. Haz click en un planeta o satélite para acercarte.";facts.innerHTML=`<div class="cell"><strong>Escala</strong><span>Radio relativo a la Tierra</span></div><div class="cell"><strong>Distancias</strong><span>No orbitales</span></div><div class="cell wide"><strong>Interacción</strong><span>Click en cualquier cuerpo para hacer zoom y ver su detalle.</span></div>`}
+/* El reset recupera también la posición inicial de la cámara, no solo la
+   distancia: los cuerpos están alineados en X, así que si se vuelve desde el
+   detalle de Neptuno conservando su dirección, la fila se ve de canto y los diez
+   cuerpos quedan uno detrás de otro. */
+function showOverview(){selected=null;controls.target.set(10,0,0);targetDistance=142;camera.position.set(16,20,142);scalePanel.hidden=true}
 function updateWheelZoom(){if(Math.abs(zoomVelocity)<.001)return;targetDistance=clampTargetDistance(targetDistance+zoomVelocity);zoomVelocity*=.78}
 
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
-window.addEventListener("pointerdown",event=>{pointer.x=event.clientX/innerWidth*2-1;pointer.y=-(event.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(clickables);if(hits.length)focusOn(hits[0].object.userData.slug)});
+/* Solo el lienzo elige cuerpo: pulsar la ficha o los botones no debe lanzar un
+   raycast que cierre lo que se acaba de abrir. */
+window.addEventListener("pointerdown",event=>{if(event.target!==renderer.domElement)return;pointer.x=event.clientX/innerWidth*2-1;pointer.y=-(event.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(clickables);if(hits.length)focusOn(hits[0].object.userData.slug);else scalePanel.hidden=true});
 resetScale.addEventListener("click",()=>{zoomVelocity=0;showOverview()});
+closeScale.addEventListener("click",()=>{scalePanel.hidden=true});
 window.addEventListener("wheel",event=>{event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.025},{passive:false});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 let ultimoInstante=performance.now();

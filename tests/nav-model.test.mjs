@@ -519,3 +519,48 @@ test("tabla completa de migas: etiquetas y enlaces exactos", () => {
     }
   }
 });
+
+import { destinationsFor } from "../sistema_solar/nav-model.js";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const MODULO = join(dirname(fileURLToPath(import.meta.url)), "..", "sistema_solar");
+
+test("cada vista ofrece las demás vistas, nunca la propia", () => {
+  // Estaban escritas a mano en cada HTML: index.html ofrecía cinco salidas y
+  // solar-scale.html dos, así que desde la escala planetaria no había forma de
+  // llegar al índice ni a las constelaciones.
+  const vistas = [
+    "index.html", "solar-scale.html", "star-scale.html",
+    "indice.html", "constellations.html", "referencias.html"
+  ];
+  for (const vista of vistas) {
+    const destinos = destinationsFor(vista);
+    assert.equal(destinos.length, vistas.length - 1, `${vista}: falta alguna salida`);
+    assert.ok(
+      !destinos.some(d => d.href === `./${vista}`),
+      `${vista} se ofrece a sí misma: un botón que no lleva a ninguna parte`
+    );
+  }
+});
+
+test("todos los destinos apuntan a una página que existe", () => {
+  // Un enlace roto en la única barra de navegación del módulo se lleva por
+  // delante la salida de todas las vistas a la vez.
+  for (const destino of destinationsFor("")) {
+    const archivo = destino.href.replace(/^\.\//, "");
+    assert.ok(existsSync(join(MODULO, archivo)), `${destino.label} apunta a ${archivo}, que no existe`);
+  }
+});
+
+test("desde el universo se ofrecen las cinco salidas pedidas", () => {
+  const etiquetas = destinationsFor("index.html").map(d => d.label);
+  assert.deepEqual(etiquetas, [
+    "Ver escala planetaria",
+    "Ver escala de soles",
+    "Índice del universo",
+    "Ver constelaciones",
+    "Referencias"
+  ]);
+});

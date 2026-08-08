@@ -177,8 +177,38 @@ const PAGE_NAMES = {
   "indice.html": "Índice",
   "constellations.html": "Constelaciones",
   "solar-scale.html": "Escala planetaria",
+  "star-scale.html": "Escala de soles",
   "referencias.html": "Referencias"
 };
+
+/* Las vistas generales del módulo, en el orden en que se ofrecen.
+
+   Estaban escritas a mano en cada HTML, así que index.html ofrecía cinco
+   destinos y solar-scale.html solo dos: desde la escala planetaria no había
+   forma de llegar al índice ni a las constelaciones sin volver antes al
+   universo. Ahora la lista vive aquí y cada vista muestra las demás.
+
+   El nombre no se saca de PAGE_NAMES porque en un botón se lee distinto que en
+   una miga de pan: la miga dice dónde estás («Escala planetaria»), el botón
+   dice a dónde vas («Ver escala planetaria»). */
+const DESTINATIONS = [
+  { filename: "index.html", label: "Volver al universo" },
+  { filename: "solar-scale.html", label: "Ver escala planetaria" },
+  { filename: "star-scale.html", label: "Ver escala de soles" },
+  { filename: "indice.html", label: "Índice del universo" },
+  { filename: "constellations.html", label: "Ver constelaciones" },
+  { filename: "referencias.html", label: "Referencias" }
+];
+
+/* Los destinos que tiene sentido ofrecer desde `filename`: todos menos el
+   propio. Un botón que lleva a la página en la que ya estás gasta espacio y
+   confunde, sobre todo en index.html, donde «Volver al universo» sería un
+   botón que no hace nada. */
+export function destinationsFor(filename = "") {
+  return DESTINATIONS
+    .filter(destination => destination.filename !== filename)
+    .map(destination => ({ label: destination.label, href: `./${destination.filename}` }));
+}
 
 // Mapping de filename a page id estructural. Ninguno ≠ ficha o página desconocida.
 const PAGE_IDS = {

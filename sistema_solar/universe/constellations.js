@@ -10,7 +10,7 @@
    Ver la cabecera de sky-catalog.js: ambas fuentes son CC BY-SA 4.0.
 */
 
-import { FIGURA_POR_ABREVIATURA, SKY_BY_HIP } from "./sky.js";
+import { FIGURA_POR_ABREVIATURA, SKY_BY_HIP, direccionDesdeRaDec } from "./sky.js";
 
 /* [slug, nombre, hemisferio, abreviatura IAU, descripción propia si la tiene] */
 const CATALOGO = [
@@ -134,6 +134,23 @@ function proyectar(estrellas) {
   });
 }
 
+/* Cuánto cielo abarca la figura, en grados de diámetro.
+
+   Es el doble del ángulo entre el centro de la constelación y su estrella más
+   alejada, medido con las direcciones reales. La Cruz del Sur cabe en 6° y la
+   Hidra se estira más de 90°: sin este dato, una vista que quiera encuadrar
+   cualquier constelación tendría que elegir un zoom fijo, que deja la Cruz como
+   un punto o la Hidra fuera de cuadro. */
+function extensionGrados(estrellas, centroRa, centroDec) {
+  const centro = direccionDesdeRaDec(centroRa, centroDec);
+  const maximo = estrellas.reduce((mayor, e) => {
+    const punto = e.direction;
+    const coseno = Math.min(1, Math.max(-1, centro[0] * punto[0] + centro[1] * punto[1] + centro[2] * punto[2]));
+    return Math.max(mayor, Math.acos(coseno));
+  }, 0);
+  return +(maximo * 2 * 180 / Math.PI).toFixed(1);
+}
+
 function construir([slug, name, hemisphere, abbr, descripcionPropia]) {
   const figura = FIGURA_POR_ABREVIATURA.get(abbr);
   const estrellas = figura.stars.map(hip => SKY_BY_HIP.get(hip));
@@ -154,6 +171,12 @@ function construir([slug, name, hemisphere, abbr, descripcionPropia]) {
     dec: +centroDec.toFixed(3),
     visibleFrom: "first-stars",
     stars: estrellas.map(e => e.slug),
+    /* Diámetro real de la figura en el cielo, en grados. */
+    extensionGrados: extensionGrados(estrellas, centroRa, centroDec),
+    /* Radio de la figura ya proyectada, en las mismas unidades que points.x/y.
+       Quien la dibuje sabe cuánto vale una unidad en su escena y puede encuadrar
+       sin volver a proyectar nada. */
+    spanPlano: +Math.max(...proyectadas.map(p => Math.hypot(p.x, p.y))).toFixed(3),
     description: descripcionPropia ??
       `${name} es una de las 88 constelaciones oficiales de la IAU. Su figura une ${estrellas.length} estrellas; la más brillante es ${[...estrellas].sort((a, b) => a.mag - b.mag)[0].name}.`,
     points: proyectadas.map(p => ({
@@ -164,6 +187,7 @@ function construir([slug, name, hemisphere, abbr, descripcionPropia]) {
       size: +(0.12 + Math.max(0, (6.6 - p.estrella.mag)) * 0.055).toFixed(3),
       color: p.estrella.color,
       type: p.estrella.type,
+      mag: p.estrella.mag,
       distance: p.estrella.ly ? `${p.estrella.ly} años luz` : "Distancia no determinada",
       distanceLy: p.estrella.ly,
       detail: `${p.estrella.type} de magnitud ${p.estrella.mag}.`
