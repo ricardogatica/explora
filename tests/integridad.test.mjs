@@ -437,3 +437,24 @@ test("la Luna no está en la fila de la escala planetaria", () => {
   assert.match(source, /objects\.earth\.group\.add\(pivoteLuna\)/,
     "la Luna tiene que orbitar dentro del grupo de la Tierra");
 });
+
+test("el proyecto declara sus licencias y las de lo que redistribuye", () => {
+  /* No es burocracia: el catálogo del cielo es obra derivada bajo CC BY-SA 4.0 y
+     las texturas son CC BY 4.0. Redistribuirlas sin decirlo incumple sus
+     licencias, y es el tipo de deuda que no avisa hasta que alguien reclama. */
+  const raiz = join(UNIVERSE, "..");
+  for (const archivo of ["LICENSE", "LICENSE-CONTENIDO", "README.md"]) {
+    assert.ok(existsSync(join(raiz, archivo)), `falta ${archivo} en la raíz`);
+  }
+  const contenido = readFileSync(join(raiz, "LICENSE-CONTENIDO"), "utf8");
+  for (const fuente of ["CC BY-SA 4.0", "HYG", "Stellarium", "Solar System Scope", "CC BY 4.0"]) {
+    assert.ok(contenido.includes(fuente), `LICENSE-CONTENIDO no menciona ${fuente}`);
+  }
+  assert.match(readFileSync(join(raiz, "LICENSE"), "utf8"), /MIT License/);
+
+  // La atribución tiene que seguir siendo visible, no solo estar en un archivo
+  // que nadie abre: es lo que exigen las dos licencias.
+  const referencias = readFileSync(join(UNIVERSE, "referencias.html"), "utf8");
+  assert.ok(referencias.includes("CC BY-SA 4.0") && referencias.includes("Solar System Scope"),
+    "referencias.html es la atribución visible y tiene que nombrar las fuentes");
+});

@@ -1,0 +1,48 @@
+# Licencia del contenido
+
+El contenido educativo de Explora —las páginas de las materias, las preguntas,
+los diagnósticos y los textos de las fichas— se publica bajo
+
+    Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+    https://creativecommons.org/licenses/by-sa/4.0/deed.es
+
+Se puede copiar, adaptar y redistribuir, incluso con fines comerciales, citando
+la fuente y manteniendo la misma licencia en las obras derivadas.
+
+El CÓDIGO es otra obra y va bajo licencia MIT: ver LICENSE.
+
+## Material de terceros incluido
+
+Estas partes no son del proyecto y conservan la licencia de su autor. Están
+citadas también en sistema_solar/referencias.html, que es la atribución visible
+que exigen sus licencias.
+
+### sistema_solar/universe/sky-catalog.js — CC BY-SA 4.0
+
+Obra derivada de dos catálogos:
+
+- HYG Database, de astronexus — https://codeberg.org/astronexus/hyg
+- Stellarium, conjunto modern_iau — https://github.com/Stellarium/stellarium
+
+Ambos son CC BY-SA 4.0, así que el archivo generado lo es también y arrastra el
+ShareAlike a cualquier adaptación suya. Su cabecera lo dice y no debe quitarse.
+
+### sistema_solar/textures/ — CC BY 4.0
+
+Mapas de superficie del Sol, los planetas, la Luna y los anillos de Saturno, de
+Solar System Scope — https://www.solarsystemscope.com/textures/
+
+Publicados bajo Creative Commons Attribution 4.0 International: se pueden usar y
+adaptar citando la fuente.
+
+## Lo que NO está tomado de una fuente publicada
+
+Hay dos conjuntos de datos aproximados, marcados como tales donde viven, para
+que nadie los confunda con mediciones:
+
+- Las posiciones de las placas continentales por época, en
+  sistema_solar/earth-epochs.js: reconstrucción de conocimiento general, no
+  tomada de un dataset paleogeográfico.
+- La asignación de bandas de edad a las categorías de lenguaje, en
+  contenido/migracion-niveles.js: estimación sobre a qué edad se enseña cada
+  tema, no tomada de las bases curriculares chilenas.
