@@ -32,6 +32,26 @@ const ESCALONES=[
 ];
 const RADIO_EN_PANTALLA=9,SEPARACION=3.4,ALTO_FILA=27;
 
+/* Rotación de las estrellas.
+
+   Los periodos reales no caben en una vista: Vega gira sobre sí misma en medio
+   día y Betelgeuse tarda unos cinco años. Poner esa proporción dejaría las
+   supergigantes congeladas, que es como estaban hasta ahora.
+
+   Lo que sí se conserva es el hecho cualitativo, que es el que importa aquí:
+   cuanto más grande la estrella, más despacio gira. El periodo crece con la
+   raíz cuarta del radio, así que Betelgeuse tarda cinco veces más que el Sol en
+   vez de setecientas. Es una decisión de legibilidad, no una medida.
+
+   La velocidad es en radianes por SEGUNDO, no por cuadro. Sumar un incremento
+   fijo en cada cuadro ata la escena al refresco de la pantalla: medido en este
+   navegador, que va a 122 cuadros por segundo, el Sol daba la vuelta en 17
+   segundos en vez de 34, y en un monitor de 60 Hz habría girado a la mitad. */
+const VUELTA_DEL_SOL=34;   // segundos por vuelta del Sol
+function velocidadDeGiro(radioSolar){
+  return Math.PI*2/(VUELTA_DEL_SOL*Math.pow(radioSolar,.25));
+}
+
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0009);
 const camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,0.01,4000);camera.position.set(0,6,132);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;app.appendChild(renderer.domElement);
@@ -127,7 +147,7 @@ ESCALONES.forEach((escalon,fila)=>{
     halo.scale.set(radio*4.2,radio*4.2,1);grupo.add(halo);
     const etiqueta=makeLabel(sol.name,`${numero(sol.radioSolar)} R☉`,radio);
     etiqueta.position.set(0,radio+2.4,0);etiqueta.userData.clave=clave;etiqueta.userData.clickable=true;grupo.add(etiqueta);clickables.push(etiqueta);
-    scene.add(grupo);objetos[clave]={grupo,sol,radio};
+    scene.add(grupo);objetos[clave]={grupo,sol,radio,malla,velocidad:velocidadDeGiro(sol.radioSolar)};
     x+=radio+SEPARACION;
   });
 });
@@ -189,9 +209,13 @@ window.addEventListener("resize",()=>{
 
 let ultimoInstante=performance.now();
 function animate(ms){
-  const ahora=performance.now();cielo.update(ahora-ultimoInstante);ultimoInstante=ahora;
+  const ahora=performance.now(),transcurrido=ahora-ultimoInstante;cielo.update(transcurrido);ultimoInstante=ahora;
   if(Math.abs(zoomVelocity)>.001){targetDistance=THREE.MathUtils.clamp(targetDistance+zoomVelocity,seleccionada?objetos[seleccionada].radio*1.5+2:24,420);zoomVelocity*=.78}
   materiales.forEach(material=>{material.uniforms.uTime.value=ms*.001});
+  // Se acota el salto: al volver de una pestaña en segundo plano, el navegador
+  // entrega un intervalo de varios segundos y las estrellas darían un tirón.
+  const segundos=Math.min(transcurrido,120)/1000;
+  Object.values(objetos).forEach(entrada=>{entrada.malla.rotation.y+=entrada.velocidad*segundos});
   const deseada=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));
   camera.position.lerp(deseada,.055);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);
 }
