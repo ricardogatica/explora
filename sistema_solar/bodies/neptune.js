@@ -3,6 +3,7 @@ export const neptune = {
   description:"Neptuno es un mundo azul profundo con vientos muy intensos y una órbita lejana alrededor del Sol.",
   interaction:"Aunque recibe poca luz solar, su interior libera energía y alimenta una atmósfera dinámica.",
   visibleFrom:"solar-system-formation",
+  textures:{day:"textures/neptune/day.jpg"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"Neptuno aparece mucho después del universo temprano."},
     {from:"solar-system-formation",state:"ice-accretion",title:"Planeta exterior temprano",description:"Se forma en la región fría y participa en la reorganización orbital temprana."},

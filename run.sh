@@ -39,4 +39,27 @@ echo "Explora está en http://localhost:$PORT"
 echo "Detén el servidor con Ctrl+C"
 echo
 
-exec python3 -m http.server "$PORT"
+# Se sirve con no-store en vez de `python3 -m http.server` a secas.
+# Sin cabeceras de caché el navegador decide por su cuenta y guarda los módulos
+# de JavaScript: editas un archivo, recargas, y sigues viendo el código viejo
+# sin ningún aviso. Es un servidor de desarrollo, así que nunca cachea.
+exec python3 - "$PORT" <<'PY'
+import sys
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+class SinCache(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-store, must-revalidate")
+        super().end_headers()
+
+    def guess_type(self, path):
+        # Algunos Python devuelven text/plain para .mjs y el navegador
+        # entonces se niega a ejecutarlo como módulo.
+        if str(path).endswith(".mjs"):
+            return "text/javascript"
+        return super().guess_type(path)
+
+puerto = int(sys.argv[1])
+ThreadingHTTPServer(("", puerto), partial(SinCache)).serve_forever()
+PY

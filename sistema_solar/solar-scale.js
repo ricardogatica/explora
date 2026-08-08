@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
+import { addStarfield } from "./starfield.js";
 
 const app=document.getElementById("app"),facts=document.getElementById("scaleFacts"),scaleTitle=document.getElementById("scaleTitle"),scaleText=document.getElementById("scaleText"),resetScale=document.getElementById("resetScale");
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0011);
@@ -11,8 +12,14 @@ const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamp
 scene.add(new THREE.AmbientLight(0x8fb3ff,.58));const key=new THREE.PointLight(0xffffff,4.2,0,2);key.position.set(-30,18,24);scene.add(key);const fill=new THREE.DirectionalLight(0x7dd3fc,.7);fill.position.set(20,12,-16);scene.add(fill);
 
 function makeLabel(text,bodyRadius){const canvas=document.createElement("canvas");canvas.width=512;canvas.height=160;const ctx=canvas.getContext("2d");ctx.fillStyle="rgba(248,250,252,.98)";ctx.font="900 54px Inter, sans-serif";ctx.textAlign="center";ctx.fillText(text,256,86);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false}));const scale=bodyRadius>25?7.4:Math.min(4.2,Math.max(1.25,bodyRadius*.65+1.15));sprite.scale.set(scale,scale*.32,1);return sprite}
-function starField(count,radius){const geometry=new THREE.BufferGeometry(),positions=new Float32Array(count*3);for(let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*radius;positions[i*3+1]=(Math.random()-.5)*radius*.45;positions[i*3+2]=(Math.random()-.5)*radius}geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));return new THREE.Points(geometry,new THREE.PointsMaterial({color:0xdbeafe,size:.9,transparent:true,opacity:.7,depthWrite:false}))}
-scene.add(starField(4200,1200));
+/* Las estrellas se repartían dentro de una CAJA de 1200 unidades, así que
+   muchas caían delante de los planetas y cerca de la cámara: se veían como
+   cuadrados grandes flotando en primer plano. El cielo compartido las coloca
+   en dos capas esféricas muy lejanas, detrás de todo, y con destello redondo. */
+/* Radios ajustados a la niebla de esta escena (FogExp2 0.0011): más allá de
+   unas 800 unidades no se ve nada, así que las capas se acercan en vez de
+   quedarse en el rango por defecto, donde desaparecían del todo. */
+const cielo=addStarfield(scene,1,{cerca:[170,380],lejos:[400,780],tamañoCerca:0.85,tamañoLejos:1.25});
 
 const relativeRadius={sun:109,mercury:.383,venus:.949,earth:1,moon:.2724,mars:.532,jupiter:11.21,saturn:9.45,uranus:4.01,neptune:3.88};
 const layout=[
@@ -32,7 +39,7 @@ layout.forEach(item=>{
   const body=BODY_DATA[item.slug],radius=relativeRadius[item.slug]*item.unit,group=new THREE.Group();group.position.set(item.x,0,0);group.userData.slug=item.slug;
   const mesh=createBodyMesh(body,item.slug,{scale:radius/body.radius,stage:"modern"});mesh.userData.slug=item.slug;mesh.userData.clickable=true;group.add(mesh);clickables.push(mesh);
   if(item.slug==="sun")group.add(createSunGlow(radius,1.08));
-  if(item.slug==="saturn")mesh.add(createSaturnRings(radius,{inner:1.2,outer:2.05,segments:96}));
+  if(item.slug==="saturn")mesh.add(createSaturnRings(radius,{texture:body.textures?.ring}));
   const label=makeLabel(body.name,radius);label.position.set(0,radius+item.labelOffset,0);label.userData.slug=item.slug;label.userData.clickable=true;group.add(label);clickables.push(label);
   scene.add(group);objects[item.slug]={group,mesh,body,radius,label};
 });
@@ -49,5 +56,6 @@ window.addEventListener("pointerdown",event=>{pointer.x=event.clientX/innerWidth
 resetScale.addEventListener("click",()=>{zoomVelocity=0;showOverview()});
 window.addEventListener("wheel",event=>{event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.025},{passive:false});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-function animate(){updateWheelZoom();Object.values(objects).forEach(entry=>{entry.mesh.rotation.y+=entry.body.rotationSpeed*2.2});const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,.055);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate)}
+let ultimoInstante=performance.now();
+function animate(){const ahora=performance.now();cielo.update(ahora-ultimoInstante);ultimoInstante=ahora;updateWheelZoom();Object.values(objects).forEach(entry=>{entry.mesh.rotation.y+=entry.body.rotationSpeed*2.2});const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,.055);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate)}
 showOverview();requestAnimationFrame(animate);

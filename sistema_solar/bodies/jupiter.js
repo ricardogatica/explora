@@ -9,6 +9,7 @@ export const jupiter = {
     {name:"Ganímedes",type:"Luna galileana mayor",diameter:"5.268 km",distance:"1.070.400 km",radius:0.15,orbitRadius:2.95,orbitSpeed:0.008,color:0xb7a58d,description:"La luna más grande del sistema solar; incluso supera en tamaño a Mercurio."},
     {name:"Calisto",type:"Luna galileana exterior",diameter:"4.821 km",distance:"1.882.700 km",radius:0.14,orbitRadius:3.8,orbitSpeed:0.005,color:0x8f8272,description:"Mundo antiguo y craterizado que conserva una superficie muy poco renovada."}
   ],
+  textures:{day:"textures/jupiter/day.jpg"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"El hidrógeno y helio existen, pero Júpiter como planeta todavía no."},
     {from:"solar-system-formation",state:"gas-accretion",title:"Crecimiento rápido",description:"Captura gas del disco solar y se convierte en el planeta dominante del sistema."},

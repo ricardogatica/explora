@@ -3,6 +3,7 @@ export const uranus = {
   description:"Urano rota casi de lado. Ese eje extremo hace que sus estaciones sean muy particulares.",
   interaction:"Su gran inclinación axial cambia cómo recibe la luz solar durante su larga órbita.",
   visibleFrom:"solar-system-formation",
+  textures:{day:"textures/uranus/day.jpg"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"Urano todavía no forma parte de ningún sistema planetario."},
     {from:"solar-system-formation",state:"ice-accretion",title:"Gigante helado temprano",description:"Se forma en la zona externa rica en hielos y materiales volátiles."},

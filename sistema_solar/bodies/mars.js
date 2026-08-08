@@ -3,6 +3,7 @@ export const mars = {
   description:"Marte es un planeta frío y desértico con casquetes polares, volcanes gigantes y huellas de agua pasada.",
   interaction:"Recibe menos energía solar que la Tierra por su mayor distancia. Su atmósfera delgada no retiene mucho calor.",
   visibleFrom:"solar-system-formation",
+  textures:{day:"textures/mars/day.jpg"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"Marte todavía no se ha formado como planeta rocoso."},
     {from:"solar-system-formation",state:"accretion",title:"Marte temprano",description:"Crece en el borde exterior de la zona de planetas rocosos."},

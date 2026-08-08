@@ -3,6 +3,9 @@ export const sun = {
   description:"El Sol concentra casi toda la masa del sistema solar. Su gravedad mantiene a los planetas, asteroides y cometas en órbita. Produce energía por fusión nuclear en su núcleo.",
   interaction:"La gravedad solar domina el sistema. Cada planeta acelera o desacelera según su distancia y velocidad orbital alrededor del Sol.",
   visibleFrom:"solar-system-formation",
+  // Emite su propia luz: material sin iluminación, o saldría a oscuras.
+  emissive:true,
+  textures:{day:"textures/sun/day.jpg"},
   timelineStages:[
     {from:"big-bang",state:"future",title:"Aún no existe",description:"En el Big Bang solo están los ingredientes iniciales; el Sol aparecerá miles de millones de años después."},
     {from:"solar-system-formation",state:"formed",title:"Proto-Sol",description:"Una onda de choque pudo comprimir la nebulosa; al colapsar, más del 99% de la masa cayó al centro, encendió el Sol joven y dejó un disco donde polvo y hielo empezaron a formar planetesimales."},
