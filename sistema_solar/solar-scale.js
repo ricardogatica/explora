@@ -1,15 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA } from "./data.js";
-import { createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
+import { applyDayTexture, createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
 
 const app=document.getElementById("app"),facts=document.getElementById("scaleFacts"),scaleTitle=document.getElementById("scaleTitle"),scaleText=document.getElementById("scaleText"),resetScale=document.getElementById("resetScale");
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0011);
 const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.01,5000);camera.position.set(16,20,142);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;app.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;app.appendChild(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enableZoom=false;controls.minDistance=2;controls.maxDistance=380;controls.target.set(10,0,0);
-scene.add(new THREE.AmbientLight(0x8fb3ff,.58));const key=new THREE.PointLight(0xffffff,4.2,0,2);key.position.set(-30,18,24);scene.add(key);const fill=new THREE.DirectionalLight(0x7dd3fc,.7);fill.position.set(20,12,-16);scene.add(fill);
+/* Con texturas fotográficas la luz ambiente generosa las deja lechosas y borra
+   el relieve, así que baja de 0,58 a 0,36 y pierde el tinte azulado. No baja
+   más porque esta vista existe para comparar tamaños y los cuatro planetas
+   interiores son puntos: con 0,26 se perdían en el negro. */
+scene.add(new THREE.AmbientLight(0xbfcede,.36));const key=new THREE.PointLight(0xffffff,4.6,0,2);key.position.set(-30,18,24);scene.add(key);const fill=new THREE.DirectionalLight(0x7dd3fc,.7);fill.position.set(20,12,-16);scene.add(fill);
 
 function makeLabel(text,bodyRadius){const canvas=document.createElement("canvas");canvas.width=512;canvas.height=160;const ctx=canvas.getContext("2d");ctx.fillStyle="rgba(248,250,252,.98)";ctx.font="900 54px Inter, sans-serif";ctx.textAlign="center";ctx.fillText(text,256,86);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false}));const scale=bodyRadius>25?7.4:Math.min(4.2,Math.max(1.25,bodyRadius*.65+1.15));sprite.scale.set(scale,scale*.32,1);return sprite}
 /* Las estrellas se repartían dentro de una CAJA de 1200 unidades, así que
@@ -39,6 +43,8 @@ layout.forEach(item=>{
   const body=BODY_DATA[item.slug],radius=relativeRadius[item.slug]*item.unit,group=new THREE.Group();group.position.set(item.x,0,0);group.userData.slug=item.slug;
   const mesh=createBodyMesh(body,item.slug,{scale:radius/body.radius,stage:"modern"});mesh.userData.slug=item.slug;mesh.userData.clickable=true;group.add(mesh);clickables.push(mesh);
   if(item.slug==="sun")group.add(createSunGlow(radius,1.08));
+  // La malla aparece con su textura dibujada y se actualiza al llegar la real.
+  applyDayTexture(mesh,body,{anisotropy:renderer.capabilities.getMaxAnisotropy()});
   if(item.slug==="saturn")mesh.add(createSaturnRings(radius,{texture:body.textures?.ring}));
   const label=makeLabel(body.name,radius);label.position.set(0,radius+item.labelOffset,0);label.userData.slug=item.slug;label.userData.clickable=true;group.add(label);clickables.push(label);
   scene.add(group);objects[item.slug]={group,mesh,body,radius,label};

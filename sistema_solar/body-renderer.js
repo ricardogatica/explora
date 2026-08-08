@@ -60,6 +60,22 @@ export function createBodyMaterials(BODY_DATA){
   };
 }
 
+/* Sustituye la textura procedural de una malla ya creada por el mapa real del
+   cuerpo, si lo declara. Se usa en las vistas de conjunto, donde interesa que
+   la página aparezca al instante y los planetas mejoren cuando lleguen sus
+   imágenes, en vez de esperar a tenerlas todas. Si alguna falla, esa malla se
+   queda con su textura dibujada y las demás siguen su curso. */
+export function applyDayTexture(mesh,body,{anisotropy=1}={}){
+  const url=body?.textures?.day;
+  if(!url)return;
+  new THREE.TextureLoader().load(url,textura=>{
+    textura.colorSpace=THREE.SRGBColorSpace;
+    textura.anisotropy=anisotropy;
+    mesh.material.map=textura;
+    mesh.material.needsUpdate=true;
+  },undefined,()=>{});
+}
+
 export function createBodyMesh(body,slug,{scale=1,stage="modern"}={}){
   return new THREE.Mesh(new THREE.SphereGeometry(body.radius*scale,64,64),materialForBody(body,slug,stage));
 }
