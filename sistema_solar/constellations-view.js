@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "./data.js";
 import { getGlowTexture } from "./star-renderer.js";
 import { baseLocal } from "./universe/sky.js";
+import { crearReloj, suavizado } from "./tiempo.js";
 // Esta vista cambia el ?slug= con replaceState sin recargar: hay que pedirle a
 // nav.js que repinte la miga, o se queda con la constelación de llegada.
 import { renderNav } from "./nav.js";
@@ -207,9 +208,12 @@ window.addEventListener("keydown",event=>{if(event.key.toLowerCase()==="q")targe
 zoomInSky.addEventListener("click",()=>setZoom(-10));zoomOutSky.addEventListener("click",()=>setZoom(10));resetSky.addEventListener("click",resetView);
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
+const reloj=crearReloj();
 function animate(ms){
-  const time=ms*.001,zoomFocus=THREE.MathUtils.clamp((76-camera.fov)/42,0,1);
-  camera.rotation.x=THREE.MathUtils.lerp(camera.rotation.x,targetPitch,.12);camera.rotation.y=THREE.MathUtils.lerp(camera.rotation.y,targetYaw,.12);camera.rotation.z=THREE.MathUtils.lerp(camera.rotation.z,targetRoll,.12);camera.fov=THREE.MathUtils.lerp(camera.fov,targetFov,.12);camera.updateProjectionMatrix();
+  /* El suavizado va por tiempo y no por cuadro: a 60 Hz la cámara tardaba el
+     doble en llegar a la constelación elegida que a 120. Ver tiempo.js. */
+  const time=ms*.001,{avance}=reloj.paso(ms),paso=suavizado(.12,avance),zoomFocus=THREE.MathUtils.clamp((76-camera.fov)/42,0,1);
+  camera.rotation.x=THREE.MathUtils.lerp(camera.rotation.x,targetPitch,paso);camera.rotation.y=THREE.MathUtils.lerp(camera.rotation.y,targetYaw,paso);camera.rotation.z=THREE.MathUtils.lerp(camera.rotation.z,targetRoll,paso);camera.fov=THREE.MathUtils.lerp(camera.fov,targetFov,paso);camera.updateProjectionMatrix();
   clickables.forEach((child,index)=>{
     if(!child.material)return;
     const {entry,role}=child.userData,isActive=active&&entry.slug===active.slug;

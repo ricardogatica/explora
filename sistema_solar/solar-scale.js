@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
+import { crearReloj, suavizado } from "./tiempo.js";
 
 const app=document.getElementById("app"),facts=document.getElementById("scaleFacts"),scaleTitle=document.getElementById("scaleTitle"),scaleText=document.getElementById("scaleText"),resetScale=document.getElementById("resetScale"),scalePanel=document.getElementById("scalePanel"),scaleFile=document.getElementById("scaleFile"),closeScale=document.getElementById("closeScale");
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0011);
@@ -118,7 +119,7 @@ function focusOn(slug){selected=slug;const entry=objects[slug];controls.target.c
    detalle de Neptuno conservando su dirección, la fila se ve de canto y los diez
    cuerpos quedan uno detrás de otro. */
 function showOverview(){selected=null;controls.target.set(10,0,0);targetDistance=142;camera.position.set(16,20,142);scalePanel.hidden=true}
-function updateWheelZoom(){if(Math.abs(zoomVelocity)<.001)return;targetDistance=clampTargetDistance(targetDistance+zoomVelocity);zoomVelocity*=.78}
+function updateWheelZoom(avance){if(Math.abs(zoomVelocity)<.001)return;targetDistance=clampTargetDistance(targetDistance+zoomVelocity*avance);zoomVelocity*=Math.pow(.78,avance)}
 
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
 /* Solo el lienzo elige cuerpo: pulsar la ficha o los botones no debe lanzar un
@@ -128,14 +129,15 @@ resetScale.addEventListener("click",()=>{zoomVelocity=0;showOverview()});
 closeScale.addEventListener("click",()=>{scalePanel.hidden=true});
 window.addEventListener("wheel",event=>{event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.025},{passive:false});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-let ultimoInstante=performance.now();
-function animate(){
-  const ahora=performance.now(),transcurrido=ahora-ultimoInstante;cielo.update(transcurrido);ultimoInstante=ahora;
-  updateWheelZoom();
-  Object.values(objects).forEach(entry=>{entry.mesh.rotation.y+=entry.body.rotationSpeed*2.2});
-  // Acotado: al volver de una pestaña en segundo plano el intervalo llega en
-  // segundos y la Luna daría un salto por su órbita.
-  pivoteLuna.rotation.y+=VELOCIDAD_ORBITA_LUNA*Math.min(transcurrido,120)/1000;
+const reloj=crearReloj();
+/* `avance` son cuadros de referencia transcurridos: 1 a 120 Hz, 2 a 60. Ver
+   tiempo.js — las velocidades están escritas por cuadro y esto las corrige. */
+function animate(ms){
+  const {segundos,avance}=reloj.paso(ms);
+  cielo.update(segundos*1000);
+  updateWheelZoom(avance);
+  Object.values(objects).forEach(entry=>{entry.mesh.rotation.y+=entry.body.rotationSpeed*2.2*avance});
+  pivoteLuna.rotation.y+=VELOCIDAD_ORBITA_LUNA*segundos;
   /* Con la Luna enfocada, la cámara la sigue: es lo único que se mueve en esta
      escena, y sin esto se iría del cuadro en cuanto avanzara por su órbita.
 
@@ -150,6 +152,6 @@ function animate(){
     controls.target.add(desplazamiento);camera.position.add(desplazamiento);
   }
   const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));
-  camera.position.lerp(desired,.055);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);
+  camera.position.lerp(desired,suavizado(.055,avance));controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);
 }
 showOverview();requestAnimationFrame(animate);

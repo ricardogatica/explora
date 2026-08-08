@@ -139,16 +139,17 @@ export function createQuasarObject(quasar,{detail=false}={}){
   return{group,core,halo};
 }
 
-export function animateStellarObject(entry,time){
+/* `avance` son cuadros de referencia transcurridos (ver tiempo.js). */
+export function animateStellarObject(entry,time,avance=1){
   const group=entry.group||entry.object||entry;
   if(entry.kind==="quasar"||group.userData.kind==="quasar"){
-    group.rotation.y+=.0015;
-    group.children.forEach((child,index)=>{if(child.geometry?.type==="RingGeometry")child.rotation.z+=.003+index*.0004;if(child.geometry?.type==="PlaneGeometry")child.scale.y=1+Math.sin(time*2.4+index)*.18});
+    group.rotation.y+=.0015*avance;
+    group.children.forEach((child,index)=>{if(child.geometry?.type==="RingGeometry")child.rotation.z+=(.003+index*.0004)*avance;if(child.geometry?.type==="PlaneGeometry")child.scale.y=1+Math.sin(time*2.4+index)*.18});
   }else{
-    group.rotation.y+=.0006;
+    group.rotation.y+=.0006*avance;
     // El plasma hierve por su cuenta, independiente del giro del cuerpo.
     if(entry.core?.material?.uniforms?.uTime)entry.core.material.uniforms.uTime.value=time;
     const glow=entry.glow||group.children.find(child=>child.isSprite);
-    if(glow)glow.scale.multiplyScalar(1+Math.sin(time*2.1)*.0008);
+    if(glow)glow.scale.multiplyScalar(1+Math.sin(time*2.1)*.0008*avance);
   }
 }

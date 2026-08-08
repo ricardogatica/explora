@@ -4,6 +4,7 @@ import { KNOWN_GALAXY_BY_SLUG, KNOWN_STAR_BY_SLUG } from "./data.js";
 import { animateGalaxyObject, createMilkyWayObject } from "./galaxy-renderer.js";
 import { animateStellarObject, createQuasarObject, createStarObject } from "./star-renderer.js";
 import { addStarfield } from "./starfield.js";
+import { crearReloj } from "./tiempo.js";
 
 const params=new URLSearchParams(location.search),slug=document.body.dataset.universeSlug||params.get("slug"),object=KNOWN_STAR_BY_SLUG[slug]||KNOWN_GALAXY_BY_SLUG[slug];
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");
@@ -59,6 +60,8 @@ function updateGalaxyZoom(){
 }
 window.addEventListener("wheel",event=>{if(!isGalaxy)return;event.preventDefault();zoomVelocity+=THREE.MathUtils.clamp(event.deltaY,-160,160)*.75},{passive:false});
 window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-let ultimoInstante=0;
-function animate(ms){const time=ms*.001,dt=ultimoInstante?ms-ultimoInstante:16;ultimoInstante=ms;cielo.update(dt);if(isGalaxy){animateGalaxyObject(parts,time);updateGalaxyZoom()}else animateStellarObject(parts,time);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate)}
+/* Ver tiempo.js: `avance` son cuadros de referencia, para que el giro no dependa
+   del refresco de la pantalla. */
+const reloj=crearReloj();
+function animate(ms){const time=ms*.001,{segundos,avance}=reloj.paso(ms);cielo.update(segundos*1000);if(isGalaxy){animateGalaxyObject(parts,time,avance);updateGalaxyZoom()}else animateStellarObject(parts,time,avance);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate)}
 requestAnimationFrame(animate);

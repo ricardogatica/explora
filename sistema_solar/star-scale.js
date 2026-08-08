@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, KNOWN_STAR_BY_SLUG } from "./data.js";
 import { getGlowTexture, starSurfaceMaterial } from "./star-renderer.js";
 import { addStarfield } from "./starfield.js";
+import { crearReloj, suavizado } from "./tiempo.js";
 
 const app=document.getElementById("app"),facts=document.getElementById("starFacts"),panel=document.getElementById("starPanel"),titleEl=document.getElementById("starTitle"),textEl=document.getElementById("starText"),fileEl=document.getElementById("starFile"),closeEl=document.getElementById("closeStar"),resetEl=document.getElementById("resetStars");
 
@@ -207,16 +208,14 @@ window.addEventListener("resize",()=>{
   if(!seleccionada)targetDistance=distanciaGeneral();
 });
 
-let ultimoInstante=performance.now();
+const reloj=crearReloj();
 function animate(ms){
-  const ahora=performance.now(),transcurrido=ahora-ultimoInstante;cielo.update(transcurrido);ultimoInstante=ahora;
-  if(Math.abs(zoomVelocity)>.001){targetDistance=THREE.MathUtils.clamp(targetDistance+zoomVelocity,seleccionada?objetos[seleccionada].radio*1.5+2:24,420);zoomVelocity*=.78}
+  const {segundos,avance}=reloj.paso(ms);
+  cielo.update(segundos*1000);
+  if(Math.abs(zoomVelocity)>.001){targetDistance=THREE.MathUtils.clamp(targetDistance+zoomVelocity*avance,seleccionada?objetos[seleccionada].radio*1.5+2:24,420);zoomVelocity*=Math.pow(.78,avance)}
   materiales.forEach(material=>{material.uniforms.uTime.value=ms*.001});
-  // Se acota el salto: al volver de una pestaña en segundo plano, el navegador
-  // entrega un intervalo de varios segundos y las estrellas darían un tirón.
-  const segundos=Math.min(transcurrido,120)/1000;
   Object.values(objetos).forEach(entrada=>{entrada.malla.rotation.y+=entrada.velocidad*segundos});
   const deseada=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));
-  camera.position.lerp(deseada,.055);controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);
+  camera.position.lerp(deseada,suavizado(.055,avance));controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);
 }
 vistaGeneral();requestAnimationFrame(animate);
