@@ -284,3 +284,30 @@ a.boton { text-decoration: none; display: inline-block; }
 .referencia p { font-size: 14px; margin: 0 0 .6rem; }
 .referencia code { font-family: var(--mono); font-size: .88em; background: rgba(197,210,214,.5); padding: .1rem .35rem; border-radius: 5px; }
 .referencia__enlace { font-family: var(--mono); font-size: 12px; word-break: break-all; }
+
+/* La escena 3D de una ficha: fondo oscuro sobre papel claro, como una ventana
+   al cielo dentro de la página. */
+.escena {
+  position: relative; margin: 1.5rem 0; border-radius: 18px; overflow: hidden;
+  background: #020617; border: 1px solid var(--rule);
+}
+.escena__lienzo { position: absolute; inset: 0; }
+.escena__lienzo canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.escena__lienzo canvas:active { cursor: grabbing; }
+.escena__aviso, .escena__ayuda {
+  position: absolute; left: 14px; bottom: 12px; margin: 0;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+  color: rgba(226,232,240,.72); pointer-events: none;
+}
+/* Pantalla completa: la misma escena ocupando la ventana, como en la versión
+   anterior del sitio. El ResizeObserver de la escena se encarga del resto. */
+.escena--completa {
+  position: fixed; inset: 0; z-index: 50; margin: 0; border-radius: 0; border: 0; height: 100dvh;
+}
+.escena__completa {
+  position: absolute; top: 12px; right: 12px;
+  border: 1px solid rgba(148,163,184,.4); border-radius: 999px;
+  background: rgba(7,12,28,.75); color: #e2e8f0;
+  font: inherit; font-size: 12px; padding: .4rem .9rem; cursor: pointer;
+}
+.escena__completa:hover { border-color: #38bdf8; color: #fff; }
