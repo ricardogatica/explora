@@ -311,3 +311,43 @@ a.boton { text-decoration: none; display: inline-block; }
   font: inherit; font-size: 12px; padding: .4rem .9rem; cursor: pointer;
 }
 .escena__completa:hover { border-color: #38bdf8; color: #fff; }
+
+/* ── Vistas de pantalla completa ────────────────────────────────────────── */
+/* La escena ocupa la ventana y los paneles flotan encima, como en el sitio
+   anterior. Es el patrón de las cuatro vistas grandes. */
+.vista { position: fixed; inset: 0; background: #020617; overflow: hidden; }
+.vista__lienzo { position: absolute; inset: 0; }
+.vista__lienzo canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+.tarjeta-vista, .ficha-flotante {
+  position: absolute; border: 1px solid rgba(148,163,184,.18); border-radius: 20px;
+  background: rgba(7,12,28,.82); backdrop-filter: blur(16px); color: #f8fafc;
+  padding: 18px; box-shadow: 0 24px 80px rgba(0,0,0,.35);
+}
+.tarjeta-vista { left: 18px; top: 18px; width: min(420px, calc(100vw - 36px)); max-height: calc(100vh - 36px); overflow: auto; }
+.tarjeta-vista h1 { font-family: var(--display); font-size: 30px; margin: 0 0 10px; letter-spacing: -.03em; }
+.tarjeta-vista p { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin: 0 0 10px; }
+.tarjeta-vista .eyebrow { color: #38bdf8; }
+
+.ficha-flotante { right: 18px; bottom: 18px; width: min(360px, calc(100vw - 36px)); }
+.ficha-flotante h2 { font-family: var(--display); margin: 0 0 6px; font-size: 22px; padding-right: 24px; }
+.ficha-flotante p { margin: 0 0 12px; font-size: 14px; color: #cbd5e1; }
+.ficha-flotante__cerrar {
+  position: absolute; top: 10px; right: 12px; border: 0; background: none;
+  color: #94a3b8; font-size: 22px; line-height: 1; cursor: pointer; padding: 2px 6px; border-radius: 8px;
+}
+.ficha-flotante__cerrar:hover { color: #fff; background: rgba(148,163,184,.16); }
+.datos--compactos { grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 14px; }
+.datos--compactos > div { background: rgba(15,23,42,.58); border-color: rgba(148,163,184,.16); padding: .5rem .6rem; }
+.datos--compactos dt { color: #94a3b8; }
+.datos--compactos dd { color: #e2e8f0; font-size: 13px; }
+
+.acciones-vista { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.acciones-vista .boton, .ficha-flotante .boton { font-size: 13px; padding: .55rem 1rem; }
+.acciones-vista .boton--suave, .ficha-flotante .boton--suave {
+  background: rgba(14,24,44,.95); color: #e2e8f0; box-shadow: inset 0 0 0 1px rgba(56,189,248,.35);
+}
+@media (max-width: 780px) {
+  .tarjeta-vista { right: 18px; width: auto; max-height: 46vh; }
+  .ficha-flotante { left: 18px; right: 18px; width: auto; }
+}
