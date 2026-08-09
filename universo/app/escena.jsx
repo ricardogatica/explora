@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
    ficha por la que se navega deja su escena en la memoria de la tarjeta
    gráfica. Medido en la fase 3: 24 navegaciones sin desmontar dan nueve avisos
    de «Too many active WebGL contexts» y el canvas se queda en negro. */
-export default function Escena({ objeto, alto = 420 }) {
+export default function Escena({ objeto, cuerpo, alto = 420 }) {
   const contenedor = useRef(null);
   const [estado, setEstado] = useState("cargando");
   /* A pantalla completa se ve como en la versión anterior del sitio, que era
@@ -25,10 +25,17 @@ export default function Escena({ objeto, alto = 420 }) {
   useEffect(() => {
     let desmontar = null, cancelado = false;
 
-    import("./escenas/objeto-celeste.js")
-      .then(({ montarObjetoCeleste }) => {
-        if (cancelado || !contenedor.current) return;
-        desmontar = montarObjetoCeleste(contenedor.current, objeto);
+    /* Dos escenas distintas: los cuerpos del sistema solar traen lunas,
+       anillos y texturas fotográficas; las estrellas y galaxias, su propio
+       renderizador. Se carga solo la que hace falta. */
+    const cargar = cuerpo
+      ? import("./escenas/cuerpo.js").then(m => contenedor.current && m.montarCuerpo(contenedor.current, cuerpo))
+      : import("./escenas/objeto-celeste.js").then(m => contenedor.current && m.montarObjetoCeleste(contenedor.current, objeto));
+
+    cargar
+      .then(soltar => {
+        if (cancelado) { soltar?.(); return; }
+        desmontar = soltar;
         setEstado("listo");
       })
       .catch(error => {
@@ -37,7 +44,7 @@ export default function Escena({ objeto, alto = 420 }) {
       });
 
     return () => { cancelado = true; desmontar?.(); };
-  }, [objeto]);
+  }, [objeto, cuerpo]);
 
   /* Salir con Escape: en pantalla completa no hay más interfaz que la escena, y
      buscar el botón con el ratón es justo lo que no se quiere hacer ahí. */
