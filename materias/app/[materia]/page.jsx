@@ -18,7 +18,7 @@ export default async function Materia({ params }) {
   const categorias = [...new Set(paginas.map(p => p.categoria))];
 
   return (
-    <main>
+    <main className="pagina">
       <Migas tramos={[{ texto: materia.nombre }]} />
       <p className="eyebrow">Materia</p>
       <h1>{materia.nombre}</h1>

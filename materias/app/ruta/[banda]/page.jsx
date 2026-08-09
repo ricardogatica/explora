@@ -17,7 +17,7 @@ export default async function Banda({ params }) {
   const banda = bandaDetalle(id);
 
   return (
-    <main>
+    <main className="pagina">
       <Migas tramos={[{ texto: "Ruta de aprendizaje", href: "/ruta/" }, { texto: banda.titulo }]} />
       <p className="eyebrow">{banda.etapa}</p>
       <h1>{banda.titulo}</h1>

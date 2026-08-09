@@ -1,32 +1,127 @@
-/* Toma la paleta y las formas del portal (assets/styles.css) para que las dos
-   mitades de Explora se parezcan mientras conviven. Cuando el sistema visual sea
-   compartido de verdad, esto se sustituye por él. */
-:root{
-  --bg:#020617;--panel:rgba(7,12,28,.78);--text:#f8fafc;--muted:#94a3b8;
-  --line:rgba(148,163,184,.18);--accent:#38bdf8;--accent2:#a78bfa;
+/* Páginas interiores: materias, fichas y la ruta.
+
+   La portada trae su propia hoja (portal.css) con la paleta de papel mineral y
+   tinta petróleo. Aquí se continúa esa misma paleta en vez de abrir un segundo
+   idioma visual: antes estas páginas eran oscuras y hacían que el sitio
+   pareciera dos sitios pegados. Se reutilizan sus variables, así que cambiar un
+   color allí lo cambia aquí. */
+
+.pagina {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) var(--shell) 5rem;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);line-height:1.55;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  margin: 0 0 1.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--ink-soft);
 }
-a{color:#7dd3fc}
-.shell{max-width:1080px;margin:0 auto;padding:28px 20px 72px}
-.eyebrow{margin:0 0 6px;color:var(--accent);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.15em}
-h1{margin:0 0 8px;font-size:clamp(26px,4vw,40px);line-height:1.05;letter-spacing:-.03em}
-h2{margin:32px 0 12px;font-size:22px}
-.subtitle{margin:0 0 24px;color:var(--muted)}
-.crumbs{display:flex;gap:6px;align-items:center;margin:0 0 18px;font-size:13px;font-weight:700;color:#64748b}
-.crumbs a{text-decoration:none}
-.rejilla{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-.tarjeta{display:block;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);text-decoration:none;color:var(--text)}
-.tarjeta:hover{border-color:rgba(56,189,248,.6)}
-.tarjeta strong{display:block;font-size:16px;margin-bottom:4px}
-.tarjeta span{font-size:13px;color:var(--muted)}
-.etiqueta{display:inline-block;margin-bottom:8px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2);background:rgba(167,139,250,.12)}
-.prosa{max-width:70ch}
-.prosa table{border-collapse:collapse;margin:16px 0;width:100%}
-.prosa th,.prosa td{border:1px solid var(--line);padding:8px 10px;text-align:left;font-size:14px}
-.prosa code{background:rgba(148,163,184,.14);padding:2px 5px;border-radius:6px;font-size:.92em}
-.prosa blockquote{margin:16px 0;padding:8px 16px;border-left:3px solid var(--accent);color:var(--muted)}
-.vacio{padding:14px 16px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px}
+.crumbs a { color: var(--mate); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+
+.pagina h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.02;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  margin: 0 0 .5rem;
+}
+.pagina h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  font-size: 1.35rem;
+  margin: 2.5rem 0 1rem;
+}
+.pagina .eyebrow {
+  margin: 0 0 .35rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.subtitle { margin: 0 0 2rem; color: var(--ink-soft); max-width: 62ch; }
+
+.rejilla {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  list-style: none;
+  padding: 0;
+}
+
+/* Las tarjetas repiten el gesto de las láminas de la portada —papel, filo fino,
+   sombra corta— a menor escala. */
+.tarjeta {
+  display: block;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: #f4f7f8;
+  box-shadow: 0 1px 0 rgba(22, 36, 44, .04);
+  color: var(--ink);
+  text-decoration: none;
+}
+a.tarjeta:hover { border-color: var(--mate); transform: translateY(-1px); }
+.tarjeta strong { display: block; font-weight: 700; margin-bottom: .25rem; }
+.tarjeta span { display: block; font-size: 14px; color: var(--ink-soft); }
+
+.etiqueta {
+  display: inline-block;
+  margin-bottom: .75rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--lengua);
+}
+
+.vacio {
+  padding: 1rem 1.15rem;
+  border: 1px dashed var(--rule);
+  border-radius: 14px;
+  color: var(--ink-soft);
+  font-size: 15px;
+  background: rgba(255, 255, 255, .4);
+}
+
+/* El texto de las páginas de contenido: markdown convertido a HTML. Medida de
+   línea corta porque son explicaciones que se leen seguidas, no fichas. */
+.prosa { max-width: 68ch; }
+.prosa h1, .prosa h2, .prosa h3 { font-family: var(--display); letter-spacing: -.02em; }
+.prosa h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.02; margin: 0 0 1rem; }
+.prosa h2 { font-size: 1.5rem; margin: 2.25rem 0 .75rem; }
+.prosa h3 { font-size: 1.15rem; margin: 1.75rem 0 .5rem; }
+.prosa table { border-collapse: collapse; width: 100%; margin: 1.25rem 0; }
+.prosa th, .prosa td {
+  border: 1px solid var(--rule);
+  padding: .5rem .7rem;
+  text-align: left;
+  font-size: 15px;
+}
+.prosa th { background: rgba(197, 210, 214, .35); font-weight: 700; }
+.prosa code {
+  font-family: var(--mono);
+  font-size: .9em;
+  background: rgba(197, 210, 214, .4);
+  padding: .1rem .35rem;
+  border-radius: 5px;
+}
+.prosa blockquote {
+  margin: 1.25rem 0;
+  padding: .35rem 1rem;
+  border-left: 3px solid var(--mate);
+  color: var(--ink-soft);
+}
+.prosa li { margin: .3rem 0; }

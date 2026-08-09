@@ -10,7 +10,7 @@ export const metadata = {
 export default function Ruta() {
   const tramos = ruta();
   return (
-    <main>
+    <main className="pagina">
       <Migas tramos={[{ texto: "Ruta de aprendizaje" }]} />
       <p className="eyebrow">De 5 a 17 años</p>
       <h1>Ruta de aprendizaje</h1>

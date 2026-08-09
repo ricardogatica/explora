@@ -21,7 +21,7 @@ export default async function Pagina({ params }) {
   const ficha = paginaDe(slug, id);
 
   return (
-    <main>
+    <main className="pagina">
       <Migas tramos={[{ texto: materia.nombre, href: `/${slug}/` }, { texto: ficha.titulo }]} />
       <span className="etiqueta">{ficha.categoria}</span>
       {/* El markdown es contenido de este repositorio, no entra nada de fuera. */}
