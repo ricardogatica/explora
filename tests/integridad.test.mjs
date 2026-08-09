@@ -497,3 +497,40 @@ test("lo que el universo importa del paquete compartido existe", () => {
     }
   }
 });
+
+test("el universo prerenderiza una ruta por ficha del catálogo", async () => {
+  /* Era la razón de peso para traer un framework aquí: hoy 400 estrellas
+     comparten star.html?slug=… —un archivo, ninguna URL propia, invisibles para
+     un buscador—. La lista de rutas se calcula del catálogo y no se escribe a
+     mano: son 415 fichas y mantener una lista al día es imposible. */
+  const { rutasParaPrerenderizar, rutaDeEntrada } = await import("../universo/app/datos/rutas.js");
+  const rutas = rutasParaPrerenderizar();
+  const entradas = buildCatalog().flatMap(grupo => grupo.entries);
+
+  assert.ok(rutas.length >= entradas.length,
+    `hay ${entradas.length} fichas y solo ${rutas.length} rutas`);
+  for (const grupo of buildCatalog()) {
+    for (const entrada of grupo.entries) {
+      const esperada = rutaDeEntrada(grupo.id, entrada.slug);
+      assert.ok(rutas.includes(esperada), `falta la ruta ${esperada}`);
+    }
+  }
+  // Ninguna ruta con .html ni con query: son las URL que verá la gente.
+  for (const ruta of rutas) {
+    assert.doesNotMatch(ruta, /\.html|\?/, `${ruta} conserva la forma vieja de URL`);
+  }
+});
+
+test("la atribución sigue visible en el universo nuevo", async () => {
+  /* Obligación de las licencias, no cortesía: el catálogo del cielo es CC BY-SA
+     y las texturas CC BY. Al migrar la página es justo cuando se pierde. */
+  const referencias = JSON.parse(
+    readFileSync(join(UNIVERSE, "..", "universo", "app", "datos", "referencias.json"), "utf8")
+  );
+  const texto = JSON.stringify(referencias);
+  for (const fuente of ["CC BY-SA 4.0", "HYG", "Stellarium", "Solar System Scope"]) {
+    assert.ok(texto.includes(fuente), `la página de referencias ya no menciona ${fuente}`);
+  }
+  assert.ok(referencias.tarjetas.length >= 12,
+    `esperaba al menos 12 fichas de referencia, hay ${referencias.tarjetas.length}`);
+});

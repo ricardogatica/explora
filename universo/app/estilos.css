@@ -1,0 +1,286 @@
+/* Estilos del universo.
+
+   Comparte la paleta con las materias —papel mineral y tinta petróleo— para que
+   Explora se lea como un solo sitio. Es una copia y no un import porque las dos
+   apps se compilan por separado; cuando el sistema visual sea de verdad
+   compartido, se moverá a compartido/ y esto desaparecerá.
+
+*/
+
+:root{
+  --paper:#e7ecee;--paper-2:#dde5e8;--ink:#16242c;--ink-soft:#47585f;--rule:#c5d2d6;
+  --lengua:#5b4bdb;--mate:#2563eb;--cielo:#0b7ea8;
+  --display:"Bricolage Grotesque","Trebuchet MS",ui-sans-serif,system-ui,sans-serif;
+  --body:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --shell:clamp(1.25rem,5vw,4.5rem);--max:1180px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--mate)}
+
+/* Páginas interiores: materias, fichas y la ruta.
+
+   La portada trae su propia hoja (portal.css) con la paleta de papel mineral y
+   tinta petróleo. Aquí se continúa esa misma paleta en vez de abrir un segundo
+   idioma visual: antes estas páginas eran oscuras y hacían que el sitio
+   pareciera dos sitios pegados. Se reutilizan sus variables, así que cambiar un
+   color allí lo cambia aquí. */
+
+.pagina {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) var(--shell) 5rem;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  margin: 0 0 1.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+}
+.crumbs a { color: var(--mate); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+
+.pagina h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.02;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  margin: 0 0 .5rem;
+}
+.pagina h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  font-size: 1.35rem;
+  margin: 2.5rem 0 1rem;
+}
+.pagina .eyebrow {
+  margin: 0 0 .35rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.subtitle { margin: 0 0 2rem; color: var(--ink-soft); max-width: 62ch; }
+
+.rejilla {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  list-style: none;
+  padding: 0;
+}
+
+/* Las tarjetas repiten el gesto de las láminas de la portada —papel, filo fino,
+   sombra corta— a menor escala. */
+.tarjeta {
+  display: block;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: #f4f7f8;
+  box-shadow: 0 1px 0 rgba(22, 36, 44, .04);
+  color: var(--ink);
+  text-decoration: none;
+}
+a.tarjeta:hover { border-color: var(--mate); transform: translateY(-1px); }
+.tarjeta strong { display: block; font-weight: 700; margin-bottom: .25rem; }
+.tarjeta span { display: block; font-size: 14px; color: var(--ink-soft); }
+
+.etiqueta {
+  display: inline-block;
+  margin-bottom: .75rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--lengua);
+}
+
+.vacio {
+  padding: 1rem 1.15rem;
+  border: 1px dashed var(--rule);
+  border-radius: 14px;
+  color: var(--ink-soft);
+  font-size: 15px;
+  background: rgba(255, 255, 255, .4);
+}
+
+/* El texto de las páginas de contenido: markdown convertido a HTML. Medida de
+   línea corta porque son explicaciones que se leen seguidas, no fichas. */
+.prosa { max-width: 68ch; }
+.prosa h1, .prosa h2, .prosa h3 { font-family: var(--display); letter-spacing: -.02em; }
+.prosa h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.02; margin: 0 0 1rem; }
+.prosa h2 { font-size: 1.5rem; margin: 2.25rem 0 .75rem; }
+.prosa h3 { font-size: 1.15rem; margin: 1.75rem 0 .5rem; }
+.prosa table { border-collapse: collapse; width: 100%; margin: 1.25rem 0; }
+.prosa th, .prosa td {
+  border: 1px solid var(--rule);
+  padding: .5rem .7rem;
+  text-align: left;
+  font-size: 15px;
+}
+.prosa th { background: rgba(197, 210, 214, .35); font-weight: 700; }
+.prosa code {
+  font-family: var(--mono);
+  font-size: .9em;
+  background: rgba(197, 210, 214, .4);
+  padding: .1rem .35rem;
+  border-radius: 5px;
+}
+.prosa blockquote {
+  margin: 1.25rem 0;
+  padding: .35rem 1rem;
+  border-left: 3px solid var(--mate);
+  color: var(--ink-soft);
+}
+.prosa li { margin: .3rem 0; }
+
+/* ── Visor de preguntas ─────────────────────────────────────────────────── */
+
+.practica {
+  margin: 2rem 0 0;
+  padding: 1.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  background: #f4f7f8;
+}
+.practica__cabecera { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+.practica__cuenta {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+  color: var(--ink-soft); white-space: nowrap;
+}
+.practica__barra { flex: 1; height: 4px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+.practica__barra i { display: block; height: 100%; background: var(--mate); transition: width .25s ease; }
+.practica__tipo {
+  margin: 0 0 .35rem; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft);
+}
+.practica__enunciado { margin: 0 0 1rem; font-size: 1.15rem; font-weight: 500; }
+.practica__pista { margin: -.5rem 0 1rem; font-size: 14px; color: var(--ink-soft); font-style: italic; }
+.practica__fin { font-family: var(--display); margin: 0 0 .5rem; }
+.practica__acciones { margin-top: 1.25rem; }
+
+.opciones { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.opcion {
+  padding: .8rem 1rem; border: 1px solid var(--rule); border-radius: 12px;
+  background: #fff; color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+}
+.opcion:hover:not(:disabled) { border-color: var(--mate); }
+.opcion.es-elegida { border-color: var(--mate); box-shadow: inset 0 0 0 1px var(--mate); }
+/* El verde y el rojo no son lo único que distingue: llevan también el borde
+   grueso y el texto del veredicto, para quien no distinga esos dos colores. */
+.opcion.es-correcta { border-color: #0f7a4a; background: #e8f6ee; box-shadow: inset 0 0 0 2px #0f7a4a; }
+.opcion.es-fallada { border-color: #b3261e; background: #fdecea; box-shadow: inset 0 0 0 2px #b3261e; }
+.opcion:disabled { cursor: default; }
+
+.completar {
+  width: min(100%, 420px); padding: .8rem 1rem; font: inherit;
+  border: 1px solid var(--rule); border-radius: 12px; background: #fff; color: var(--ink);
+}
+.completar:focus { outline: 2px solid var(--mate); outline-offset: 1px; }
+
+.arrastre { display: grid; gap: 1rem; }
+.banco { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; align-items: center; }
+.banco__vacio { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.ficha {
+  padding: .6rem .9rem; border: 1px solid var(--rule); border-radius: 12px;
+  background: #fff; color: var(--ink); font: inherit; cursor: pointer;
+}
+.ficha.es-tomada { border-color: var(--mate); box-shadow: 0 0 0 2px rgba(37, 99, 235, .25); }
+.ficha--puesta { background: #eef3f5; }
+.destinos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.destinos--fila { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+.destino {
+  padding: .7rem .8rem; border: 1px dashed var(--rule); border-radius: 14px;
+  background: rgba(255, 255, 255, .5); cursor: pointer;
+}
+.destino.es-disponible { border-color: var(--mate); background: rgba(37, 99, 235, .06); }
+.destino__nombre {
+  display: block; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .4rem;
+}
+.destino__caja { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; align-items: center; }
+.destino__hueco { font-size: 13px; color: var(--ink-soft); }
+
+.veredicto { margin-top: 1.25rem; padding: .9rem 1.1rem; border-radius: 14px; border: 1px solid var(--rule); }
+.veredicto strong { display: block; margin-bottom: .25rem; }
+.veredicto p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+.veredicto.es-bien { border-color: #0f7a4a; background: #e8f6ee; }
+.veredicto.es-mal { border-color: #b3261e; background: #fdecea; }
+.veredicto.es-anotado { border-color: var(--lengua); background: rgba(91, 75, 219, .07); }
+
+.boton {
+  padding: .75rem 1.4rem; border: 0; border-radius: 999px;
+  background: var(--mate); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.boton:hover:not(:disabled) { filter: brightness(1.08); }
+.boton:disabled { background: var(--rule); color: var(--ink-soft); cursor: not-allowed; }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.boton--suave { background: transparent; color: var(--mate); box-shadow: inset 0 0 0 1px var(--mate); }
+.boton--suave:hover { background: rgba(37, 99, 235, .08); }
+a.boton { text-decoration: none; display: inline-block; }
+
+.buscador { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 2rem 0 .5rem; }
+.buscador__campo {
+  flex: 1 1 260px; padding: .7rem 1rem; font: inherit;
+  border: 1px solid var(--rule); border-radius: 999px; background: #fff; color: var(--ink);
+}
+.buscador__campo:focus { outline: 2px solid var(--mate); outline-offset: 1px; }
+.buscador__cuenta { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 .75rem; }
+.etiqueta--banda {
+  color: var(--mate); text-decoration: none;
+  background: rgba(37, 99, 235, .09); padding: .1rem .5rem; border-radius: 999px;
+}
+.etiqueta--banda:hover { background: rgba(37, 99, 235, .18); }
+
+/* ── Figuras 3D incrustadas ─────────────────────────────────────────────── */
+
+.figura {
+  margin: 2rem 0; padding: 1rem; border: 1px solid var(--rule); border-radius: 18px;
+  background: #f4f7f8; display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 640px) { .figura { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; } }
+/* El lienzo necesita alto propio: un canvas sin altura declarada colapsa a cero
+   y la figura no se ve, sin dar ningún error. */
+.figura__lienzo { width: 100%; height: 260px; display: block; touch-action: none; cursor: grab; }
+.figura__lienzo:active { cursor: grabbing; }
+.figura__pie { font-size: 14px; }
+.figura__pie strong { display: block; margin-bottom: .5rem; }
+.figura__medidas { margin: 0; display: grid; gap: 6px; }
+.figura__medidas > div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--rule); padding-bottom: 4px; }
+.figura__medidas dt { color: var(--ink-soft); }
+.figura__medidas dd { margin: 0; font-family: var(--mono); font-size: 13px; }
+.figura__ayuda { display: block; margin-top: .75rem; font-size: 12px; color: var(--ink-soft); }
+
+/* Fichas del universo */
+.datos { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 1.5rem 0; }
+.datos > div { border: 1px solid var(--rule); border-radius: 14px; padding: .7rem .9rem; background: #f4f7f8; }
+.datos dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.datos dd { margin: .25rem 0 0; font-size: 15px; }
+.aviso { padding: .8rem 1rem; border-left: 3px solid var(--cielo); background: rgba(11,126,168,.07); font-size: 15px; }
+.nota { color: var(--ink-soft); font-size: 15px; max-width: 68ch; }
+.hermanos { display: flex; justify-content: space-between; gap: 10px; margin-top: 2.5rem; }
+
+/* Referencias: la atribución que exigen las licencias */
+.referencias { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); margin-top: 1.5rem; }
+.referencia { border: 1px solid var(--rule); border-radius: 16px; padding: 1.1rem 1.2rem; background: #f4f7f8; }
+.referencia h2 { font-family: var(--display); font-size: 1.2rem; margin: 0 0 .6rem; }
+.referencia p { font-size: 14px; margin: 0 0 .6rem; }
+.referencia code { font-family: var(--mono); font-size: .88em; background: rgba(197,210,214,.5); padding: .1rem .35rem; border-radius: 5px; }
+.referencia__enlace { font-family: var(--mono); font-size: 12px; word-break: break-all; }

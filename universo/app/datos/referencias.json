@@ -1,0 +1,149 @@
+{
+  "tarjetas": [
+    {
+      "epigrafe": "Cielo estrellado · CC BY-SA 4.0",
+      "titulo": "HYG Database y Stellarium",
+      "parrafos": [
+        "Las 744 estrellas que trazan las figuras y las 88 constelaciones salen de dos catálogos reales: los datos estelares —posición, magnitud, distancia y tipo espectral— de la <strong>HYG Database</strong> de astronexus, y las figuras del conjunto <strong>modern_iau</strong> de <strong>Stellarium</strong>.",
+        "Antes de esto, cada constelación se dibujaba con cuatro puntos inventados y todas sus estrellas compartían una sola coordenada, así que ninguna figura se parecía a la real.",
+        "<strong>Ambos catálogos son CC BY-SA 4.0.</strong> El archivo <code>universe/sky-catalog.js</code> es obra derivada y lleva la misma licencia: quien lo reutilice queda sujeto al ShareAlike y debe citar las dos fuentes. Se genera con <code>tools/construir-cielo.mjs</code>."
+      ],
+      "enlace": {
+        "href": "https://codeberg.org/astronexus/hyg",
+        "texto": "codeberg.org/astronexus/hyg"
+      }
+    },
+    {
+      "epigrafe": "Texturas de los planetas",
+      "titulo": "Solar System Scope",
+      "parrafos": [
+        "Las superficies del Sol, los ocho planetas y la Luna son mapas equirectangulares de 2048×1024 de <strong>Solar System Scope</strong>. La Tierra usa cinco (superficie, nubes, luces nocturnas, normales y especular), Venus dos y Saturno lleva además la textura de sus anillos.",
+        "De la superficie diurna de la Tierra se deriva también la máscara de continentes con la que se dibujan las ocho etapas de la línea temporal.",
+        "<strong>Publicadas bajo licencia Creative Commons Attribution 4.0 International (CC BY 4.0)</strong>, que permite usarlas, adaptarlas y compartirlas, incluso con fines comerciales, citando la fuente. Esta ficha es esa cita."
+      ],
+      "enlace": {
+        "href": "https://www.solarsystemscope.com/textures/",
+        "texto": "solarsystemscope.com/textures"
+      }
+    },
+    {
+      "epigrafe": "Escala de soles",
+      "titulo": "Radios estelares",
+      "parrafos": [
+        "La vista de escala de soles compara nueve estrellas en <strong>radios solares</strong> (1 R☉ = 696.340 km, valor nominal de la IAU). El catálogo HYG trae posición y brillo, pero no tamaño: los radios son <strong>medidas publicadas estrella por estrella</strong>, obtenidas en su mayoría por interferometría, y solo se indican los de las nueve que tienen ficha propia.",
+        "No se estima el radio de las otras 735 a partir de su tipo espectral: sería una cifra con aspecto de dato que nadie ha medido.",
+        "Los de las supergigantes son los que más varían entre publicaciones, porque su atmósfera no tiene un borde nítido que medir: <strong>Betelgeuse va de 640 a 900 R☉</strong> según el método y la longitud de onda. La ficha de cada una lo dice en lugar de fingir precisión."
+      ],
+      "enlace": null
+    },
+    {
+      "epigrafe": "Color de las estrellas",
+      "titulo": "Índice B−V y cuerpo negro",
+      "parrafos": [
+        "El color de cada una de las 744 estrellas se calcula, no se elige: del índice <strong>B−V</strong> del catálogo se obtiene la temperatura con la fórmula de <strong>Ballesteros (2012)</strong>, y de la temperatura el color con la aproximación de cuerpo negro de Helland. Así Sirio sale blanco-azulada, el Sol casi blanco y Betelgeuse naranja.",
+        "La primera versión mezclaba los tres canales con curvas hechas a ojo y le daba al verde su máximo en las estrellas amarillas, así que a las azules les quitaba verde: Sirio y Rigel salían lavanda. En la vista del universo, con cada estrella ocupando tres píxeles, no se notaba."
+      ],
+      "enlace": null
+    },
+    {
+      "epigrafe": "Reconstrucción de los continentes",
+      "titulo": "Posiciones de las placas",
+      "parrafos": [
+        "Las etapas anteriores a hoy se dibujan moviendo las costas actuales sobre la esfera, que es como se construyen los mapas paleogeográficos. Las costas son reales; las posiciones de cada placa en cada época son <strong>aproximaciones de conocimiento general, no tomadas de un dataset publicado</strong>.",
+        "Sirven para transmitir la idea —los continentes se mueven, estuvieron unidos, se separaron— con formas reconocibles, no para medir sobre ellas. Están reunidas en una sola tabla de <code>earth-epochs.js</code> por si alguien con formación en geología quiere corregirlas."
+      ],
+      "enlace": null
+    },
+    {
+      "epigrafe": "Constelaciones oficiales",
+      "titulo": "IAU",
+      "parrafos": [
+        "Define las 88 constelaciones como regiones oficiales del cielo. Sirve para nombres, abreviaturas y contexto histórico."
+      ],
+      "enlace": {
+        "href": "https://www.iau.org/public/themes/constellations/",
+        "texto": "iau.org/public/themes/constellations"
+      }
+    },
+    {
+      "epigrafe": "Límites celestes",
+      "titulo": "CDS / VizieR VI/49",
+      "parrafos": [
+        "Catálogo de límites de constelaciones. Sirve para dibujar regiones oficiales y determinar a qué constelación pertenece una coordenada RA/Dec."
+      ],
+      "enlace": {
+        "href": "https://cdsarc.u-strasbg.fr/viz-bin/Cat?cat=VI%2F49",
+        "texto": "cdsarc.u-strasbg.fr/viz-bin/Cat?cat=VI/49"
+      }
+    },
+    {
+      "epigrafe": "Figuras y líneas",
+      "titulo": "Stellarium Sky Cultures",
+      "parrafos": [
+        "Fuente recomendada para reemplazar trazos aproximados por líneas reales de constelaciones. Incluye culturas celestes modernas, occidentales y tradicionales."
+      ],
+      "enlace": {
+        "href": "https://github.com/Stellarium/stellarium/tree/master/skycultures",
+        "texto": "github.com/Stellarium/stellarium/skycultures"
+      }
+    },
+    {
+      "epigrafe": "Cultura moderna",
+      "titulo": "Stellarium modern_iau",
+      "parrafos": [
+        "Base práctica para este atlas: líneas modernas compatibles con las 88 constelaciones IAU. Debe transformarse a nuestro formato <code>points</code> y <code>lines</code>."
+      ],
+      "enlace": {
+        "href": "https://github.com/Stellarium/stellarium/tree/master/skycultures/modern_iau",
+        "texto": "github.com/Stellarium/stellarium/skycultures/modern_iau"
+      }
+    },
+    {
+      "epigrafe": "Catálogo estelar simple",
+      "titulo": "HYG Database",
+      "parrafos": [
+        "Catálogo cómodo para visualizaciones educativas: nombres comunes, coordenadas, magnitud, distancia, color aproximado y referencias cruzadas."
+      ],
+      "enlace": {
+        "href": "https://codeberg.org/astronexus/hyg",
+        "texto": "codeberg.org/astronexus/hyg"
+      }
+    },
+    {
+      "epigrafe": "Fichas astronómicas",
+      "titulo": "SIMBAD / CDS",
+      "parrafos": [
+        "Base de datos de referencia para objetos fuera del sistema solar. Útil para enriquecer fichas de estrellas, nebulosas, galaxias y quásares."
+      ],
+      "enlace": {
+        "href": "https://simbad.u-strasbg.fr/simbad/",
+        "texto": "simbad.u-strasbg.fr/simbad"
+      }
+    },
+    {
+      "epigrafe": "Astrometría precisa",
+      "titulo": "Gaia Archive",
+      "parrafos": [
+        "Fuente para posiciones, paralajes, movimientos propios y fotometría moderna. Es la opción más precisa para ubicar estrellas reales."
+      ],
+      "enlace": {
+        "href": "https://gea.esac.esa.int/archive/",
+        "texto": "gea.esac.esa.int/archive"
+      }
+    },
+    {
+      "epigrafe": "Estrellas visibles",
+      "titulo": "Yale Bright Star Catalogue",
+      "parrafos": [
+        "Catálogo clásico de estrellas visibles a simple vista, útil para poblar una esfera celeste educativa sin traer millones de objetos."
+      ],
+      "enlace": {
+        "href": "https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=V/50",
+        "texto": "vizier.cds.unistra.fr V/50"
+      }
+    }
+  ],
+  "intro": [
+    "Esta página documenta de dónde deben salir los datos para mejorar la precisión de constelaciones, estrellas, límites celestes, distancias y fichas educativas del proyecto."
+  ]
+}

@@ -54,3 +54,7 @@ tmp/
 # Next
 .next/
 out/
+build/
+
+# React Router genera estos tipos en cada build
+.react-router/
