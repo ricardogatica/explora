@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Migas from "../../migas.jsx";
+import Practica from "../../practica.jsx";
 import { bandaDetalle, ruta } from "../../../lib/contenido.js";
 
 export function generateStaticParams() {
@@ -15,6 +16,7 @@ export async function generateMetadata({ params }) {
 export default async function Banda({ params }) {
   const { banda: id } = await params;
   const banda = bandaDetalle(id);
+  const preguntasDelTramo = banda.materias.flatMap(m => m.preguntas).filter(p => p.familia === "practica");
 
   return (
     <main className="pagina">
@@ -50,6 +52,15 @@ export default async function Banda({ params }) {
             </div>
           </section>
         ))
+      )}
+
+      {/* La práctica del tramo mezcla materias a propósito: quien acompaña a un
+          niño de nueve años quiere «lo de nueve años», no elegir asignatura. */}
+      {preguntasDelTramo.length > 0 && (
+        <>
+          <h2>Practicar este tramo</h2>
+          <Practica preguntas={preguntasDelTramo} />
+        </>
       )}
     </main>
   );

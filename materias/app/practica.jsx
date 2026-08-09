@@ -1,0 +1,290 @@
+"use client";
+
+import { useState } from "react";
+import { esCorrecta, puntaje, puntajeMaximo, comentario } from "@explora/contenido/corregir.js";
+
+/* El visor de preguntas: uno para los cinco tipos y las dos materias.
+
+   Sustituye a los dos app.js, que hacían casi lo mismo con 673 líneas de
+   diferencia entre ellos. Con seis materias por delante, cada visor propio
+   habría sido un dialecto más.
+
+   La corrección no está aquí: vive en contenido/corregir.js, donde se puede
+   probar. Este archivo solo pinta y recoge.
+
+   Los dos tipos de arrastre admiten las dos formas. Pulsando —primero el
+   elemento, después su sitio— porque es lo que funciona con el dedo, que es como
+   lo va a usar un niño de seis años, y es lo que ya anunciaba la pista del
+   contenido. Y arrastrando de verdad, porque el enunciado dice «arrastra cada
+   objeto a su caja» y una interfaz que no deja hacer lo que pide su propio
+   enunciado le está mintiendo a quien la lee. */
+
+const nombreDeTipo = {
+  "multiple-choice": "Elige una opción",
+  fill: "Escribe la respuesta",
+  observation: "Marca lo que observas",
+  "drag-match": "Empareja cada elemento",
+  "drag-order": "Ordena los elementos"
+};
+
+function Opciones({ pregunta, valor, elegir, bloqueado }) {
+  return (
+    <div className="opciones">
+      {pregunta.opciones.map(opcion => {
+        const elegida = valor === opcion;
+        /* Con la pregunta ya revisada se marca la correcta aunque no sea la
+           elegida: ver cuál era enseña más que saber que fallaste. En las
+           observaciones no hay correcta, así que no se marca ninguna. */
+        const correcta = bloqueado && pregunta.tipo !== "observation" && opcion === pregunta.respuesta;
+        const fallada = bloqueado && elegida && !correcta && pregunta.tipo !== "observation";
+        return (
+          <button
+            key={opcion}
+            type="button"
+            className={`opcion${elegida ? " es-elegida" : ""}${correcta ? " es-correcta" : ""}${fallada ? " es-fallada" : ""}`}
+            onClick={() => !bloqueado && elegir(opcion)}
+            aria-pressed={elegida}
+            disabled={bloqueado}
+          >
+            {opcion}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Completar({ valor, elegir, bloqueado }) {
+  return (
+    <input
+      className="completar"
+      value={valor ?? ""}
+      onChange={evento => elegir(evento.target.value)}
+      placeholder="Escribe la respuesta"
+      disabled={bloqueado}
+      autoComplete="off"
+      spellCheck="false"
+    />
+  );
+}
+
+function Emparejar({ pregunta, valor, elegir, bloqueado }) {
+  const [tomado, setTomado] = useState(null);
+  const puestos = valor ?? {};
+  const sueltos = pregunta.elementos.filter(elemento => !(elemento.id in puestos));
+
+  const colocar = destino => {
+    if (bloqueado || !tomado) return;
+    elegir({ ...puestos, [tomado]: destino });
+    setTomado(null);
+  };
+  const sacar = id => {
+    if (bloqueado) return;
+    const resto = { ...puestos };
+    delete resto[id];
+    elegir(resto);
+  };
+
+  return (
+    <div className="arrastre">
+      <div className="banco" aria-label="Elementos por colocar">
+        {sueltos.map(elemento => (
+          <button
+            key={elemento.id}
+            type="button"
+            className={`ficha${tomado === elemento.id ? " es-tomada" : ""}`}
+            onClick={() => !bloqueado && setTomado(tomado === elemento.id ? null : elemento.id)}
+            draggable={!bloqueado}
+            onDragStart={() => setTomado(elemento.id)}
+            disabled={bloqueado}
+          >
+            {elemento.etiqueta}
+          </button>
+        ))}
+        {sueltos.length === 0 && <p className="banco__vacio">Todos colocados</p>}
+      </div>
+
+      <div className="destinos">
+        {pregunta.destinos.map(destino => {
+          const dentro = pregunta.elementos.filter(e => puestos[e.id] === destino.id);
+          return (
+            <div
+              key={destino.id}
+              className={`destino${tomado ? " es-disponible" : ""}`}
+              onClick={() => colocar(destino.id)}
+              onDragOver={evento => evento.preventDefault()}
+              onDrop={evento => { evento.preventDefault(); colocar(destino.id); }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={evento => evento.key === "Enter" && colocar(destino.id)}
+            >
+              <span className="destino__nombre">{destino.etiqueta}</span>
+              <div className="destino__caja">
+                {dentro.length === 0
+                  ? <span className="destino__hueco">{tomado ? "Pulsa aquí" : "Vacío"}</span>
+                  : dentro.map(elemento => (
+                      <button
+                        key={elemento.id}
+                        type="button"
+                        className="ficha ficha--puesta"
+                        onClick={evento => { evento.stopPropagation(); sacar(elemento.id); }}
+                        disabled={bloqueado}
+                      >
+                        {elemento.etiqueta}
+                      </button>
+                    ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Ordenar({ pregunta, valor, elegir, bloqueado }) {
+  const [tomado, setTomado] = useState(null);
+  const huecos = valor ?? pregunta.elementos.map(() => null);
+  const sueltos = pregunta.elementos.filter(elemento => !huecos.includes(elemento.id));
+
+  const colocar = posicion => {
+    if (bloqueado || !tomado) return;
+    const siguiente = huecos.map(id => (id === tomado ? null : id));
+    siguiente[posicion] = tomado;
+    elegir(siguiente);
+    setTomado(null);
+  };
+  const etiquetaDe = id => pregunta.elementos.find(e => e.id === id)?.etiqueta ?? "";
+
+  return (
+    <div className="arrastre">
+      <div className="banco" aria-label="Elementos por ordenar">
+        {sueltos.map(elemento => (
+          <button
+            key={elemento.id}
+            type="button"
+            className={`ficha${tomado === elemento.id ? " es-tomada" : ""}`}
+            onClick={() => !bloqueado && setTomado(tomado === elemento.id ? null : elemento.id)}
+            draggable={!bloqueado}
+            onDragStart={() => setTomado(elemento.id)}
+            disabled={bloqueado}
+          >
+            {elemento.etiqueta}
+          </button>
+        ))}
+        {sueltos.length === 0 && <p className="banco__vacio">Todos colocados</p>}
+      </div>
+
+      <div className="destinos destinos--fila">
+        {huecos.map((id, posicion) => (
+          <div
+            key={posicion}
+            className={`destino${tomado ? " es-disponible" : ""}`}
+            onClick={() => (id ? !bloqueado && elegir(huecos.map((x, i) => (i === posicion ? null : x))) : colocar(posicion))}
+            onDragOver={evento => evento.preventDefault()}
+            onDrop={evento => { evento.preventDefault(); colocar(posicion); }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={evento => evento.key === "Enter" && colocar(posicion)}
+          >
+            <span className="destino__nombre">{posicion + 1}</span>
+            <div className="destino__caja">
+              {id
+                ? <span className="ficha ficha--puesta">{etiquetaDe(id)}</span>
+                : <span className="destino__hueco">{tomado ? "Pulsa aquí" : "Vacío"}</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const CUERPOS = {
+  "multiple-choice": Opciones,
+  observation: Opciones,
+  fill: Completar,
+  "drag-match": Emparejar,
+  "drag-order": Ordenar
+};
+
+export default function Practica({ preguntas }) {
+  const [indice, setIndice] = useState(0);
+  const [valor, setValor] = useState(null);
+  const [revisada, setRevisada] = useState(false);
+  const [resultados, setResultados] = useState([]);
+
+  if (preguntas.length === 0) return null;
+
+  const terminado = indice >= preguntas.length;
+  if (terminado) {
+    const puntos = resultados.reduce((suma, r) => suma + r.puntos, 0);
+    const maximo = resultados.reduce((suma, r) => suma + r.maximo, 0);
+    return (
+      <section className="practica">
+        <h2 className="practica__fin">Has terminado</h2>
+        <p className="subtitle">
+          {puntos} de {maximo} puntos en {resultados.length} preguntas.
+          {" "}Equivocarse es parte de aprender: puedes repetir cuando quieras.
+        </p>
+        <button
+          type="button"
+          className="boton"
+          onClick={() => { setIndice(0); setValor(null); setRevisada(false); setResultados([]); }}
+        >
+          Empezar de nuevo
+        </button>
+      </section>
+    );
+  }
+
+  const pregunta = preguntas[indice];
+  const Cuerpo = CUERPOS[pregunta.tipo];
+  const respondida = valor !== null && valor !== "" && !(typeof valor === "object" && Object.keys(valor).length === 0);
+  const acierto = revisada ? esCorrecta(pregunta, valor) : null;
+
+  const revisar = () => {
+    setRevisada(true);
+    setResultados([...resultados, {
+      id: pregunta.id, puntos: puntaje(pregunta, valor), maximo: puntajeMaximo(pregunta)
+    }]);
+  };
+  const siguiente = () => { setIndice(indice + 1); setValor(null); setRevisada(false); };
+
+  return (
+    <section className="practica">
+      <header className="practica__cabecera">
+        <span className="practica__cuenta">Pregunta {indice + 1} de {preguntas.length}</span>
+        <span className="practica__barra" aria-hidden="true">
+          <i style={{ width: `${(indice / preguntas.length) * 100}%` }} />
+        </span>
+      </header>
+
+      <p className="practica__tipo">{nombreDeTipo[pregunta.tipo]}</p>
+      <p className="practica__enunciado">{pregunta.pregunta}</p>
+      {pregunta.pista && !revisada && <p className="practica__pista">{pregunta.pista}</p>}
+
+      <Cuerpo pregunta={pregunta} valor={valor} elegir={setValor} bloqueado={revisada} />
+
+      {revisada && (
+        /* Las observaciones no aciertan ni fallan: se anotan. Pintarlas de rojo
+           sería decirle a un niño de tres años que ha fallado algo que no era
+           una prueba. */
+        <div className={`veredicto${acierto === null ? " es-anotado" : acierto ? " es-bien" : " es-mal"}`}>
+          <strong>
+            {acierto === null ? "Anotado" : acierto ? "Correcto" : "No es esa"}
+          </strong>
+          {comentario(pregunta) && <p>{comentario(pregunta)}</p>}
+        </div>
+      )}
+
+      <div className="practica__acciones">
+        {!revisada
+          ? <button type="button" className="boton" onClick={revisar} disabled={!respondida}>Revisar</button>
+          : <button type="button" className="boton" onClick={siguiente}>
+              {indice + 1 === preguntas.length ? "Ver resultado" : "Siguiente"}
+            </button>}
+      </div>
+    </section>
+  );
+}

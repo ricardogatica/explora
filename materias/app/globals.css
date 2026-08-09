@@ -125,3 +125,88 @@ a.tarjeta:hover { border-color: var(--mate); transform: translateY(-1px); }
   color: var(--ink-soft);
 }
 .prosa li { margin: .3rem 0; }
+
+/* ── Visor de preguntas ─────────────────────────────────────────────────── */
+
+.practica {
+  margin: 2rem 0 0;
+  padding: 1.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  background: #f4f7f8;
+}
+.practica__cabecera { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+.practica__cuenta {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+  color: var(--ink-soft); white-space: nowrap;
+}
+.practica__barra { flex: 1; height: 4px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+.practica__barra i { display: block; height: 100%; background: var(--mate); transition: width .25s ease; }
+.practica__tipo {
+  margin: 0 0 .35rem; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft);
+}
+.practica__enunciado { margin: 0 0 1rem; font-size: 1.15rem; font-weight: 500; }
+.practica__pista { margin: -.5rem 0 1rem; font-size: 14px; color: var(--ink-soft); font-style: italic; }
+.practica__fin { font-family: var(--display); margin: 0 0 .5rem; }
+.practica__acciones { margin-top: 1.25rem; }
+
+.opciones { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.opcion {
+  padding: .8rem 1rem; border: 1px solid var(--rule); border-radius: 12px;
+  background: #fff; color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+}
+.opcion:hover:not(:disabled) { border-color: var(--mate); }
+.opcion.es-elegida { border-color: var(--mate); box-shadow: inset 0 0 0 1px var(--mate); }
+/* El verde y el rojo no son lo único que distingue: llevan también el borde
+   grueso y el texto del veredicto, para quien no distinga esos dos colores. */
+.opcion.es-correcta { border-color: #0f7a4a; background: #e8f6ee; box-shadow: inset 0 0 0 2px #0f7a4a; }
+.opcion.es-fallada { border-color: #b3261e; background: #fdecea; box-shadow: inset 0 0 0 2px #b3261e; }
+.opcion:disabled { cursor: default; }
+
+.completar {
+  width: min(100%, 420px); padding: .8rem 1rem; font: inherit;
+  border: 1px solid var(--rule); border-radius: 12px; background: #fff; color: var(--ink);
+}
+.completar:focus { outline: 2px solid var(--mate); outline-offset: 1px; }
+
+.arrastre { display: grid; gap: 1rem; }
+.banco { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; align-items: center; }
+.banco__vacio { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.ficha {
+  padding: .6rem .9rem; border: 1px solid var(--rule); border-radius: 12px;
+  background: #fff; color: var(--ink); font: inherit; cursor: pointer;
+}
+.ficha.es-tomada { border-color: var(--mate); box-shadow: 0 0 0 2px rgba(37, 99, 235, .25); }
+.ficha--puesta { background: #eef3f5; }
+.destinos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.destinos--fila { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+.destino {
+  padding: .7rem .8rem; border: 1px dashed var(--rule); border-radius: 14px;
+  background: rgba(255, 255, 255, .5); cursor: pointer;
+}
+.destino.es-disponible { border-color: var(--mate); background: rgba(37, 99, 235, .06); }
+.destino__nombre {
+  display: block; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .4rem;
+}
+.destino__caja { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; align-items: center; }
+.destino__hueco { font-size: 13px; color: var(--ink-soft); }
+
+.veredicto { margin-top: 1.25rem; padding: .9rem 1.1rem; border-radius: 14px; border: 1px solid var(--rule); }
+.veredicto strong { display: block; margin-bottom: .25rem; }
+.veredicto p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+.veredicto.es-bien { border-color: #0f7a4a; background: #e8f6ee; }
+.veredicto.es-mal { border-color: #b3261e; background: #fdecea; }
+.veredicto.es-anotado { border-color: var(--lengua); background: rgba(91, 75, 219, .07); }
+
+.boton {
+  padding: .75rem 1.4rem; border: 0; border-radius: 999px;
+  background: var(--mate); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.boton:hover:not(:disabled) { filter: brightness(1.08); }
+.boton:disabled { background: var(--rule); color: var(--ink-soft); cursor: not-allowed; }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.boton--suave { background: transparent; color: var(--mate); box-shadow: inset 0 0 0 1px var(--mate); }
+.boton--suave:hover { background: rgba(37, 99, 235, .08); }
+a.boton { text-decoration: none; display: inline-block; }

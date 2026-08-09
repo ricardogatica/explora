@@ -26,6 +26,13 @@ export default async function Materia({ params }) {
         {materia.descripcion} {paginas.length} páginas y {preguntas.length} preguntas.
       </p>
 
+      <p className="acciones">
+        <Link className="boton" href={`/${slug}/practicar/`}>Practicar {materia.nombre}</Link>
+        {preguntas.some(p => p.familia === "diagnostico") && (
+          <Link className="boton boton--suave" href={`/${slug}/diagnostico/`}>Diagnóstico</Link>
+        )}
+      </p>
+
       {categorias.map(categoria => (
         <section key={categoria}>
           <h2>{categoria}</h2>
