@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Migas from "../../migas.jsx";
+import Figura from "../../figura.jsx";
 import { MATERIAS, materiaPorSlug, paginaDe, paginasDe } from "../../../lib/contenido.js";
 
 /* Con output: "export" hay que enumerar TODAS las rutas dinámicas: no existe la
@@ -32,8 +33,14 @@ export default async function Pagina({ params }) {
           </Link>
         ))}
       </p>
-      {/* El markdown es contenido de este repositorio, no entra nada de fuera. */}
-      <article className="prosa" dangerouslySetInnerHTML={{ __html: ficha.html }} />
+      <article className="prosa">
+        {ficha.bloques.map((bloque, indice) =>
+          bloque.tipo === "figura"
+            ? <Figura key={indice} tipo={bloque.figura} titulo={bloque.titulo} {...bloque.parametros} />
+            /* El markdown es contenido de este repositorio, no entra nada de fuera. */
+            : <div key={indice} dangerouslySetInnerHTML={{ __html: bloque.html }} />
+        )}
+      </article>
     </main>
   );
 }

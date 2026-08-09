@@ -14,6 +14,8 @@ import { join } from "node:path";
 import { marked } from "marked";
 import { validarCorpus, MATERIAS as MATERIAS_VALIDAS } from "@explora/contenido/esquema.js";
 import { separarFrontmatter, validarPagina } from "@explora/contenido/paginas.js";
+import { partirEnBloques } from "@explora/contenido/bloques.js";
+import { NOMBRES_DE_FIGURA } from "@explora/compartido/primitivas.js";
 import { BANDAS, bandaPorId, IDS_VALIDOS } from "@explora/contenido/bandas.js";
 
 /* En build el proceso corre dentro de materias/, y el contenido es hermano suyo:
@@ -77,9 +79,27 @@ export function paginasDe(slug) {
 export function paginaDe(slug, id) {
   const pagina = paginasDe(slug).find(p => p.id === id);
   if (!pagina) return null;
-  /* El HTML sale de markdown escrito en este repositorio: no hay entrada de
-     usuario en este camino. */
-  return { ...pagina, html: marked.parse(pagina.cuerpo) };
+
+  /* El texto se trocea en bloques: markdown y figuras 3D alternándose. El HTML
+     sale de markdown escrito en este repositorio, no de nada que llegue de
+     fuera. */
+  const bloques = partirEnBloques(pagina.cuerpo).map(bloque =>
+    bloque.tipo === "markdown" ? { ...bloque, html: marked.parse(bloque.texto) } : bloque
+  );
+
+  /* Una figura mal escrita rompe el build en vez de dejar un hueco: el nombre se
+     teclea a mano dentro del markdown y equivocarse es cuestión de tiempo. */
+  for (const bloque of bloques) {
+    if (bloque.tipo !== "figura") continue;
+    if (!NOMBRES_DE_FIGURA.includes(bloque.figura)) {
+      throw new Error(
+        `contenido/${slug}/paginas/${id}.md pide la figura «${bloque.figura}», que no existe. ` +
+        `Las que hay: ${NOMBRES_DE_FIGURA.join(", ")}.`
+      );
+    }
+  }
+
+  return { ...pagina, bloques };
 }
 
 let cachePreguntas = null;

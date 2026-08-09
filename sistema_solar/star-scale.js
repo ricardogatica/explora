@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, KNOWN_STAR_BY_SLUG } from "./data.js";
 import { getGlowTexture, starSurfaceMaterial } from "./star-renderer.js";
 import { addStarfield } from "./starfield.js";
-import { crearReloj, suavizado } from "./tiempo.js";
+import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 
 const app=document.getElementById("app"),facts=document.getElementById("starFacts"),panel=document.getElementById("starPanel"),titleEl=document.getElementById("starTitle"),textEl=document.getElementById("starText"),fileEl=document.getElementById("starFile"),closeEl=document.getElementById("closeStar"),resetEl=document.getElementById("resetStars");
 

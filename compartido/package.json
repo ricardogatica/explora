@@ -1,0 +1,13 @@
+{
+  "name": "@explora/compartido",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Andamiaje 3D: ciclo de vida del canvas, reloj y primitivas",
+  "exports": {
+    "./*": "./*"
+  },
+  "dependencies": {
+    "three": "0.185.0"
+  }
+}

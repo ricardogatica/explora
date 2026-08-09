@@ -11,8 +11,9 @@ estrellas y constelaciones.
 |---|---|
 | `contenido/` | El contenido y su contrato: páginas, preguntas, bandas y validador |
 | `materias/` | La aplicación de las materias (Next.js) |
+| `compartido/` | Andamiaje 3D: canvas con desmontaje, reloj y primitivas |
 | `sistema_solar/` | Simulador 3D del universo y sus fichas |
-| `tests/` | 128 tests, sin dependencias |
+| `tests/` | 150 tests |
 | `tools/` | Generadores, como el del catálogo del cielo |
 | `docs/superpowers/` | Specs y planes de las reformas en curso |
 

@@ -4,7 +4,7 @@ import { KNOWN_GALAXY_BY_SLUG, KNOWN_STAR_BY_SLUG } from "./data.js";
 import { animateGalaxyObject, createMilkyWayObject } from "./galaxy-renderer.js";
 import { animateStellarObject, createQuasarObject, createStarObject } from "./star-renderer.js";
 import { addStarfield } from "./starfield.js";
-import { crearReloj } from "./tiempo.js";
+import { crearReloj } from "@explora/compartido/tiempo.js";
 
 const params=new URLSearchParams(location.search),slug=document.body.dataset.universeSlug||params.get("slug"),object=KNOWN_STAR_BY_SLUG[slug]||KNOWN_GALAXY_BY_SLUG[slug];
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");

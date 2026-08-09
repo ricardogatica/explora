@@ -421,7 +421,8 @@ test("las escenas 3D miden el tiempo con el reloj compartido", () => {
   const escenas = ["main.js", "body.js", "solar-scale.js", "star-scale.js", "universe-body.js", "constellations-view.js"];
   for (const escena of escenas) {
     const source = readFileSync(join(UNIVERSE, escena), "utf8");
-    assert.match(source, /from "\.\/tiempo\.js"/, `${escena} debe usar el reloj compartido`);
+    assert.match(source, /from "@explora\/compartido\/tiempo\.js"/,
+      `${escena} debe usar el reloj compartido`);
     assert.match(source, /reloj\.paso\(/, `${escena} debe pedirle el intervalo al reloj`);
   }
 });
@@ -457,4 +458,42 @@ test("el proyecto declara sus licencias y las de lo que redistribuye", () => {
   const referencias = readFileSync(join(UNIVERSE, "referencias.html"), "utf8");
   assert.ok(referencias.includes("CC BY-SA 4.0") && referencias.includes("Solar System Scope"),
     "referencias.html es la atribución visible y tiene que nombrar las fuentes");
+});
+
+test("el universo puede resolver el paquete compartido", () => {
+  /* El reloj y el andamiaje 3D viven en compartido/, que las dos aplicaciones
+     comparten. En materias lo resuelve el empaquetador; en el universo, que no
+     tiene build, lo resuelve el importmap de cada HTML. Si un módulo importa
+     «@explora/compartido/…» y su página no declara el prefijo, la página se cae
+     entera con un error de resolución. Y eso no lo ve `node --test`: aquí los
+     módulos de escena ni siquiera se cargan, porque necesitan DOM. */
+  const modulos = readdirSync(UNIVERSE).filter(nombre => nombre.endsWith(".js"));
+  const importadores = modulos.filter(nombre =>
+    readFileSync(join(UNIVERSE, nombre), "utf8").includes("@explora/compartido/")
+  );
+  assert.ok(importadores.length >= 6,
+    `esperaba al menos 6 módulos usando el paquete compartido, hay ${importadores.length}`);
+
+  const paginas = readdirSync(UNIVERSE).filter(nombre => nombre.endsWith(".html"));
+  for (const pagina of paginas) {
+    const html = readFileSync(join(UNIVERSE, pagina), "utf8");
+    if (!html.includes('"three"')) continue;   // páginas sin escena 3D
+    assert.match(
+      html, /"@explora\/compartido\/"\s*:\s*"\.\.\/compartido\/"/,
+      `${pagina} carga módulos 3D pero su importmap no sabe resolver @explora/compartido/`
+    );
+  }
+});
+
+test("lo que el universo importa del paquete compartido existe", () => {
+  // Un prefijo bien declarado que apunta a un archivo que no está da un 404 y
+  // una página en blanco.
+  const compartido = join(UNIVERSE, "..", "compartido");
+  for (const nombre of readdirSync(UNIVERSE).filter(n => n.endsWith(".js"))) {
+    const fuente = readFileSync(join(UNIVERSE, nombre), "utf8");
+    for (const [, archivo] of fuente.matchAll(/@explora\/compartido\/([\w.-]+)/g)) {
+      assert.ok(existsSync(join(compartido, archivo)),
+        `${nombre} importa compartido/${archivo}, que no existe`);
+    }
+  }
 });

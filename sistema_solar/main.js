@@ -5,7 +5,7 @@ import { BODY_DATA, BODY_ORDER, ROTATION_SLOWDOWN, CONSTELLATIONS, CONSTELLATION
 import { createBodyMaterials, createSaturnRings } from "./body-renderer.js";
 import { createMilkyWayObject } from "./galaxy-renderer.js";
 import { animateStellarObject, createQuasarObject, createStarObject, getGlowTexture } from "./star-renderer.js";
-import { crearReloj, suavizado } from "./tiempo.js";
+import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 const app=document.getElementById("app"),timelineEl=document.getElementById("timeline"),timelineScrubber=document.getElementById("timelineScrubber"),timelineTicks=document.getElementById("timelineTicks"),cosmicMap=document.getElementById("cosmicMap"),zoomRange=document.getElementById("zoomRange"),zoomValue=document.getElementById("zoomValue"),infoTitle=document.getElementById("infoTitle"),infoMeta=document.getElementById("infoMeta"),infoText=document.getElementById("infoText"),factsEl=document.getElementById("facts"),openFile=document.getElementById("openFile"),focusEarth=document.getElementById("focusEarth"),focusSystem=document.getElementById("focusSystem"),infoPanel=document.getElementById("infoPanel"),closeInfo=document.getElementById("closeInfo");
 
 /* La ficha aparece cuando se elige un cuerpo y no antes.

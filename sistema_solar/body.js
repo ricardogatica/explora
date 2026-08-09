@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA, ROTATION_SLOWDOWN, SATELLITE_SLOWDOWN } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow, hasPhotorealTextures, loadPhotorealBody, RING_OUTER_SCALE } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
-import { crearReloj } from "./tiempo.js";
+import { crearReloj } from "@explora/compartido/tiempo.js";
 
 const slug=document.body.dataset.slug,body=BODY_DATA[slug],parent=body.parent?BODY_DATA[body.parent]:null;
 const title=document.getElementById("bodyTitle"),meta=document.getElementById("bodyMeta"),description=document.getElementById("bodyDescription"),table=document.getElementById("bodyTable"),interaction=document.getElementById("interactionText"),parentLink=document.getElementById("parentLink");

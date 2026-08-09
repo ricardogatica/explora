@@ -9,6 +9,7 @@
   },
   "workspaces": [
     "contenido",
+    "compartido",
     "materias"
   ]
 }

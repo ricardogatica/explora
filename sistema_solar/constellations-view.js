@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "./data.js";
 import { getGlowTexture } from "./star-renderer.js";
 import { baseLocal } from "./universe/sky.js";
-import { crearReloj, suavizado } from "./tiempo.js";
+import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 // Esta vista cambia el ?slug= con replaceState sin recargar: hay que pedirle a
 // nav.js que repinte la miga, o se queda con la constelación de llegada.
 import { renderNav } from "./nav.js";

@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { BODY_DATA } from "./data.js";
 import { createBodyMesh, createSaturnRings, createSunGlow } from "./body-renderer.js";
 import { addStarfield } from "./starfield.js";
-import { crearReloj, suavizado } from "./tiempo.js";
+import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 
 const app=document.getElementById("app"),facts=document.getElementById("scaleFacts"),scaleTitle=document.getElementById("scaleTitle"),scaleText=document.getElementById("scaleText"),resetScale=document.getElementById("resetScale"),scalePanel=document.getElementById("scalePanel"),scaleFile=document.getElementById("scaleFile"),closeScale=document.getElementById("closeScale");
 const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0011);

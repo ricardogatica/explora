@@ -26,3 +26,5 @@ Este eje desarrolla comprensión del espacio, formas y magnitudes.
 - Medir sin unidad.
 - Creer que una figura cambia de nombre al rotarla.
 - Aplicar fórmulas sin identificar las dimensiones correctas.
+
+::figura{tipo=esfera radio=2 titulo="Una esfera de radio 2"}

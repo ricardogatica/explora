@@ -224,3 +224,22 @@ a.boton { text-decoration: none; display: inline-block; }
   background: rgba(37, 99, 235, .09); padding: .1rem .5rem; border-radius: 999px;
 }
 .etiqueta--banda:hover { background: rgba(37, 99, 235, .18); }
+
+/* ── Figuras 3D incrustadas ─────────────────────────────────────────────── */
+
+.figura {
+  margin: 2rem 0; padding: 1rem; border: 1px solid var(--rule); border-radius: 18px;
+  background: #f4f7f8; display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 640px) { .figura { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; } }
+/* El lienzo necesita alto propio: un canvas sin altura declarada colapsa a cero
+   y la figura no se ve, sin dar ningún error. */
+.figura__lienzo { width: 100%; height: 260px; display: block; touch-action: none; cursor: grab; }
+.figura__lienzo:active { cursor: grabbing; }
+.figura__pie { font-size: 14px; }
+.figura__pie strong { display: block; margin-bottom: .5rem; }
+.figura__medidas { margin: 0; display: grid; gap: 6px; }
+.figura__medidas > div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--rule); padding-bottom: 4px; }
+.figura__medidas dt { color: var(--ink-soft); }
+.figura__medidas dd { margin: 0; font-family: var(--mono); font-size: 13px; }
+.figura__ayuda { display: block; margin-top: .75rem; font-size: 12px; color: var(--ink-soft); }
