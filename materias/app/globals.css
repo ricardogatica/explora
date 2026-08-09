@@ -210,3 +210,11 @@ a.tarjeta:hover { border-color: var(--mate); transform: translateY(-1px); }
 .boton--suave { background: transparent; color: var(--mate); box-shadow: inset 0 0 0 1px var(--mate); }
 .boton--suave:hover { background: rgba(37, 99, 235, .08); }
 a.boton { text-decoration: none; display: inline-block; }
+
+.buscador { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 2rem 0 .5rem; }
+.buscador__campo {
+  flex: 1 1 260px; padding: .7rem 1rem; font: inherit;
+  border: 1px solid var(--rule); border-radius: 999px; background: #fff; color: var(--ink);
+}
+.buscador__campo:focus { outline: 2px solid var(--mate); outline-offset: 1px; }
+.buscador__cuenta { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
