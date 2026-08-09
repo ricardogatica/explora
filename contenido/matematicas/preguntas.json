@@ -1,0 +1,757 @@
+[
+  {
+    "id": "p-1",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Qué número viene después del 6?",
+    "categoria": "Conteo",
+    "explicacion": "La secuencia continúa 5, 6, 7.",
+    "opciones": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "respuesta": "7"
+  },
+  {
+    "id": "p-2",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuántas decenas hay en 90?",
+    "categoria": "Valor posicional",
+    "explicacion": "90 equivale a 9 decenas.",
+    "opciones": [
+      "9",
+      "90",
+      "0",
+      "99"
+    ],
+    "respuesta": "9"
+  },
+  {
+    "id": "p-3",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "45 + 36 =",
+    "categoria": "Suma",
+    "explicacion": "45 + 36 = 81.",
+    "respuesta": "81"
+  },
+  {
+    "id": "p-4",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "9 × 6 =",
+    "categoria": "Multiplicación",
+    "explicacion": "9 × 6 = 54.",
+    "respuesta": "54"
+  },
+  {
+    "id": "p-5",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál es mayor?",
+    "categoria": "Fracciones",
+    "explicacion": "Un medio es mayor que un cuarto y un octavo.",
+    "opciones": [
+      "1/4",
+      "1/2",
+      "1/8",
+      "Son iguales"
+    ],
+    "respuesta": "1/2"
+  },
+  {
+    "id": "p-6",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "10% de 250 =",
+    "categoria": "Porcentajes",
+    "explicacion": "10% equivale a dividir por 10: 250 ÷ 10 = 25.",
+    "respuesta": "25"
+  },
+  {
+    "id": "p-7",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "x - 4 = 11. ¿Cuánto vale x?",
+    "categoria": "Álgebra",
+    "explicacion": "x = 11 + 4 = 15.",
+    "respuesta": "15",
+    "aceptadas": [
+      "x=15",
+      "x = 15"
+    ]
+  },
+  {
+    "id": "p-8",
+    "materia": "matematicas",
+    "banda": "15-17",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "Si f(x)=2x, calcula f(9).",
+    "categoria": "Funciones",
+    "explicacion": "f(9)=2×9=18.",
+    "respuesta": "18"
+  },
+  {
+    "id": "p-9",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "Perímetro de un cuadrado de lado 6:",
+    "categoria": "Geometría",
+    "explicacion": "Perímetro = 4 × lado = 4 × 6 = 24.",
+    "respuesta": "24",
+    "aceptadas": [
+      "24 cm"
+    ]
+  },
+  {
+    "id": "p-10",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "En los datos 2, 3, 3, 5, ¿cuál es la moda?",
+    "categoria": "Estadística",
+    "explicacion": "La moda es el dato que más se repite.",
+    "opciones": [
+      "2",
+      "3",
+      "5",
+      "13"
+    ],
+    "respuesta": "3"
+  },
+  {
+    "id": "d-1-3-1",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "observation",
+    "pregunta": "Cuando se le pide entregar un objeto, ¿puede entregar solo uno?",
+    "habilidad": "Cantidad inicial",
+    "retroalimentacion": "Esta habilidad muestra comprensión inicial de cantidad uno.",
+    "opciones": [
+      "Sí",
+      "A veces",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "A veces": 1,
+      "No observado": 0,
+      "No": 0
+    }
+  },
+  {
+    "id": "d-1-3-2",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "observation",
+    "pregunta": "¿Distingue objetos grandes y pequeños durante el juego?",
+    "habilidad": "Comparación",
+    "retroalimentacion": "La comparación de atributos es una base temprana de pensamiento matemático.",
+    "opciones": [
+      "Sí",
+      "A veces",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "A veces": 1,
+      "No observado": 0,
+      "No": 0
+    }
+  },
+  {
+    "id": "d-1-3-3",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "observation",
+    "pregunta": "¿Agrupa objetos parecidos, por ejemplo autos con autos o bloques con bloques?",
+    "habilidad": "Clasificación",
+    "retroalimentacion": "Clasificar ayuda a desarrollar categorías y relaciones.",
+    "opciones": [
+      "Sí",
+      "A veces",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "A veces": 1,
+      "No observado": 0,
+      "No": 0
+    }
+  },
+  {
+    "id": "d-1-3-4",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "observation",
+    "pregunta": "¿Sigue instrucciones simples como dentro, fuera, arriba o abajo?",
+    "habilidad": "Espacio",
+    "retroalimentacion": "El lenguaje espacial es parte de la base geométrica.",
+    "opciones": [
+      "Sí",
+      "A veces",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "A veces": 1,
+      "No observado": 0,
+      "No": 0
+    }
+  },
+  {
+    "id": "d-1-3-5",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "drag-match",
+    "pregunta": "Arrastra cada objeto a su caja. Un adulto puede ayudar leyendo las cajas.",
+    "habilidad": "Clasificación táctil",
+    "retroalimentacion": "Clasificar objetos cotidianos ayuda a reconocer semejanzas y diferencias.",
+    "elementos": [
+      {
+        "id": "pelota",
+        "etiqueta": "Pelota"
+      },
+      {
+        "id": "galleta",
+        "etiqueta": "Galleta"
+      }
+    ],
+    "destinos": [
+      {
+        "id": "juguetes",
+        "etiqueta": "Juguetes"
+      },
+      {
+        "id": "comida",
+        "etiqueta": "Comida"
+      }
+    ],
+    "respuesta": {
+      "pelota": "juguetes",
+      "galleta": "comida"
+    },
+    "pista": "También se puede tocar primero el objeto y después la caja."
+  },
+  {
+    "id": "d-3-5-1",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "Cuenta los objetos: 🍎 🍎 🍎. ¿Cuántas manzanas hay?",
+    "habilidad": "Conteo",
+    "retroalimentacion": "Hay tres manzanas.",
+    "opciones": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "respuesta": "3"
+  },
+  {
+    "id": "d-3-5-2",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Dónde hay más elementos?",
+    "habilidad": "Comparación",
+    "retroalimentacion": "Cuatro elementos son más que dos o uno.",
+    "opciones": [
+      "● ●",
+      "● ● ● ●",
+      "●",
+      "Hay igual cantidad"
+    ],
+    "respuesta": "● ● ● ●"
+  },
+  {
+    "id": "d-3-5-3",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "Continúa el patrón: rojo, azul, rojo, azul, rojo, ___",
+    "habilidad": "Patrones",
+    "retroalimentacion": "El patrón alterna rojo y azul.",
+    "opciones": [
+      "rojo",
+      "azul",
+      "verde",
+      "amarillo"
+    ],
+    "respuesta": "azul"
+  },
+  {
+    "id": "d-3-5-4",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Qué figura tiene tres lados?",
+    "habilidad": "Figuras",
+    "retroalimentacion": "El triángulo tiene tres lados.",
+    "opciones": [
+      "Círculo",
+      "Cuadrado",
+      "Triángulo",
+      "Rectángulo"
+    ],
+    "respuesta": "Triángulo"
+  },
+  {
+    "id": "d-3-5-5",
+    "materia": "matematicas",
+    "banda": "previo",
+    "familia": "diagnostico",
+    "tipo": "drag-match",
+    "pregunta": "Arrastra cada grupo al número que corresponde.",
+    "habilidad": "Correspondencia uno a uno",
+    "retroalimentacion": "Contar cada elemento una sola vez fortalece la correspondencia uno a uno.",
+    "elementos": [
+      {
+        "id": "dos",
+        "etiqueta": "● ●"
+      },
+      {
+        "id": "cuatro",
+        "etiqueta": "● ● ● ●"
+      },
+      {
+        "id": "uno",
+        "etiqueta": "●"
+      }
+    ],
+    "destinos": [
+      {
+        "id": "1",
+        "etiqueta": "1"
+      },
+      {
+        "id": "2",
+        "etiqueta": "2"
+      },
+      {
+        "id": "4",
+        "etiqueta": "4"
+      }
+    ],
+    "respuesta": {
+      "uno": "1",
+      "dos": "2",
+      "cuatro": "4"
+    },
+    "pista": "Los botones son grandes para usar con dedo o mouse."
+  },
+  {
+    "id": "d-6-8-1",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "En el número 247, ¿qué valor tiene el 4?",
+    "habilidad": "Valor posicional",
+    "retroalimentacion": "El 4 está en la posición de decenas; vale 40.",
+    "opciones": [
+      "4 unidades",
+      "4 decenas",
+      "4 centenas",
+      "40 centenas"
+    ],
+    "respuesta": "4 decenas"
+  },
+  {
+    "id": "d-6-8-2",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: 38 + 24 =",
+    "habilidad": "Suma",
+    "retroalimentacion": "38 + 24 = 62.",
+    "respuesta": "62"
+  },
+  {
+    "id": "d-6-8-3",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: 70 - 45 =",
+    "habilidad": "Resta",
+    "retroalimentacion": "70 - 45 = 25.",
+    "respuesta": "25"
+  },
+  {
+    "id": "d-6-8-4",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "Martina tenía 12 lápices y recibió 5 más. ¿Cuántos tiene ahora?",
+    "habilidad": "Problemas",
+    "retroalimentacion": "Se suma: 12 + 5 = 17.",
+    "opciones": [
+      "7",
+      "15",
+      "17",
+      "18"
+    ],
+    "respuesta": "17"
+  },
+  {
+    "id": "d-6-8-5",
+    "materia": "matematicas",
+    "banda": "7-8",
+    "familia": "diagnostico",
+    "tipo": "drag-order",
+    "pregunta": "Ordena los números de menor a mayor.",
+    "habilidad": "Secuencias numéricas",
+    "retroalimentacion": "Comparar decenas y unidades permite ordenar números de dos cifras.",
+    "elementos": [
+      {
+        "id": "36",
+        "etiqueta": "36"
+      },
+      {
+        "id": "18",
+        "etiqueta": "18"
+      },
+      {
+        "id": "42",
+        "etiqueta": "42"
+      },
+      {
+        "id": "25",
+        "etiqueta": "25"
+      }
+    ],
+    "respuesta": [
+      "18",
+      "25",
+      "36",
+      "42"
+    ],
+    "pista": "Arrastra o toca un número y luego toca la posición."
+  },
+  {
+    "id": "d-9-11-1",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: 7 × 8 =",
+    "habilidad": "Multiplicación",
+    "retroalimentacion": "7 × 8 = 56.",
+    "respuesta": "56"
+  },
+  {
+    "id": "d-9-11-2",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: 54 ÷ 6 =",
+    "habilidad": "División",
+    "retroalimentacion": "54 dividido en 6 grupos da 9.",
+    "respuesta": "9"
+  },
+  {
+    "id": "d-9-11-3",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál fracción equivale a 1/2?",
+    "habilidad": "Fracciones",
+    "retroalimentacion": "2/4 representa la misma cantidad que 1/2.",
+    "opciones": [
+      "1/4",
+      "2/4",
+      "3/4",
+      "2/3"
+    ],
+    "respuesta": "2/4"
+  },
+  {
+    "id": "d-9-11-4",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Un rectángulo mide 5 cm de largo y 3 cm de ancho. ¿Cuál es su área?",
+    "habilidad": "Área",
+    "retroalimentacion": "Área = largo × ancho = 5 × 3 = 15 cm².",
+    "respuesta": "15",
+    "aceptadas": [
+      "15 cm2",
+      "15 cm²"
+    ]
+  },
+  {
+    "id": "d-9-11-5",
+    "materia": "matematicas",
+    "banda": "9-10",
+    "familia": "diagnostico",
+    "tipo": "drag-match",
+    "pregunta": "Une cada fracción con una equivalente.",
+    "habilidad": "Fracciones equivalentes",
+    "retroalimentacion": "Fracciones equivalentes representan la misma parte del entero.",
+    "elementos": [
+      {
+        "id": "1/2",
+        "etiqueta": "1/2"
+      },
+      {
+        "id": "1/3",
+        "etiqueta": "1/3"
+      },
+      {
+        "id": "3/4",
+        "etiqueta": "3/4"
+      }
+    ],
+    "destinos": [
+      {
+        "id": "2/4",
+        "etiqueta": "2/4"
+      },
+      {
+        "id": "2/6",
+        "etiqueta": "2/6"
+      },
+      {
+        "id": "6/8",
+        "etiqueta": "6/8"
+      }
+    ],
+    "respuesta": {
+      "1/2": "2/4",
+      "1/3": "2/6",
+      "3/4": "6/8"
+    },
+    "pista": "Una unión correcta vale como respuesta completa."
+  },
+  {
+    "id": "d-12-14-1",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: -4 + 9 =",
+    "habilidad": "Enteros",
+    "retroalimentacion": "-4 + 9 = 5.",
+    "respuesta": "5"
+  },
+  {
+    "id": "d-12-14-2",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Calcula el 25% de 80.",
+    "habilidad": "Porcentajes",
+    "retroalimentacion": "25% equivale a un cuarto; un cuarto de 80 es 20.",
+    "respuesta": "20"
+  },
+  {
+    "id": "d-12-14-3",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: x + 7 = 15. ¿Cuánto vale x?",
+    "habilidad": "Ecuaciones",
+    "retroalimentacion": "Si x + 7 = 15, entonces x = 8.",
+    "respuesta": "8",
+    "aceptadas": [
+      "x = 8",
+      "x=8"
+    ]
+  },
+  {
+    "id": "d-12-14-4",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Calcula el promedio de 4, 6 y 8.",
+    "habilidad": "Promedio",
+    "retroalimentacion": "(4 + 6 + 8) ÷ 3 = 6.",
+    "respuesta": "6"
+  },
+  {
+    "id": "d-12-14-5",
+    "materia": "matematicas",
+    "banda": "13-14",
+    "familia": "diagnostico",
+    "tipo": "drag-match",
+    "pregunta": "Relaciona cada porcentaje con su forma decimal.",
+    "habilidad": "Proporcionalidad",
+    "retroalimentacion": "Para pasar de porcentaje a decimal se divide por 100.",
+    "elementos": [
+      {
+        "id": "25%",
+        "etiqueta": "25%"
+      },
+      {
+        "id": "50%",
+        "etiqueta": "50%"
+      },
+      {
+        "id": "75%",
+        "etiqueta": "75%"
+      }
+    ],
+    "destinos": [
+      {
+        "id": "0.25",
+        "etiqueta": "0,25"
+      },
+      {
+        "id": "0.50",
+        "etiqueta": "0,50"
+      },
+      {
+        "id": "0.75",
+        "etiqueta": "0,75"
+      }
+    ],
+    "respuesta": {
+      "25%": "0.25",
+      "50%": "0.50",
+      "75%": "0.75"
+    },
+    "pista": "Ideal para responder rápido sin escribir."
+  },
+  {
+    "id": "d-15-17-1",
+    "materia": "matematicas",
+    "banda": "15-17",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Resuelve: 2x + 5 = 17.",
+    "habilidad": "Ecuaciones lineales",
+    "retroalimentacion": "2x = 12, por lo tanto x = 6.",
+    "respuesta": "6",
+    "aceptadas": [
+      "x = 6",
+      "x=6"
+    ]
+  },
+  {
+    "id": "d-15-17-2",
+    "materia": "matematicas",
+    "banda": "15-17",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "Si f(x) = 3x + 2, calcula f(4).",
+    "habilidad": "Funciones",
+    "retroalimentacion": "f(4) = 3×4 + 2 = 14.",
+    "respuesta": "14"
+  },
+  {
+    "id": "d-15-17-3",
+    "materia": "matematicas",
+    "banda": "15-17",
+    "familia": "diagnostico",
+    "tipo": "fill",
+    "pregunta": "En un triángulo rectángulo con catetos 3 y 4, ¿cuánto mide la hipotenusa?",
+    "habilidad": "Pitágoras",
+    "retroalimentacion": "3² + 4² = 9 + 16 = 25; raíz de 25 = 5.",
+    "respuesta": "5"
+  },
+  {
+    "id": "d-15-17-4",
+    "materia": "matematicas",
+    "banda": "15-17",
+    "familia": "diagnostico",
+    "tipo": "multiple-choice",
+    "pregunta": "Al lanzar una moneda justa, ¿cuál es la probabilidad de obtener cara?",
+    "habilidad": "Probabilidad",
+    "retroalimentacion": "Hay dos resultados igualmente probables: cara o sello.",
+    "opciones": [
+      "0",
+      "1/4",
+      "1/2",
+      "1"
+    ],
+    "respuesta": "1/2"
+  },
+  {
+    "id": "d-15-17-5",
+    "materia": "matematicas",
+    "banda": "15-17",
+    "familia": "diagnostico",
+    "tipo": "drag-match",
+    "pregunta": "Relaciona cada función con su pendiente.",
+    "habilidad": "Funciones lineales",
+    "retroalimentacion": "En y = mx + b, la pendiente es el coeficiente que multiplica a x.",
+    "elementos": [
+      {
+        "id": "f",
+        "etiqueta": "f(x)=2x+1"
+      },
+      {
+        "id": "g",
+        "etiqueta": "g(x)=-3x+4"
+      },
+      {
+        "id": "h",
+        "etiqueta": "h(x)=x-5"
+      }
+    ],
+    "destinos": [
+      {
+        "id": "2",
+        "etiqueta": "m = 2"
+      },
+      {
+        "id": "-3",
+        "etiqueta": "m = -3"
+      },
+      {
+        "id": "1",
+        "etiqueta": "m = 1"
+      }
+    ],
+    "respuesta": {
+      "f": "2",
+      "g": "-3",
+      "h": "1"
+    },
+    "pista": "Lee el coeficiente de x y arrastra a la pendiente correcta."
+  }
+]

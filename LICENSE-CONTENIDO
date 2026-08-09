@@ -43,6 +43,6 @@ que nadie los confunda con mediciones:
 - Las posiciones de las placas continentales por época, en
   sistema_solar/earth-epochs.js: reconstrucción de conocimiento general, no
   tomada de un dataset paleogeográfico.
-- La asignación de bandas de edad a las categorías de lenguaje, en
-  contenido/migracion-niveles.js: estimación sobre a qué edad se enseña cada
-  tema, no tomada de las bases curriculares chilenas.
+- Las bandas de edad de las preguntas de lenguaje: estimación sobre a qué edad
+  se enseña cada tema, no tomada de las bases curriculares chilenas. El aviso
+  completo está en contenido/README.md.

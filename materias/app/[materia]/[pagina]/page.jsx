@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Migas from "../../migas.jsx";
 import { MATERIAS, materiaPorSlug, paginaDe, paginasDe } from "../../../lib/contenido.js";
 
@@ -23,7 +24,14 @@ export default async function Pagina({ params }) {
   return (
     <main className="pagina">
       <Migas tramos={[{ texto: materia.nombre, href: `/${slug}/` }, { texto: ficha.titulo }]} />
-      <span className="etiqueta">{ficha.categoria}</span>
+      <p className="etiquetas">
+        <span className="etiqueta">{ficha.categoria}</span>
+        {(ficha.bandas ?? []).map(banda => (
+          <Link key={banda} className="etiqueta etiqueta--banda" href={`/ruta/${banda}/`}>
+            {banda === "previo" ? "Antes de los 5" : `${banda} años`}
+          </Link>
+        ))}
+      </p>
       {/* El markdown es contenido de este repositorio, no entra nada de fuera. */}
       <article className="prosa" dangerouslySetInnerHTML={{ __html: ficha.html }} />
     </main>

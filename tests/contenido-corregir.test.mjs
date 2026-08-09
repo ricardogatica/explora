@@ -91,15 +91,11 @@ test("el corpus real se puede corregir entero sin reventar", async () => {
   const { readFileSync } = await import("node:fs");
   const { join, dirname } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
-  const { traducirPractica, traducirDiagnostico } = await import("../contenido/legado.js");
 
   const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
   const leer = ruta => JSON.parse(readFileSync(join(raiz, ruta), "utf8"));
-  const preguntas = [
-    ...leer("matematicas/data/practice.json").map(p => traducirPractica(p, "matematicas")),
-    ...leer("matematicas/data/diagnostics.json").map(p => traducirDiagnostico(p, "matematicas")),
-    ...leer("lenguaje/data/exercises.json").map(p => traducirPractica(p, "lenguaje"))
-  ];
+  const preguntas = ["lenguaje", "matematicas"]
+    .flatMap(materia => leer(`contenido/${materia}/preguntas.json`));
 
   let corregibles = 0;
   for (const pregunta of preguntas) {

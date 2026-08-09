@@ -9,20 +9,23 @@ estrellas y constelaciones.
 
 | Carpeta | Qué es |
 |---|---|
-| `contenido/` | El contrato de contenido: bandas de edad, esquema y validador |
-| `lenguaje/`, `matematicas/` | Materias actuales (se migran a `materias/` en la fase 2) |
+| `contenido/` | El contenido y su contrato: páginas, preguntas, bandas y validador |
+| `materias/` | La aplicación de las materias (Next.js) |
 | `sistema_solar/` | Simulador 3D del universo y sus fichas |
-| `tests/` | 114 tests, sin dependencias |
+| `tests/` | 128 tests, sin dependencias |
 | `tools/` | Generadores, como el del catálogo del cielo |
 | `docs/superpowers/` | Specs y planes de las reformas en curso |
 
 ## Cómo se levanta
 
-No hay build ni dependencias todavía:
+Dos aplicaciones, cada una con su stack:
 
 ```sh
-./run.sh 6767      # y abrir http://localhost:6767
+cd materias && npm run dev    # las materias, en http://localhost:3000
+./run.sh 6767                 # el universo, en http://localhost:6767
 ```
+
+El universo todavía no tiene build: se sirve tal cual.
 
 El servidor manda `Cache-Control: no-store` a propósito: sin eso el navegador
 sirve módulos viejos después de editarlos y se depura código que ya no existe.

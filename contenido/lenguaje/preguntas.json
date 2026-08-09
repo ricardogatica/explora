@@ -1,0 +1,283 @@
+[
+  {
+    "id": "acentuacion-1",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál palabra está correctamente acentuada?",
+    "categoria": "Acentuación",
+    "explicacion": "“Canción” es aguda terminada en n, por eso lleva tilde.",
+    "opciones": [
+      "cancion",
+      "canción",
+      "cáncion",
+      "canciòn"
+    ],
+    "respuesta": "canción"
+  },
+  {
+    "id": "acentuacion-2",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál palabra grave debe llevar tilde?",
+    "categoria": "Acentuación",
+    "explicacion": "“Árbol” es grave y termina en consonante distinta de n o s.",
+    "opciones": [
+      "casa",
+      "joven",
+      "arbol",
+      "mesa"
+    ],
+    "respuesta": "arbol"
+  },
+  {
+    "id": "diacritica-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "Completa: ___ tienes ___ cuaderno.",
+    "categoria": "Tilde diacrítica",
+    "explicacion": "“Tú” es pronombre; “tu” es posesivo.",
+    "respuesta": "Tú tienes tu cuaderno.",
+    "aceptadas": [
+      "Tú tienes tu cuaderno",
+      "tú tienes tu cuaderno"
+    ]
+  },
+  {
+    "id": "interrogativos-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "Corrige la oración: No se que paso.",
+    "categoria": "Interrogativos",
+    "explicacion": "“Sé” del verbo saber lleva tilde; “qué” interrogativo indirecto también; “pasó” es aguda terminada en vocal.",
+    "respuesta": "No sé qué pasó.",
+    "aceptadas": [
+      "No sé qué pasó"
+    ]
+  },
+  {
+    "id": "hiato-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál opción está correctamente escrita?",
+    "categoria": "Hiatos",
+    "explicacion": "La vocal cerrada tónica í rompe el diptongo y forma hiato.",
+    "opciones": [
+      "pais",
+      "país",
+      "paìs",
+      "páis"
+    ],
+    "respuesta": "país"
+  },
+  {
+    "id": "puntuacion-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "Elige la oración correctamente puntuada.",
+    "categoria": "Puntuación",
+    "explicacion": "El vocativo o saludo inicial se separa con coma y la pregunta lleva signos de apertura y cierre.",
+    "opciones": [
+      "Hola cómo estás?",
+      "Hola, ¿cómo estás?",
+      "Hola ¿cómo estás.",
+      "Hola cómo, estás?"
+    ],
+    "respuesta": "Hola, ¿cómo estás?"
+  },
+  {
+    "id": "mayusculas-1",
+    "materia": "lenguaje",
+    "banda": "7-8",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál oración usa correctamente las mayúsculas?",
+    "categoria": "Mayúsculas",
+    "explicacion": "Los días van en minúscula; los nombres propios llevan mayúscula inicial.",
+    "opciones": [
+      "El Lunes viajaremos a Valparaíso.",
+      "El lunes viajaremos a Valparaíso.",
+      "El lunes viajaremos a valparaíso.",
+      "el lunes viajaremos a Valparaíso."
+    ],
+    "respuesta": "El lunes viajaremos a Valparaíso."
+  },
+  {
+    "id": "bv-1",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál palabra está bien escrita?",
+    "categoria": "B y V",
+    "explicacion": "La forma correcta del verbo estar en pretérito es “estuvo”.",
+    "opciones": [
+      "estubo",
+      "estuvo",
+      "estuvó",
+      "hestuvo"
+    ],
+    "respuesta": "estuvo"
+  },
+  {
+    "id": "csz-1",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "fill",
+    "pregunta": "Escribe el plural de “luz”.",
+    "categoria": "C, S y Z",
+    "explicacion": "Las palabras terminadas en z cambian z por c ante e: luz → luces.",
+    "respuesta": "luces",
+    "aceptadas": [
+      "Luces"
+    ]
+  },
+  {
+    "id": "gj-1",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál palabra está correctamente escrita?",
+    "categoria": "G y J",
+    "explicacion": "Las palabras terminadas en -aje suelen escribirse con j.",
+    "opciones": [
+      "viage",
+      "viaje",
+      "biaje",
+      "viajé"
+    ],
+    "respuesta": "viaje"
+  },
+  {
+    "id": "h-1",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "Elige la oración correcta.",
+    "categoria": "H",
+    "explicacion": "“A ver” se usa para mirar o comprobar; “haber” es verbo.",
+    "opciones": [
+      "Vamos haber la película.",
+      "Vamos a ver la película.",
+      "Vamos aver la película.",
+      "Vamos ha ver la película."
+    ],
+    "respuesta": "Vamos a ver la película."
+  },
+  {
+    "id": "concordancia-1",
+    "materia": "lenguaje",
+    "banda": "9-10",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál oración tiene concordancia correcta?",
+    "categoria": "Concordancia",
+    "explicacion": "El sujeto plural “los estudiantes” exige verbo plural: “responden”.",
+    "opciones": [
+      "Los estudiantes responde.",
+      "Los estudiantes responden.",
+      "El estudiantes responde.",
+      "Las estudiante responden."
+    ],
+    "respuesta": "Los estudiantes responden."
+  },
+  {
+    "id": "verbos-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "Completa: Espero que tú ___ mañana.",
+    "categoria": "Verbos",
+    "explicacion": "Después de “espero que” se usa subjuntivo: “vengas”.",
+    "opciones": [
+      "vienes",
+      "vengas",
+      "vendrás",
+      "venías"
+    ],
+    "respuesta": "vengas"
+  },
+  {
+    "id": "pronombres-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "Sustituye correctamente: Vi a Ana.",
+    "categoria": "Pronombres",
+    "explicacion": "Ana funciona como complemento directo femenino singular: “la”.",
+    "opciones": [
+      "Le vi.",
+      "La vi.",
+      "Lo vi.",
+      "Les vi."
+    ],
+    "respuesta": "La vi."
+  },
+  {
+    "id": "preposiciones-1",
+    "materia": "lenguaje",
+    "banda": "11-12",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál oración evita el dequeísmo?",
+    "categoria": "Preposiciones",
+    "explicacion": "El verbo “pensar” con este sentido se construye con “que”, no con “de que”.",
+    "opciones": [
+      "Pienso de que está bien.",
+      "Pienso que está bien.",
+      "Pienso en que está bien.",
+      "Pienso a que está bien."
+    ],
+    "respuesta": "Pienso que está bien."
+  },
+  {
+    "id": "conectores-1",
+    "materia": "lenguaje",
+    "banda": "13-14",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Qué conector expresa consecuencia?",
+    "categoria": "Conectores",
+    "explicacion": "“Por lo tanto” introduce una consecuencia o conclusión derivada de lo anterior.",
+    "opciones": [
+      "sin embargo",
+      "por lo tanto",
+      "en cambio",
+      "aunque"
+    ],
+    "respuesta": "por lo tanto"
+  },
+  {
+    "id": "redaccion-1",
+    "materia": "lenguaje",
+    "banda": "13-14",
+    "familia": "practica",
+    "tipo": "multiple-choice",
+    "pregunta": "¿Cuál versión es más clara?",
+    "categoria": "Redacción clara",
+    "explicacion": "La frase es directa, breve y tiene un sujeto claro.",
+    "opciones": [
+      "Se procederá a efectuar la revisión de los documentos.",
+      "Revisaremos los documentos.",
+      "Será realizada una acción revisora documental.",
+      "Los documentos serán objeto de procedimiento."
+    ],
+    "respuesta": "Revisaremos los documentos."
+  }
+]

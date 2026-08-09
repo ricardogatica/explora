@@ -1,128 +1,131 @@
 /* Lector de contenido, en tiempo de build.
 
-   Lee las páginas y las preguntas DONDE ESTÁN HOY, no donde acabarán. Los dos
-   sitios anteriores siguen en pie leyendo esos mismos archivos, y copiarlos aquí
-   dejaría dos verdades que se separan en cuanto alguien edite una. El traslado a
-   `contenido/<materia>/` ocurre cuando esos sitios se borren, y entonces solo
-   cambia este archivo.
+   Lee de `contenido/<materia>/`, donde una página es un archivo: su texto y su
+   metadata en el mismo sitio. Antes eran dos —el texto en `pages/` y el título
+   en un manifiesto— y añadir una página obligaba a escribir en dos lugares;
+   olvidarse del segundo la dejaba invisible sin dar ningún error.
 
    Valida al leer y **rompe el build** si algo no cumple el contrato. Es la
    propiedad que este stack no trae de fábrica: sin ella una pregunta mal formada
-   no da ningún error, solo aparece rota delante de un niño. Vale la pena que el
-   build falle en vez de publicarla. */
+   no da ningún error, solo aparece rota delante de un niño. */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { marked } from "marked";
-import { validarCorpus } from "@explora/contenido/esquema.js";
-import { traducirPractica, traducirDiagnostico } from "@explora/contenido/legado.js";
-import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
+import { validarCorpus, MATERIAS as MATERIAS_VALIDAS } from "@explora/contenido/esquema.js";
+import { separarFrontmatter, validarPagina } from "@explora/contenido/paginas.js";
+import { BANDAS, bandaPorId, IDS_VALIDOS } from "@explora/contenido/bandas.js";
 
-/* El contrato se importa como paquete del workspace y no con rutas relativas
-   hacia arriba: el empaquetador de Next no resuelve por encima de la raíz de la
-   app, y pelearse con su configuración para lograrlo sería tapar que esto es un
-   monorepo. Como paquete, el día que el sistema solar necesite lo mismo lo
-   declara igual. */
-
-/* En build, el proceso corre dentro de materias/. La raíz del repositorio es su
-   carpeta madre, y de ahí cuelgan las materias viejas. */
-const RAIZ = join(process.cwd(), "..");
+/* En build el proceso corre dentro de materias/, y el contenido es hermano suyo:
+   vive fuera de la aplicación a propósito, porque es el activo del proyecto y no
+   debe quedar preso de la aplicación que hoy lo pinta. */
+const CONTENIDO = join(process.cwd(), "..", "contenido");
 
 export const MATERIAS = [
   {
     slug: "lenguaje",
     nombre: "Lenguaje",
-    descripcion: "Ortografía, gramática y redacción del español.",
-    carpeta: "lenguaje",
-    fuentes: [{ archivo: "data/exercises.json", familia: "practica" }]
+    descripcion: "Ortografía, gramática y redacción del español."
   },
   {
     slug: "matematicas",
     nombre: "Matemáticas",
-    descripcion: "Números, geometría, datos y álgebra, por edad.",
-    carpeta: "matematicas",
-    fuentes: [
-      { archivo: "data/practice.json", familia: "practica" },
-      { archivo: "data/diagnostics.json", familia: "diagnostico" }
-    ]
+    descripcion: "Números, geometría, datos y álgebra, por edad."
   }
 ];
-
-const leerJSON = ruta => JSON.parse(readFileSync(join(RAIZ, ruta), "utf8"));
 
 export function materiaPorSlug(slug) {
   return MATERIAS.find(m => m.slug === slug) ?? null;
 }
 
-/* La metadata de las páginas vive en manifest.json y el texto en pages/*.md: las
-   páginas no llevan frontmatter. Al trasladar el contenido se fusionarán en un
-   solo archivo, que es donde debería estar; por ahora se juntan al leer. */
+/* Las páginas de una materia, ordenadas por su campo `orden` —que casi nunca es
+   el alfabético— y validadas. Se leen una vez por build. */
+const cachePaginas = new Map();
+
 export function paginasDe(slug) {
-  const materia = materiaPorSlug(slug);
-  return leerJSON(`${materia.carpeta}/data/manifest.json`).map(entrada => ({
-    id: entrada.id,
-    titulo: entrada.title,
-    categoria: entrada.category,
-    descripcion: entrada.description,
-    materia: slug
-  }));
+  if (cachePaginas.has(slug)) return cachePaginas.get(slug);
+
+  const carpeta = join(CONTENIDO, slug, "paginas");
+  const paginas = readdirSync(carpeta)
+    .filter(nombre => nombre.endsWith(".md"))
+    .map(nombre => {
+      const id = nombre.replace(/\.md$/, "");
+      const { meta, cuerpo, tieneFrontmatter } = separarFrontmatter(
+        readFileSync(join(carpeta, nombre), "utf8")
+      );
+      if (!tieneFrontmatter) {
+        throw new Error(`contenido/${slug}/paginas/${nombre} no tiene frontmatter: sin él no se sabe ni su título`);
+      }
+      return { id, cuerpo, ...meta, orden: Number(meta.orden ?? 9999) };
+    })
+    .sort((a, b) => a.orden - b.orden);
+
+  const fallos = paginas.flatMap(pagina =>
+    validarPagina(pagina, { materias: MATERIAS_VALIDAS, bandasValidas: IDS_VALIDOS })
+  );
+  if (fallos.length) {
+    throw new Error(
+      "Hay páginas que no cumplen el contrato y por eso no se publican:\n" +
+      fallos.map(f => `  [${f.regla}] ${f.mensaje}`).join("\n")
+    );
+  }
+
+  cachePaginas.set(slug, paginas);
+  return paginas;
 }
 
 export function paginaDe(slug, id) {
-  const meta = paginasDe(slug).find(p => p.id === id);
-  if (!meta) return null;
-  const materia = materiaPorSlug(slug);
-  const markdown = readFileSync(join(RAIZ, materia.carpeta, "pages", `${id}.md`), "utf8");
-  /* El HTML sale de markdown escrito en este repositorio, no de nada que llegue
-     de fuera: no hay entrada de usuario en este camino. */
-  return { ...meta, html: marked.parse(markdown) };
+  const pagina = paginasDe(slug).find(p => p.id === id);
+  if (!pagina) return null;
+  /* El HTML sale de markdown escrito en este repositorio: no hay entrada de
+     usuario en este camino. */
+  return { ...pagina, html: marked.parse(pagina.cuerpo) };
 }
 
-/* Todas las preguntas, ya en la forma del contrato y validadas de una vez. Se
-   calcula una sola vez por build: cada ruta de Next lo pediría si no. */
-let cache = null;
+let cachePreguntas = null;
 
 export function todasLasPreguntas() {
-  if (cache) return cache;
+  if (cachePreguntas) return cachePreguntas;
 
-  const archivos = MATERIAS.flatMap(materia =>
-    materia.fuentes.map(fuente => {
-      const crudas = leerJSON(`${materia.carpeta}/${fuente.archivo}`);
-      const traducir = fuente.familia === "diagnostico" ? traducirDiagnostico : traducirPractica;
-      return {
-        archivo: `${materia.carpeta}/${fuente.archivo}`,
-        preguntas: crudas.map(cruda => traducir(cruda, materia.slug))
-      };
-    })
-  );
+  const archivos = MATERIAS.map(materia => ({
+    archivo: `contenido/${materia.slug}/preguntas.json`,
+    preguntas: JSON.parse(readFileSync(join(CONTENIDO, materia.slug, "preguntas.json"), "utf8"))
+  }));
 
   const fallos = validarCorpus(archivos);
   if (fallos.length) {
     throw new Error(
-      `El contenido no cumple el contrato y por eso no se publica:\n` +
+      "El contenido no cumple el contrato y por eso no se publica:\n" +
       fallos.map(f => `  [${f.regla}] ${f.mensaje}`).join("\n")
     );
   }
-  cache = archivos.flatMap(a => a.preguntas);
-  return cache;
+  cachePreguntas = archivos.flatMap(a => a.preguntas);
+  return cachePreguntas;
 }
 
 export const preguntasDe = slug => todasLasPreguntas().filter(p => p.materia === slug);
 export const preguntasDeBanda = banda => todasLasPreguntas().filter(p => p.banda === banda);
 
-/* La ruta de aprendizaje: qué hay en cada tramo de edad, atravesando materias.
-   Es lo que un adulto recorre para acompañar, así que se arma por banda y no por
-   asignatura. */
+/* Las páginas de un tramo de edad. Una página puede estar en varios: la misma
+   explicación de la tilde diacrítica sirve a los 11 y a los 12. */
+export const paginasDeBanda = banda =>
+  MATERIAS.flatMap(materia => paginasDe(materia.slug)).filter(p => (p.bandas ?? []).includes(banda));
+
+/* La ruta de aprendizaje: qué hay en cada tramo, atravesando materias. Se arma
+   por banda y no por asignatura porque es lo que recorre quien acompaña. */
 export function ruta() {
   return BANDAS.map(banda => {
     const preguntas = preguntasDeBanda(banda.id);
+    const paginas = paginasDeBanda(banda.id);
     return {
       ...banda,
       total: preguntas.length,
+      paginas,
       materias: MATERIAS.map(materia => ({
         ...materia,
-        preguntas: preguntas.filter(p => p.materia === materia.slug)
-      })).filter(m => m.preguntas.length > 0)
+        preguntas: preguntas.filter(p => p.materia === materia.slug),
+        paginas: paginas.filter(p => p.materia === materia.slug)
+      })).filter(m => m.preguntas.length > 0 || m.paginas.length > 0)
     };
   });
 }

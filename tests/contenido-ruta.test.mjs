@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { traducirPractica, traducirDiagnostico } from "../contenido/legado.js";
 import { BANDAS } from "../contenido/bandas.js";
 
 /* Una ruta con huecos no es una ruta.
@@ -16,11 +15,8 @@ import { BANDAS } from "../contenido/bandas.js";
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "..");
 const leer = ruta => JSON.parse(readFileSync(join(RAIZ, ruta), "utf8"));
 
-const PREGUNTAS = [
-  ...leer("matematicas/data/practice.json").map(p => traducirPractica(p, "matematicas")),
-  ...leer("matematicas/data/diagnostics.json").map(p => traducirDiagnostico(p, "matematicas")),
-  ...leer("lenguaje/data/exercises.json").map(p => traducirPractica(p, "lenguaje"))
-];
+const PREGUNTAS = ["lenguaje", "matematicas"]
+  .flatMap(materia => leer(`contenido/${materia}/preguntas.json`));
 
 const cuentaPorBanda = preguntas => {
   const cuenta = new Map(BANDAS.map(b => [b.id, 0]));
