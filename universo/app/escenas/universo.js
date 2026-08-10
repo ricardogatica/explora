@@ -174,7 +174,11 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     parte.material?.dispose?.();
   });
 
-  const nubesDeLaGalaxia=[[galaxyParts.disk,1.9],[galaxyParts.dust,1.5],[galaxyParts.bar,2.1]]
+  const nubesDeLaGalaxia=[
+    [galaxyParts.disk,1.9],[galaxyParts.dust,1.5],[galaxyParts.bar,2.1],
+    // Las tres que le dan cuerpo: ver la nota del renderizador.
+    [galaxyParts.discoGrueso,1.5],[galaxyParts.bulbo,2.0],[galaxyParts.halo,1.2]
+  ]
     .filter(([parte])=>parte?.material)
     .map(([parte,tamano])=>{
       parte.material.sizeAttenuation=false;
@@ -385,7 +389,22 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     objetivoLibre=centro.clone();
     const distancia=96000;
     controls.target.copy(centro);
-    camera.position.copy(centro).addScaledVector(new THREE.Vector3(0.34,0.66,0.67).normalize(),distancia);
+
+    /* La cámara se coloca a 38° del plano del disco, y el plano se calcula, no
+       se supone: el disco viene inclinado por dentro y el grupo girado por
+       fuera, así que una dirección fija en coordenadas del mundo daba lo que
+       tocara —quedó casi de canto, y de canto no se ven los brazos—.
+
+       El lado se elige para que el Sol quede en el encuadre: verse a uno mismo
+       dentro de la galaxia es la mitad de lo que esta vista cuenta. */
+    const normal=new THREE.Vector3(0,1,0)
+      .applyQuaternion(galaxyParts.disk.getWorldQuaternion(new THREE.Quaternion())).normalize();
+    const haciaElSol=new THREE.Vector3().sub(centro);           // el Sol está en el origen
+    const enElPlano=haciaElSol.projectOnPlane(normal).normalize();
+    const inclinacion=THREE.MathUtils.degToRad(38);
+    const direccion=normal.multiplyScalar(Math.sin(inclinacion))
+      .addScaledVector(enElPlano,Math.cos(inclinacion)).normalize();
+    camera.position.copy(centro).addScaledVector(direccion,distancia);
     targetDistance=distancia;
     setZoom(zoomParaDistancia(distancia));
   }

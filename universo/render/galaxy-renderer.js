@@ -24,6 +24,31 @@ function makeGalaxyPoints({count=18000,radius=520,arms=4,thickness=1,opacity=.58
   return new THREE.Points(geometry,new THREE.PointsMaterial({size,map:getGlowTexture(),vertexColors:true,transparent:true,opacity,blending:THREE.AdditiveBlending,depthWrite:false}));
 }
 
+/* Un esferoide de estrellas: sirve para el bulbo y para el halo.
+
+   `achatado` es cuánto se aplasta en vertical —0,6 en el bulbo, casi 1 en el
+   halo— y `concentracion` cómo se apiñan hacia el centro: por debajo de 1 se
+   amontonan dentro, que es como se distribuyen las estrellas viejas. */
+function makeSpheroidPoints({count,radius,achatado=0.6,concentracion=0.55,color=[1,.86,.62],opacity=.5,size=2}){
+  const geometry=new THREE.BufferGeometry(),positions=new Float32Array(count*3),colors=new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    const r=Math.pow(Math.random(),concentracion)*radius;
+    const theta=Math.random()*Math.PI*2,phi=Math.acos(2*Math.random()-1);
+    positions[i*3]=r*Math.sin(phi)*Math.cos(theta);
+    positions[i*3+1]=r*Math.cos(phi)*achatado;
+    positions[i*3+2]=r*Math.sin(phi)*Math.sin(theta);
+    /* Más amarillas hacia dentro: son estrellas viejas, y el degradado es lo que
+       hace que el bulbo se lea como un bulbo y no como una nube gris. */
+    const dentro=1-r/radius, brillo=.55+Math.random()*.45;
+    colors[i*3]=color[0]*brillo*(0.72+dentro*0.28);
+    colors[i*3+1]=color[1]*brillo*(0.72+dentro*0.28);
+    colors[i*3+2]=color[2]*brillo;
+  }
+  geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+  geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));
+  return new THREE.Points(geometry,new THREE.PointsMaterial({size,map:getGlowTexture(),vertexColors:true,transparent:true,opacity,blending:THREE.AdditiveBlending,depthWrite:false}));
+}
+
 /* Barra central: elipsoide muy alargado de estrellas, denso en el centro y
    deshilachado en las puntas, que es como se ve una barra galáctica real. */
 function makeBarPoints({count=5200,length=300,radius=26,size=2.4,opacity=.5}={}){
@@ -85,6 +110,43 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
   const dust=makeGalaxyPoints({count:detail?18000:9000,radius:(detail?470:930)*scale,arms:4,thickness:detail?1.1:.8,opacity:detail ? .34 : .18,size:detail?2.2:1.75,palette:"dust"});
   dust.rotation.x=diskTilt+.02;dust.rotation.z=.035;dust.userData.visibleFrom=galaxy.visibleFrom;group.add(dust);
 
+  /* ── Lo que le daba volumen a la galaxia y no estaba ──────────────────────
+
+     El disco fino mide el 1% de su diámetro de grosor, que es exactamente lo
+     que mide el de verdad. No estaba demasiado delgado: estaba SOLO. Una galaxia
+     no es una lámina, y estas tres piezas son las que le dan cuerpo. Son reales,
+     así que esta es de las veces en que lo que se ve mejor es también lo más
+     cierto.
+
+     El disco GRUESO: estrellas más viejas repartidas en una capa unas tres veces
+     más alta que la del disco fino. Reutiliza el mismo generador con otro
+     grosor, y va más tenue y más cálida.
+
+     El BULBO: la concentración de estrellas viejas del centro, unos 10.000 años
+     luz de ancho —un 10% del diámetro del disco— y achatada. Es lo que rompe el
+     filo de cuchilla al mirar la galaxia de canto.
+
+     El HALO: una envoltura casi esférica y muy dispersa, del tamaño del disco.
+     Apenas se ve, y es justo lo que hace que el disco no acabe en un borde
+     recortado. */
+  const discoGrueso=makeGalaxyPoints({
+    count:detail?9000:6000,radius:(detail?500:1000)*scale,arms:4,
+    thickness:detail?3.4:3.2,opacity:detail?.16:.10,size:detail?2.0:1.7,palette:"dust"
+  });
+  discoGrueso.rotation.x=diskTilt;discoGrueso.userData.visibleFrom=galaxy.visibleFrom;group.add(discoGrueso);
+
+  const bulbo=makeSpheroidPoints({
+    count:detail?11000:8000,radius:(detail?108:112)*scale,achatado:.62,concentracion:.5,
+    color:[1,.85,.6],opacity:detail?.5:.34,size:detail?2.3:2.0
+  });
+  bulbo.rotation.x=diskTilt;bulbo.userData.visibleFrom=galaxy.visibleFrom;group.add(bulbo);
+
+  const halo=makeSpheroidPoints({
+    count:detail?3000:2400,radius:(detail?520:1060)*scale,achatado:.86,concentracion:1.1,
+    color:[.86,.9,1],opacity:detail?.10:.07,size:detail?1.5:1.3
+  });
+  halo.userData.visibleFrom=galaxy.visibleFrom;group.add(halo);
+
   const coreRadius=detail?38:42,core=new THREE.Mesh(new THREE.SphereGeometry(coreRadius,56,56),new THREE.MeshBasicMaterial({color:0xfff1d6,transparent:true,opacity:.88,blending:THREE.AdditiveBlending,depthWrite:false}));
   core.userData.slug=galaxy.slug;core.userData.kind="galaxy";core.userData.clickable=true;core.userData.visibleFrom=galaxy.visibleFrom;group.add(core);
 
@@ -141,7 +203,7 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
     }
   }
 
-  return{group,disk,dust,core,glow,bar,solarMarker,markerGlow,solarSystemPosition,kind:"galaxy",detail};
+  return{group,disk,dust,discoGrueso,bulbo,halo,core,glow,bar,solarMarker,markerGlow,solarSystemPosition,kind:"galaxy",detail};
 }
 
 /* `avance` son cuadros de referencia transcurridos (ver tiempo.js): los
