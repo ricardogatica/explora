@@ -67,10 +67,10 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     elegido: fichaAbierta ? selectedBody : null,
     evento: TIMELINE_EVENTS[selectedEvent]
   });
-  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.000018);  // ver la nota de escalas de abajo
+  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.0000045);  // ver la nota de escalas de abajo
   const camera=new THREE.PerspectiveCamera(55,ancho()/alto(),0.01,9000);camera.position.set(0,6,42);
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(ancho(),alto());renderer.outputColorSpace=THREE.SRGBColorSpace;contenedor.appendChild(renderer.domElement);
-  const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.05;controls.minDistance=3;controls.maxDistance=26000;controls.autoRotate=true;controls.autoRotateSpeed=0.18;controls.target.set(0,0,0);
+  const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.05;controls.minDistance=3;controls.maxDistance=140000;controls.autoRotate=true;controls.autoRotateSpeed=0.18;controls.target.set(0,0,0);
   scene.add(new THREE.AmbientLight(0x88aaff,0.55));const sunLight=new THREE.PointLight(0xffffff,4.2,0,2);sunLight.position.set(0,0,0);scene.add(sunLight);const fill=new THREE.DirectionalLight(0x7dd3fc,0.6);fill.position.set(-20,12,-12);scene.add(fill);
   function starField(count,radius,size,opacity){const g=new THREE.BufferGeometry(),positions=new Float32Array(count*3),colors=new Float32Array(count*3);for(let i=0;i<count;i++){const r=radius*(0.3+Math.random()*0.7),theta=Math.random()*Math.PI*2,phi=Math.acos(2*Math.random()-1);positions[i*3]=r*Math.sin(phi)*Math.cos(theta);positions[i*3+1]=r*Math.sin(phi)*Math.sin(theta);positions[i*3+2]=r*Math.cos(phi);const c=0.65+Math.random()*0.35;colors[i*3]=c;colors[i*3+1]=0.8+Math.random()*0.2;colors[i*3+2]=1}g.setAttribute("position",new THREE.BufferAttribute(positions,3));g.setAttribute("color",new THREE.BufferAttribute(colors,3));return new THREE.Points(g,new THREE.PointsMaterial({size,map:getGlowTexture(),vertexColors:true,transparent:true,opacity,depthWrite:false}))}
   /* ── Las tres escalas de la escena ──────────────────────────────────────
@@ -86,14 +86,22 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
 
        sistema solar     0 – 35        hasta la órbita de Neptuno
        vecindario      620 – 2400      las 745 estrellas, de 4 a 2509 años luz
-       Vía Láctea       disco ~10800   con el Sol puesto en el origen
+       Vía Láctea       disco ~47000   con el Sol puesto en el origen
+
+     La proporción entre las dos últimas SÍ es la de verdad, y no lo era: el
+     disco medía 10.800 y el vecindario 2.400, o sea el 22% de su radio, cuando
+     la estrella más lejana del catálogo está a 2.509 años luz de un disco de
+     50.000 de radio —el 5%—. El barrio salía cuatro veces más grande de lo que
+     le toca, y eso da a entender que nuestras constelaciones ocupan un buen
+     trozo de la galaxia. Ocupan una mota.
 
      Las proporciones siguen sin ser las reales —la estrella más cercana está a
      4000 veces la órbita de Neptuno, no a 18— porque las de verdad no caben en
      ninguna pantalla; de eso se ocupan las vistas de escala, que existen justo
      para enseñar lo que aquí no cabe. Lo que sí es real es el ORDEN y la
      separación: cada capa se lee como una capa. */
-  const backgroundStars=starField(10000,14000,4.2,0.72);scene.add(backgroundStars);
+  const OPACIDAD_DEL_RELLENO=0.72;
+  const backgroundStars=starField(10000,14000,4.2,OPACIDAD_DEL_RELLENO);scene.add(backgroundStars);
 
   const vecindario=new THREE.Group();scene.add(vecindario);
 
@@ -138,7 +146,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
 
   const galaxyParts=createMilkyWayObject(KNOWN_GALAXIES[0]),galaxy=galaxyParts.group;
   const viaLactea=new THREE.Group();viaLactea.add(galaxy);scene.add(viaLactea);
-  const ESCALA_GALAXIA=10.5;
+  const ESCALA_GALAXIA=46;
   viaLactea.scale.setScalar(ESCALA_GALAXIA);
   /* Los puntos de la galaxia se dibujan en píxeles, no en unidades de mundo.
 
@@ -180,6 +188,19 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      escalada y se desplaza el conjunto para llevarlo al cero: así, al alejarse,
      el vecindario aparece como una mota dentro de un brazo espiral, que es
      exactamente dónde estamos. */
+  /* El Sol está a 26.000 años luz del centro galáctico, de un disco de 50.000
+     de radio: a la mitad. El modelo lo ponía a un cuarto, o sea demasiado
+     adentro, así que se aparta. Se mueven las tres cosas que marcan dónde
+     estamos —el punto, su halo y el aro de su órbita alrededor del centro— para
+     que no se separen entre ellas. */
+  const AFUERA=1.97;
+  [galaxyParts.solarMarker,galaxyParts.markerGlow].forEach(parte=>{
+    if(parte)parte.position.multiplyScalar(AFUERA);
+  });
+  galaxy.children
+    .filter(hijo=>hijo.geometry?.type==="RingGeometry")
+    .forEach(aro=>aro.scale.multiplyScalar(AFUERA));
+
   viaLactea.updateMatrixWorld(true);
   viaLactea.position.sub(galaxyParts.solarMarker.getWorldPosition(new THREE.Vector3()));
 
@@ -207,7 +228,12 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   const materials=createBodyMaterials(BODY_DATA);
   const planetObjects={},orbitObjects={},universeObjects={};let earthMesh,moonMesh,moonOrbit,saturnRings,earthClouds,atmosphere,selectedBody="earth",preferredFocus="earth",selectedEvent=TIMELINE_EVENTS.length-1,timelineProgress=TIMELINE_EVENTS.length-1,targetDistance=18,currentOrbitScale=1,zoomVelocity=0;
   function makeLabel(name,{color="rgba(248,250,252,.98)",scale=[3.4,.85,1],font="700 46px Inter, sans-serif"}={}){const c=document.createElement("canvas");c.width=512;c.height=128;const ctx=c.getContext("2d");ctx.fillStyle=color;ctx.font=font;ctx.fillText(name,22,74);const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));spr.scale.set(...scale);return spr}
-  function createPlanet(slug,material){const body=BODY_DATA[slug],group=new THREE.Group();group.userData.slug=slug;const mesh=new THREE.Mesh(new THREE.SphereGeometry(body.radius,64,64),material);mesh.userData.slug=slug;mesh.userData.clickable=true;group.add(mesh);if(slug!=="sun"){const label=makeLabel(body.name);label.position.set(0,body.radius+.7,0);group.add(label)}const orbit=makeOrbit(body.orbitRadius,slug==="earth"?0x3b82f6:0x334155,BODY_ORDER.indexOf(slug));orbitObjects[slug]=orbit;solar.add(orbit);solar.add(group);planetObjects[slug]=group;return{group,mesh,orbit}}
+  function createPlanet(slug,material){const body=BODY_DATA[slug],group=new THREE.Group();group.userData.slug=slug;const mesh=new THREE.Mesh(new THREE.SphereGeometry(body.radius,64,64),material);mesh.userData.slug=slug;mesh.userData.clickable=true;group.add(mesh);if(slug!=="sun"){const label=makeLabel(body.name);label.position.set(0,body.radius+.7,0);
+    /* El rótulo también elige el cuerpo. Es un blanco mucho mayor que el planeta
+       —a esta escala el nombre ocupa más que la esfera— y ya funcionaba así en
+       las estrellas y las constelaciones; que en los planetas no, era una
+       inconsistencia que se pagaba con clics fallados. */
+    label.userData.slug=slug;label.userData.clickable=true;group.add(label)}const orbit=makeOrbit(body.orbitRadius,slug==="earth"?0x3b82f6:0x334155,BODY_ORDER.indexOf(slug));orbitObjects[slug]=orbit;solar.add(orbit);solar.add(group);planetObjects[slug]=group;return{group,mesh,orbit}}
   const sunBody=createPlanet("sun",materials.sun);sunBody.group.position.set(0,0,0);sunBody.group.add(new THREE.Mesh(new THREE.SphereGeometry(BODY_DATA.sun.radius*1.16,48,48),new THREE.MeshBasicMaterial({color:0xffd166,transparent:true,opacity:0.25})));
   createPlanet("mercury",materials.mercury);createPlanet("venus",materials.venus);const earthObj=createPlanet("earth",materials.earthModern);earthMesh=earthObj.mesh;
   earthClouds=new THREE.Mesh(new THREE.SphereGeometry(BODY_DATA.earth.radius*1.02,48,48),new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:0.18,emissive:0xffffff,emissiveIntensity:0.03}));earthObj.group.add(earthClouds);
@@ -233,7 +259,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      entra en esta cuenta —está a 10.400 millones de años luz, no es del
      vecindario— y se coloca más allá de la galaxia, que es donde está. */
   const VECINDARIO={cerca:620,lejos:2400,masLejana:2509};
-  const DISTANCIA_DEL_CUASAR=26000;
+  const DISTANCIA_DEL_CUASAR=130000;
 
   function posicionEstelar(star){
     const direccion=new THREE.Vector3(...star.direction);
@@ -357,7 +383,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
        de quitarlo, y el disco se construye centrado en él. */
     const centro=galaxy.getWorldPosition(new THREE.Vector3());
     objetivoLibre=centro.clone();
-    const distancia=21000;
+    const distancia=96000;
     controls.target.copy(centro);
     camera.position.copy(centro).addScaledVector(new THREE.Vector3(0.34,0.66,0.67).normalize(),distancia);
     targetDistance=distancia;
@@ -390,13 +416,18 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     cieloFoto.material.opacity=1-fuera;
     cieloFoto.visible=fuera<1&&backgroundStars.visible;
 
+    /* El relleno de estrellas se apaga con la foto: es lo mismo, el cielo visto
+       desde aquí. Con el disco de la galaxia a 47.000, ese campo de radio 14.000
+       quedaría de lejos como una pelota densa pegada al Sol, que no es nada. */
+    backgroundStars.material.opacity=OPACIDAD_DEL_RELLENO*(1-fuera);
+
     nubesDeLaGalaxia.forEach(({parte,opacidadPlena})=>{
       parte.material.opacity=opacidadPlena*fuera;
       parte.visible=fuera>0.02;
     });
   }
 
-  function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(40000,dist*8);camera.updateProjectionMatrix()}
+  function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(300000,dist*8);camera.updateProjectionMatrix()}
   function syncSelectedTarget(avance){
     const destino=objetivoLibre??bodyPosition(selectedBody);
     controls.target.lerp(destino,suavizado(0.08,avance));
@@ -416,29 +447,95 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   /* Solo las pulsaciones sobre el lienzo eligen cuerpo: sin este filtro, pulsar
      un botón del panel lanzaba además un raycast que no acertaba nada y cerraba
      la ficha que ese mismo botón acababa de abrir. */
+  /* ── Elegir un cuerpo ────────────────────────────────────────────────────
+
+     Con el raycaster a secas hay que acertar la esfera, y en esta vista casi
+     nada mide lo suficiente: alejado para ver el sistema entero, Mercurio ocupa
+     dos píxeles. Acertarlo con el ratón era cuestión de suerte, y con el dedo,
+     imposible.
+
+     Así que hay dos intentos. Primero el rayo, que es exacto y respeta quién
+     tapa a quién: si el cuerpo es grande en pantalla, manda él. Si el rayo no
+     acierta nada, se busca el cuerpo cuyo centro caiga más cerca del cursor
+     dentro de un margen en PÍXELES. Y ahí está la clave: el margen es de
+     pantalla, no de escena, así que un planeta se pulsa igual de fácil ocupando
+     dos píxeles que doscientos. */
+  const MARGEN_PX = 18;
+
+  /* La lista de lo pulsable se arma una vez. Los objetos no se crean ni se
+     destruyen después del montaje; lo que cambia es cuáles están visibles, y eso
+     se comprueba al elegir. Recorrer el grafo entero en cada movimiento del
+     ratón —con 746 estrellas y 88 figuras— sí se notaría. */
+  let pulsables = null;
+  function recogerPulsables() {
+    const lista = [];
+    const añadir = obj => { if (obj?.userData?.clickable) lista.push(obj); };
+    Object.values(planetObjects).forEach(group => group.traverse(añadir));
+    Object.values(universeObjects).forEach(entry => {
+      entry.object?.traverse?.(añadir);
+      entry.label?.traverse?.(añadir);
+      entry.parts?.forEach(part => part.traverse?.(añadir));
+    });
+    return lista;
+  }
+
+  const enPantalla = new THREE.Vector3();
+
+  /* Devuelve el slug de lo que hay bajo el cursor, o null. */
+  function elegirEn(clientX, clientY) {
+    if (!pulsables) pulsables = recogerPulsables();
+    const caja = renderer.domElement.getBoundingClientRect();
+    const visibles = pulsables.filter(isActuallyVisible);
+
+    pointer.x = (clientX - caja.left) / caja.width * 2 - 1;
+    pointer.y = -((clientY - caja.top) / caja.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const aciertos = raycaster.intersectObjects(visibles);
+    if (aciertos.length) return aciertos[0].object.userData.slug ?? null;
+
+    let elegido = null, masCerca = MARGEN_PX;
+    for (const objeto of visibles) {
+      if (!objeto.userData.slug) continue;
+      objeto.getWorldPosition(enPantalla).project(camera);
+      // Detrás de la cámara: proyecta igual, pero al otro lado.
+      if (enPantalla.z > 1) continue;
+      const x = caja.left + (enPantalla.x * 0.5 + 0.5) * caja.width;
+      const y = caja.top + (-enPantalla.y * 0.5 + 0.5) * caja.height;
+      const distancia = Math.hypot(x - clientX, y - clientY);
+      if (distancia < masCerca) { masCerca = distancia; elegido = objeto.userData.slug; }
+    }
+    return elegido;
+  }
+
   const alPulsar = e => {
     if (e.target !== renderer.domElement) return;
-    const caja = renderer.domElement.getBoundingClientRect();
-    pointer.x = (e.clientX - caja.left) / caja.width * 2 - 1;
-    pointer.y = -((e.clientY - caja.top) / caja.height) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    const clickable = [];
-    Object.values(planetObjects).forEach(group => group.traverse(obj => {
-      if (obj.userData.clickable && isActuallyVisible(obj)) clickable.push(obj);
-    }));
-    Object.values(universeObjects).forEach(entry => {
-      entry.object.traverse?.(obj => { if (obj.userData.clickable && isActuallyVisible(obj)) clickable.push(obj); });
-      entry.label?.traverse?.(obj => { if (obj.userData.clickable && isActuallyVisible(obj)) clickable.push(obj); });
-      entry.parts?.forEach(part => part.traverse?.(obj => { if (obj.userData.clickable && isActuallyVisible(obj)) clickable.push(obj); }));
-    });
-    const hits = raycaster.intersectObjects(clickable);
+    const slug = elegirEn(e.clientX, e.clientY);
     /* Pulsar el vacío cierra la ficha pero no suelta la cámara: seguir a la
        Tierra y estar leyendo su ficha son decisiones separadas. */
-    if (hits.length) { focusOn(hits[0].object.userData.slug); fichaAbierta = true; }
+    if (slug) { focusOn(slug); fichaAbierta = true; }
     else fichaAbierta = false;
     avisar();
   };
   window.addEventListener("pointerdown", alPulsar);
+
+  /* El cursor avisa de que ahí se puede pulsar. Sin esto, el margen de píxeles
+     es un secreto: se puede acertar, pero nadie sabe dónde ni cuándo.
+
+     Se resuelve una vez por cuadro y no en cada movimiento del ratón, que
+     dispara muchas más veces de las que se dibujan. */
+  let punteroPendiente = null;
+  const alMover = e => {
+    if (e.target !== renderer.domElement) { punteroPendiente = null; return; }
+    punteroPendiente = { x: e.clientX, y: e.clientY };
+  };
+  renderer.domElement.addEventListener("pointermove", alMover);
+
+  function actualizarCursor() {
+    if (!punteroPendiente) return;
+    const { x, y } = punteroPendiente;
+    punteroPendiente = null;
+    renderer.domElement.style.cursor = elegirEn(x, y) ? "pointer" : "";
+  }
 
   const observador = new ResizeObserver(() => {
     camera.aspect = ancho() / alto();
@@ -461,6 +558,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     updateTemporalVisibility();
     animateCamera(avance);
     actualizarMarcadorSolar();
+    actualizarCursor();
     controls.update();
     renderer.render(scene, camera);
     cuadro = requestAnimationFrame(animate);
@@ -489,6 +587,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       cancelAnimationFrame(cuadro);
       observador.disconnect();
       window.removeEventListener("pointerdown", alPulsar);
+      renderer.domElement.removeEventListener("pointermove", alMover);
       renderer.domElement.removeEventListener("wheel", alGirarRueda);
       controls.dispose();
       liberarEscena(scene);
