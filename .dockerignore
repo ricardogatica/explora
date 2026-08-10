@@ -1,0 +1,20 @@
+# Lo que no debe entrar en el contexto de construcción.
+#
+# node_modules queda fuera a propósito: dentro de la imagen se instala con
+# `npm ci` para Linux, y copiar el de macOS metería binarios que no sirven
+# —y unos cuantos cientos de megas de contexto en cada build.
+node_modules
+**/node_modules
+
+# Los builds se rehacen dentro de la imagen; copiar los de la máquina de
+# desarrollo es la forma más fácil de publicar algo que nadie compiló.
+materias/out
+materias/.next
+universo/build
+universo/.react-router
+
+.git
+.playwright-mcp
+.superpowers
+*.log
+.DS_Store

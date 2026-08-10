@@ -1,0 +1,23 @@
+# Un solo servicio: el sitio entero es estático.
+#
+#   docker compose -f infra/compose.yaml up --build
+#
+# El puerto se publica en local. En el servidor, delante va el proxy que ya
+# termina el TLS de ricardogatica.com; a este contenedor le llega HTTP plano y
+# por eso su nginx no sabe nada de certificados.
+services:
+  explora:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    image: explora:local
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    healthcheck:
+      # Una página del universo, no la raíz: comprueba de paso que el reparto por
+      # prefijo funciona, que es lo único que esta configuración puede romper.
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/universo/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

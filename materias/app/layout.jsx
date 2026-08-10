@@ -3,7 +3,10 @@ import "./globals.css";
 
 export const metadata = {
   title: "Explora",
-  description: "Base de conocimiento interactivo por edades, de los 5 a los 17 años."
+  description: "Base de conocimiento interactivo por edades, de los 5 a los 17 años.",
+  /* Declarado, y no dejado al azar: sin esto el navegador pide /favicon.ico por
+     su cuenta y se lleva un 404 en cada visita. */
+  icons: { icon: "/favicon.svg" }
 };
 
 /* Las tipografías son las del portal: Bricolage para los títulos, Inter para el
