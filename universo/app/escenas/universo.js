@@ -193,9 +193,37 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       return {parte,opacidadPlena:parte.material.opacity};
     });
 
+  /* Lo que se apaga al salir del barrio: las estrellas conocidas, las figuras de
+     las constelaciones y sus rótulos.
+
+     Una constelación es una línea de visión DESDE LA TIERRA: une estrellas que
+     no tienen nada que ver entre sí y que están a distancias muy distintas.
+     Vista desde fuera del vecindario no significa nada, y además tapaba: esa
+     maraña blanca alrededor del Sol era lo primero que se veía al mirar la
+     galaxia. Se apaga con la misma cuenta que el cielo fotográfico, porque las
+     dos cosas son lo mismo: el cielo tal como se ve desde aquí. */
+  /* Se recoge la primera vez que hace falta y no aquí mismo: las estrellas y las
+     figuras se crean más abajo, así que recorrer el grupo ahora devolvería una
+     lista vacía y el apagado no haría nada. */
+  let telaDelVecindario=null;
+  let velosPuestos=-1;
+  function recogerTelaDelVecindario(){
+    const lista=[],vistos=new Set();
+    vecindario.traverse(objeto=>{
+      const material=objeto.material;
+      if(!material||vistos.has(material))return;
+      vistos.add(material);
+      material.transparent=true;
+      lista.push({material,opacidadPlena:material.opacity});
+    });
+    return lista;
+  }
+
   /* El disco pintado se desvanece con las nubes pero no lleva tamaño de punto:
      es una malla con textura, no un campo de partículas. */
   if(galaxyParts.pintado){
+    const mapa=galaxyParts.pintado.material.map;
+    if(mapa){mapa.anisotropy=renderer.capabilities.getMaxAnisotropy();mapa.needsUpdate=true;}
     nubesDeLaGalaxia.push({parte:galaxyParts.pintado,opacidadPlena:galaxyParts.pintado.material.opacity});
   }
   /* El Sol tiene que caer en el origen de la escena, que es donde está el
@@ -226,6 +254,17 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      así que aparece con la distancia. */
   const MARCADOR_DESDE=3000;
   const marcadorSolar=[galaxyParts.solarMarker,galaxyParts.markerGlow].filter(Boolean);
+
+  /* Y a su tamaño. Escalado con la galaxia medía 368 de radio con un halo de
+     3.220 de ancho: el 6,8% del radio del disco y vez y media el vecindario
+     entero. Era la cosa más brillante de la escena y se confundía con el
+     sistema solar, que a esta escala no mide ni un píxel. Es un alfiler que
+     dice «aquí estamos», así que tiene que leerse como un alfiler. */
+  if(galaxyParts.solarMarker)galaxyParts.solarMarker.scale.setScalar(0.30);
+  if(galaxyParts.markerGlow){
+    galaxyParts.markerGlow.scale.multiplyScalar(0.25);
+    galaxyParts.markerGlow.material.opacity=0.4;
+  }
 
   const solar=new THREE.Group();scene.add(solar);
   const cosmicEvents=new THREE.Group();scene.add(cosmicEvents);
@@ -356,9 +395,18 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   /* La barra recorre la escena por tramos y no de forma uniforme: entre las
      constelaciones y la galaxia hay un desierto que no merece un tercio del
      recorrido. Ver zoom.js, donde está la aritmética y sus pruebas. */
-  function setZoom(value){
+  function setZoom(value,{soltarObjetivo=true}={}){
+    const antes=targetDistance;
     zoomActual=THREE.MathUtils.clamp(value,0,100);
     targetDistance=distanciaDe(zoomActual);
+
+    /* Acercarse siempre es acercarse AL SISTEMA SOLAR. Si la cámara estaba
+       mirando el centro de la galaxia y se empieza a acercar, suelta ese punto y
+       vuelve a mirar a casa: así el zoom entra por las estrellas del vecindario
+       y acaba en los planetas, en vez de meterse en el disco pintado —donde no
+       hay nada que ver de cerca y encima se le notan los píxeles de la
+       textura—. Alejarse no lo suelta: para eso está el botón. */
+    if(soltarObjetivo&&objetivoLibre&&targetDistance<antes)objetivoLibre=null;
   }
   function focusTimelineEvent(distance=null,{remember=true}={}){objetivoLibre=null;if(remember)preferredFocus=null;selectedBody=null;controls.target.set(0,0,0);const eventDistance={["big-bang"]:58,inflation:74,["cosmic-background"]:92,["dark-ages"]:118,["first-stars"]:135,["early-galaxies"]:150,["early-milky-way"]:155};targetDistance=distance??eventDistance[currentEvent().id]??120;avisar()}
   function focusOn(slug,distance=null,{remember=true}={}){objetivoLibre=null;if(!slug){focusTimelineEvent(distance,{remember});return}if(remember)preferredFocus=slug;const resolved=fallbackFocusForPreferred(slug);if(!resolved){focusTimelineEvent(distance,{remember:false});return}slug=resolved;selectedBody=slug;const p=bodyPosition(slug);controls.target.copy(p);if(distance==null){const body=BODY_DATA[slug],universeEntry=universeObjects[slug];if(body){distance=Math.max(body.radius*8,slug==="sun"?12:5);if(slug==="jupiter"||slug==="saturn")distance*=1.4;if(slug==="moon")distance=2.5}else if(universeEntry){distance=universeEntry.focusDistance||150}else{distance=180}}targetDistance=distance;avisar()}
@@ -416,7 +464,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       .addScaledVector(enElPlano,Math.cos(inclinacion)).normalize();
     camera.position.copy(centro).addScaledVector(direccion,distancia);
     targetDistance=distancia;
-    setZoom(zoomParaDistancia(distancia));
+    setZoom(zoomParaDistancia(distancia),{soltarObjetivo:false});
   }
 
   function applyInitialLayout(){selectedEvent=TIMELINE_EVENTS.length-1;timelineProgress=selectedEvent;setZoom(SOLAR_SYSTEM_BEHAVIOR.initialZoom);earthMesh.material=getEarthMaterialByStage("modern");avisar();updateTemporalVisibility();focusOn("earth",SOLAR_SYSTEM_BEHAVIOR.initialFocusDistance)}
@@ -454,6 +502,16 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       parte.material.opacity=opacidadPlena*fuera;
       parte.visible=fuera>0.02;
     });
+
+    /* Las mil y pico piezas del vecindario solo se retocan cuando el desvanecido
+       cambia de verdad. Recorrerlas en cada cuadro para escribir el mismo número
+       sería trabajo tirado. */
+    const dentro=1-fuera;
+    if(Math.abs(dentro-velosPuestos)>0.01){
+      velosPuestos=dentro;
+      telaDelVecindario??=recogerTelaDelVecindario();
+      telaDelVecindario.forEach(({material,opacidadPlena})=>{material.opacity=opacidadPlena*dentro;});
+    }
   }
 
   function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(300000,dist*8);camera.updateProjectionMatrix()}

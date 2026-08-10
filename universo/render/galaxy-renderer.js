@@ -119,6 +119,13 @@ function makeGalaxyTexture(tamano = 1024) {
 
   const textura = new THREE.CanvasTexture(lienzo);
   textura.colorSpace = THREE.SRGBColorSpace;
+  /* Mipmaps y anisotropía: sin ellas, el disco visto en escorzo se llena de
+     dientes de sierra, que es cuando peor se ve una textura grande. La
+     anisotropía la fija la escena, que es la que conoce las capacidades de la
+     tarjeta. */
+  textura.generateMipmaps = true;
+  textura.minFilter = THREE.LinearMipmapLinearFilter;
+  textura.magFilter = THREE.LinearFilter;
   return textura;
 }
 
