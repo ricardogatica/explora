@@ -5,6 +5,7 @@ import { createBodyMesh, createSaturnRings, createSunGlow } from "../../../siste
 import { addStarfield } from "../../../sistema_solar/starfield.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
+import { conRutasDeTextura } from "../datos/texturas.js";
 
 /* La escala planetaria: los cuerpos por tamaño relativo, en fila.
 
@@ -43,12 +44,6 @@ const FILA = [
 ];
 const RADIO_ORBITA_LUNA = 2.4;
 const VELOCIDAD_ORBITA_LUNA = Math.PI * 2 / 40;   // una vuelta cada 40 s
-
-const BASE_TEXTURAS = "/universo/";
-const conRutas = cuerpo => !cuerpo.textures ? cuerpo : {
-  ...cuerpo,
-  textures: Object.fromEntries(Object.entries(cuerpo.textures).map(([k, v]) => [k, BASE_TEXTURAS + v]))
-};
 
 export const RADIOS = RADIO_RELATIVO;
 
@@ -106,7 +101,7 @@ export function montarEscalaPlanetaria(contenedor, { alElegir } = {}) {
 
   const objetos = {}, pulsables = [];
   FILA.forEach(item => {
-    const cuerpo = conRutas(BODY_DATA[item.slug]);
+    const cuerpo = conRutasDeTextura(BODY_DATA[item.slug]);
     const radio = RADIO_RELATIVO[item.slug] * item.unidad;
     const grupo = new THREE.Group();
     grupo.position.set(item.x, 0, 0);
@@ -128,7 +123,7 @@ export function montarEscalaPlanetaria(contenedor, { alElegir } = {}) {
   // La Luna, colgada de un pivote que gira dentro del grupo de la Tierra.
   const pivoteLuna = new THREE.Group();
   {
-    const cuerpo = conRutas(BODY_DATA.moon);
+    const cuerpo = conRutasDeTextura(BODY_DATA.moon);
     const radio = RADIO_RELATIVO.moon * UNIDAD;
     const grupo = new THREE.Group();
     grupo.position.set(RADIO_ORBITA_LUNA, 0, 0);

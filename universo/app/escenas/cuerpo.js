@@ -8,6 +8,7 @@ import {
 import { addStarfield } from "../../../sistema_solar/starfield.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
+import { conRutasDeTextura, BASE_TEXTURAS } from "../datos/texturas.js";
 
 /* La escena de un cuerpo del sistema solar: el planeta con sus lunas y, si los
    tiene, sus anillos.
@@ -21,20 +22,8 @@ import { liberarEscena } from "@explora/compartido/desmontar.js";
    Una sola cosa cambia a propósito, y está explicada abajo: el desplazamiento
    lateral. */
 
-/* Las texturas se declaran con rutas relativas —«textures/earth/day.jpg»— que
-   funcionaban porque cada ficha era un HTML dentro de sistema_solar/. Con URLs
-   como /universo/cuerpos/earth, esa misma ruta apuntaría a un sitio que no
-   existe. Se resuelven contra la raíz de la app. */
-const BASE_TEXTURAS = "/universo/";
-const conRutasAbsolutas = cuerpo => !cuerpo.textures ? cuerpo : {
-  ...cuerpo,
-  textures: Object.fromEntries(
-    Object.entries(cuerpo.textures).map(([nombre, ruta]) => [nombre, BASE_TEXTURAS + ruta])
-  )
-};
-
 export function montarCuerpo(contenedor, slug) {
-  const body = conRutasAbsolutas(BODY_DATA[slug]);
+  const body = conRutasDeTextura(BODY_DATA[slug]);
   if (!body) return () => {};
 
   const escena = new THREE.Scene();
