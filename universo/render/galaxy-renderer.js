@@ -24,6 +24,104 @@ function makeGalaxyPoints({count=18000,radius=520,arms=4,thickness=1,opacity=.58
   return new THREE.Points(geometry,new THREE.PointsMaterial({size,map:getGlowTexture(),vertexColors:true,transparent:true,opacity,blending:THREE.AdditiveBlending,depthWrite:false}));
 }
 
+/* La galaxia pintada, que es lo que le da las bandas de polvo.
+
+   Con nubes de puntos no hay manera: se dibujan en modo aditivo, y lo aditivo
+   solo puede SUMAR luz. Una banda de polvo es lo contrario —una franja que tapa
+   la luz de detrás— y por eso los brazos salían como un salpicado de estrellas
+   sin la estructura de las fotos.
+
+   Así que el disco se pinta una vez en un lienzo y se usa como textura: el
+   núcleo cálido, cuatro brazos azulados con sus nudos brillantes, y encima las
+   vetas oscuras siguiendo el borde interior de cada brazo. Sobre negro, un
+   píxel oscuro con alfa oscurece lo que hay debajo, que es justo lo que hace
+   falta.
+
+   Un lienzo de 1024 son 4 MB en la tarjeta y una sola textura. Mucho menos que
+   los cientos de miles de puntos que harían falta para insinuar lo mismo, y
+   además queda suave en vez de granulado. */
+function makeGalaxyTexture(tamano = 1024) {
+  const lienzo = document.createElement("canvas");
+  lienzo.width = lienzo.height = tamano;
+  const ctx = lienzo.getContext("2d");
+  const centro = tamano / 2, radio = centro * 0.96;
+
+  /* Ruido reproducible: la galaxia tiene que salir igual en cada carga, o
+     cambiaría de forma al recargar la página. */
+  let semilla = 20260810;
+  const azar = () => (semilla = (semilla * 1664525 + 1013904223) % 4294967296) / 4294967296;
+
+  /* Un borrón suave: opaco en el centro y transparente en el borde. Es el único
+     pincel que se usa, y de sumar muchos sale todo lo demás. */
+  const borron = (x, y, r, rgb, alfa) => {
+    if (r <= 0 || alfa <= 0) return;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `rgba(${rgb},${alfa})`);
+    g.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  };
+
+  /* Un brazo es una espiral logarítmica: el ángulo crece con el logaritmo del
+     radio, y por eso se enrolla igual a cualquier escala. */
+  const BRAZOS = 4, VUELTA = 2.6;
+  const puntoDelBrazo = (brazo, t) => {
+    const r = 0.1 + t * 0.9;
+    const angulo = brazo * Math.PI * 2 / BRAZOS + Math.log(r / 0.1) * VUELTA;
+    return { r, angulo, x: centro + Math.cos(angulo) * r * radio, y: centro + Math.sin(angulo) * r * radio };
+  };
+
+  ctx.clearRect(0, 0, tamano, tamano);
+
+  // Un velo general, para que el disco tenga cuerpo también entre los brazos.
+  borron(centro, centro, radio, "70,96,150", 0.5);
+
+  // Los brazos, azulados, con nudos brillantes de formación estelar.
+  for (let brazo = 0; brazo < BRAZOS; brazo++) {
+    for (let i = 0; i <= 260; i++) {
+      const t = i / 260, p = puntoDelBrazo(brazo, t);
+      const grosor = radio * (0.055 + t * 0.075);
+      borron(p.x + (azar() - .5) * grosor, p.y + (azar() - .5) * grosor, grosor,
+        "178,206,255", (0.30 - t * 0.13) * (0.75 + azar() * 0.5));
+      if (azar() < 0.10) {
+        borron(p.x + (azar() - .5) * grosor * 2, p.y + (azar() - .5) * grosor * 2,
+          grosor * 0.3, "230,242,255", 0.5);
+      }
+    }
+  }
+
+  /* Las vetas de polvo, en oscuro y por dentro de cada brazo. Van después de la
+     luz para poder taparla, que es lo que hace el polvo de verdad. */
+  for (let brazo = 0; brazo < BRAZOS; brazo++) {
+    for (let i = 0; i <= 240; i++) {
+      const t = i / 240, p = puntoDelBrazo(brazo, t);
+      // Hacia dentro: el polvo se acumula en el borde interior del brazo.
+      const desvio = -0.05 * radio * (1 + t);
+      const x = p.x + Math.cos(p.angulo + Math.PI / 2) * desvio;
+      const y = p.y + Math.sin(p.angulo + Math.PI / 2) * desvio;
+      borron(x, y, radio * (0.026 + t * 0.04), "12,9,18", (0.46 - t * 0.24) * (0.7 + azar() * 0.6));
+    }
+  }
+
+  // El bulbo, cálido y lo más brillante de todo, encima.
+  borron(centro, centro, radio * 0.32, "255,210,142", 0.5);
+  borron(centro, centro, radio * 0.16, "255,242,214", 0.72);
+  borron(centro, centro, radio * 0.06, "255,255,250", 0.95);
+
+  // El borde se desvanece del todo, para que el disco no acabe en un canto.
+  const desvanecer = ctx.createRadialGradient(centro, centro, radio * 0.60, centro, centro, radio);
+  desvanecer.addColorStop(0, "rgba(0,0,0,0)");
+  desvanecer.addColorStop(1, "rgba(0,0,0,1)");
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.fillStyle = desvanecer;
+  ctx.fillRect(0, 0, tamano, tamano);
+  ctx.globalCompositeOperation = "source-over";
+
+  const textura = new THREE.CanvasTexture(lienzo);
+  textura.colorSpace = THREE.SRGBColorSpace;
+  return textura;
+}
+
 /* Un esferoide de estrellas: sirve para el bulbo y para el halo.
 
    `achatado` es cuánto se aplasta en vertical —0,6 en el bulbo, casi 1 en el
@@ -104,7 +202,8 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
   group.userData.slug=galaxy.slug;group.userData.kind="galaxy";group.userData.clickable=true;group.userData.detail=detail;
 
   const scale=detail?1:.92,diskOpacity=detail ? .76 : .46,diskTilt=detail ? .5 : .22;
-  const disk=makeGalaxyPoints({count:detail?42000:26000,radius:(detail?520:1120)*scale,arms:4,thickness:detail?1.8:1,opacity:diskOpacity,size:detail?2.55:2.2});
+  const radiusBase=(detail?520:1120)*scale;
+  const disk=makeGalaxyPoints({count:detail?42000:26000,radius:radiusBase,arms:4,thickness:detail?1.8:1,opacity:diskOpacity,size:detail?2.55:2.2});
   disk.rotation.x=diskTilt;disk.userData.visibleFrom=galaxy.visibleFrom;group.add(disk);
 
   const dust=makeGalaxyPoints({count:detail?18000:9000,radius:(detail?470:930)*scale,arms:4,thickness:detail?1.1:.8,opacity:detail ? .34 : .18,size:detail?2.2:1.75,palette:"dust"});
@@ -129,6 +228,19 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
      El HALO: una envoltura casi esférica y muy dispersa, del tamaño del disco.
      Apenas se ve, y es justo lo que hace que el disco no acabe en un borde
      recortado. */
+  /* El disco pintado: los brazos, las vetas de polvo y el bulbo, en una textura.
+     Va con mezcla normal y no aditiva, porque lo aditivo no puede oscurecer y
+     las vetas son precisamente oscuridad. Se dibuja antes que las nubes de
+     puntos, que le añaden el brillo granulado por encima. */
+  const pintado=new THREE.Mesh(
+    new THREE.PlaneGeometry(radiusBase*2.05,radiusBase*2.05),
+    new THREE.MeshBasicMaterial({map:makeGalaxyTexture(detail?1024:1024),transparent:true,depthWrite:false,side:THREE.DoubleSide,opacity:detail?.95:.9})
+  );
+  pintado.rotation.x=-Math.PI/2+diskTilt;   // el plano nace vertical: se tumba
+  pintado.renderOrder=-1;
+  pintado.userData.visibleFrom=galaxy.visibleFrom;
+  group.add(pintado);
+
   const discoGrueso=makeGalaxyPoints({
     count:detail?9000:6000,radius:(detail?500:1000)*scale,arms:4,
     thickness:detail?3.4:3.2,opacity:detail?.16:.10,size:detail?2.0:1.7,palette:"dust"
@@ -203,7 +315,7 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
     }
   }
 
-  return{group,disk,dust,discoGrueso,bulbo,halo,core,glow,bar,solarMarker,markerGlow,solarSystemPosition,kind:"galaxy",detail};
+  return{group,disk,dust,pintado,discoGrueso,bulbo,halo,core,glow,bar,solarMarker,markerGlow,solarSystemPosition,kind:"galaxy",detail};
 }
 
 /* `avance` son cuadros de referencia transcurridos (ver tiempo.js): los

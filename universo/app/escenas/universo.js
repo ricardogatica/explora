@@ -16,6 +16,7 @@ import { liberarEscena } from "@explora/compartido/desmontar.js";
 import { rutaDeTextura } from "../datos/texturas.js";
 import { crearCuerposMenores } from "./cuerpos-menores.js";
 import { baseGalactica } from "../../cielo/universe/sky.js";
+import { distanciaDe, zoomDe } from "./zoom.js";
 
 /* La vista del universo: la escena grande, con su línea temporal.
 
@@ -175,7 +176,10 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   });
 
   const nubesDeLaGalaxia=[
-    [galaxyParts.disk,1.9],[galaxyParts.dust,1.5],[galaxyParts.bar,2.1],
+    [galaxyParts.disk,1.9],[galaxyParts.dust,1.5],
+    /* La barra, muy tenue: el bulbo ya lo pinta la textura, y encima de ella
+       este trazo de puntos cruzando el centro parecía un destello de lente. */
+    [galaxyParts.bar,1.6],
     // Las tres que le dan cuerpo: ver la nota del renderizador.
     [galaxyParts.discoGrueso,1.5],[galaxyParts.bulbo,2.0],[galaxyParts.halo,1.2]
   ]
@@ -184,9 +188,16 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       parte.material.sizeAttenuation=false;
       parte.material.size=tamano;
       parte.material.needsUpdate=true;
+      if(parte===galaxyParts.bar)parte.material.opacity*=0.35;
       // Se guarda la opacidad de partida: es el techo del desvanecido.
       return {parte,opacidadPlena:parte.material.opacity};
     });
+
+  /* El disco pintado se desvanece con las nubes pero no lleva tamaño de punto:
+     es una malla con textura, no un campo de partículas. */
+  if(galaxyParts.pintado){
+    nubesDeLaGalaxia.push({parte:galaxyParts.pintado,opacidadPlena:galaxyParts.pintado.material.opacity});
+  }
   /* El Sol tiene que caer en el origen de la escena, que es donde está el
      sistema solar. Se calcula dónde queda su marcador dentro de la galaxia ya
      escalada y se desplaza el conjunto para llevarlo al cero: así, al alejarse,
@@ -342,25 +353,19 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   function getEarthMaterialByStage(stage){switch(stage){case"molten":return materials.earthMolten;case"archaean":return materials.earthArchaean;case"proterozoic":return materials.earthProterozoic;case"paleozoic":return materials.earthPaleozoic;case"pangaea":return materials.earthPangaea;case"breakup1":return materials.earthBreakup1;case"breakup2":return materials.earthBreakup2;default:return materials.earthModern}}
   function selectTimelineProgress(value,{focusMode="preserve",zoom=true}={}){timelineProgress=THREE.MathUtils.clamp(Number(value),0,TIMELINE_EVENTS.length-1);selectedEvent=Math.round(timelineProgress);const ev=currentEvent();earthMesh.material=getEarthMaterialByStage(ev.earthStage);if(zoom)setZoom(ev.zoom);updateTemporalVisibility();if(focusMode==="event"){const eventFocus=focusSlugForEvent(ev);if(isCosmicEventFocus(ev)){preferredFocus=null;focusTimelineEvent()}else{preferredFocus=eventFocus;focusOn(eventFocus)}}else{resolvePreferredFocus()}avisar()}
   function bodyPosition(slug){if(!slug)return new THREE.Vector3();if(slug==="moon"){return planetObjects.earth.position.clone().add(planetObjects.moon.position)}if(planetObjects[slug])return planetObjects[slug].position.clone();if(universeObjects[slug])return (universeObjects[slug].focusObject||universeObjects[slug].object).getWorldPosition(new THREE.Vector3());return new THREE.Vector3()}
-  /* Logarítmico y no lineal. La barra recorre de 6 a 26.000 unidades: con una
-   interpolación lineal, o su curva, el sistema solar entero cabía en el primer
-   tramo y el resto era vacío. Cada paso de la barra multiplica la distancia por
-   lo mismo, que es como se mira el cielo: por órdenes de magnitud. */
+  /* La barra recorre la escena por tramos y no de forma uniforme: entre las
+     constelaciones y la galaxia hay un desierto que no merece un tercio del
+     recorrido. Ver zoom.js, donde está la aritmética y sus pruebas. */
   function setZoom(value){
-    zoomActual=value;
-    const {min,max}=SOLAR_SYSTEM_BEHAVIOR.zoomDistance;
-    targetDistance=min*Math.pow(max/min,THREE.MathUtils.clamp(value,0,100)/100);
+    zoomActual=THREE.MathUtils.clamp(value,0,100);
+    targetDistance=distanciaDe(zoomActual);
   }
   function focusTimelineEvent(distance=null,{remember=true}={}){objetivoLibre=null;if(remember)preferredFocus=null;selectedBody=null;controls.target.set(0,0,0);const eventDistance={["big-bang"]:58,inflation:74,["cosmic-background"]:92,["dark-ages"]:118,["first-stars"]:135,["early-galaxies"]:150,["early-milky-way"]:155};targetDistance=distance??eventDistance[currentEvent().id]??120;avisar()}
   function focusOn(slug,distance=null,{remember=true}={}){objetivoLibre=null;if(!slug){focusTimelineEvent(distance,{remember});return}if(remember)preferredFocus=slug;const resolved=fallbackFocusForPreferred(slug);if(!resolved){focusTimelineEvent(distance,{remember:false});return}slug=resolved;selectedBody=slug;const p=bodyPosition(slug);controls.target.copy(p);if(distance==null){const body=BODY_DATA[slug],universeEntry=universeObjects[slug];if(body){distance=Math.max(body.radius*8,slug==="sun"?12:5);if(slug==="jupiter"||slug==="saturn")distance*=1.4;if(slug==="moon")distance=2.5}else if(universeEntry){distance=universeEntry.focusDistance||150}else{distance=180}}targetDistance=distance;avisar()}
   /* Porcentaje de la barra de zoom que corresponde a una distancia: es la inversa
      de setZoom(). Sin esto, mover la cámara a mano deja la barra marcando otra cosa
      y el primer golpe de rueda salta de vuelta a lo que dice la barra. */
-  function zoomParaDistancia(distancia){
-    const {min,max}=SOLAR_SYSTEM_BEHAVIOR.zoomDistance;
-    const t=Math.log(Math.max(distancia,min)/min)/Math.log(max/min);
-    return THREE.MathUtils.clamp(t,0,1)*100;
-  }
+  const zoomParaDistancia = zoomDe;
 
   /* Encuadra el sistema completo: la órbita de Neptuno, que es la que manda, con
      el factor por el que las órbitas se separan al enfocar un cuerpo y un margen
@@ -401,7 +406,12 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       .applyQuaternion(galaxyParts.disk.getWorldQuaternion(new THREE.Quaternion())).normalize();
     const haciaElSol=new THREE.Vector3().sub(centro);           // el Sol está en el origen
     const enElPlano=haciaElSol.projectOnPlane(normal).normalize();
-    const inclinacion=THREE.MathUtils.degToRad(38);
+    /* Casi de frente, no de canto. A 38° la galaxia salía como una elipse
+       achatada, y por eso seguía pareciendo delgada: de frente lo que se ve es
+       su ANCHURA, no su grosor, y una espiral de frente no parece delgada nunca.
+       Se dejan 14° de escorzo para que siga leyéndose como un disco en el
+       espacio y no como un dibujo pegado a la pantalla. */
+    const inclinacion=THREE.MathUtils.degToRad(76);
     const direccion=normal.multiplyScalar(Math.sin(inclinacion))
       .addScaledVector(enElPlano,Math.cos(inclinacion)).normalize();
     camera.position.copy(centro).addScaledVector(direccion,distancia);
