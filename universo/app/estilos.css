@@ -470,3 +470,14 @@ a.boton { text-decoration: none; display: inline-block; }
   background: rgba(56,189,248,.07); color: #cbd5e1; font-size: 14px;
 }
 .destacado a { color: #7dd3fc; font-weight: 600; }
+
+/* Los subtítulos que parten una lista en grupos —los planetas rocosos y los
+   gigantes—: más pequeños que un h2 y sin tanto aire, porque no abren sección,
+   la ordenan por dentro. */
+.pagina .grupo {
+  margin: 1.4rem 0 .7rem;
+  font-family: var(--mono);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #94a3b8;
+}

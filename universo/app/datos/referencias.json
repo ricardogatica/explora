@@ -142,6 +142,20 @@
         "href": "https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=V/50",
         "texto": "vizier.cds.unistra.fr V/50"
       }
+    },
+    {
+      "epigrafe": "Ficha del Sistema Solar · CC BY-SA 4.0",
+      "titulo": "Wikipedia y datos publicados",
+      "parrafos": [
+        "Los textos de la ficha del Sistema Solar —la formación a partir de la nebulosa, la línea de hielo que separa planetas rocosos de gigantes, la definición de planeta de 2006 y los cinco planetas enanos reconocidos— se escribieron consultando el artículo <strong>Sistema solar</strong> de <strong>Wikipedia en español</strong>. La redacción es propia; los hechos, suyos y de las fuentes que cita.",
+        "Las cifras que se pueden derivar de los datos del propio sitio —cuántos planetas hay, cuál es el más lejano, su tipo y su distancia— no están escritas a mano: salen del mismo catálogo con el que se dibuja la escena.",
+        "Algunas cifras se redondean para que se lean, y una no es una medida: <strong>la nube de Oort nunca se ha observado directamente</strong>. Su tamaño se deduce de por dónde llegan los cometas de periodo largo, y las estimaciones van de 0,8 a más de 3 años luz. La ficha lo dice en lugar de dar una cifra con aspecto de dato medido.",
+        "<strong>Wikipedia se publica bajo CC BY-SA 4.0</strong>, la misma licencia que el contenido de Explora."
+      ],
+      "enlace": {
+        "href": "https://es.wikipedia.org/wiki/Sistema_solar",
+        "texto": "es.wikipedia.org/wiki/Sistema_solar"
+      }
     }
   ],
   "intro": [
