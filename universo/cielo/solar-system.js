@@ -42,7 +42,11 @@ export const ROTATION_SLOWDOWN = 4;
 export const SATELLITE_SLOWDOWN = 8;
 
 export const SOLAR_SYSTEM_BEHAVIOR = {
-  zoomDistance:{min:6,max:2200,curve:2.2},
+  /* Hasta 26.000: es lo que hace falta para que alejarse acabe enseñando la Vía
+     Láctea entera, que es lo que uno espera al arrastrar la barra hasta el final.
+     La curva ya no se usa —el recorrido es logarítmico, ver setZoom— y se deja
+     fuera para que nadie la ajuste creyendo que hace algo. */
+  zoomDistance:{min:6,max:26000},
   initialZoom:18,
   initialFocusDistance:7,
   orbitPhaseStep:0.45,

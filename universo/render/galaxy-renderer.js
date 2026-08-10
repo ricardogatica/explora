@@ -141,7 +141,7 @@ export function createMilkyWayObject(galaxy,{detail=false}={}){
     }
   }
 
-  return{group,disk,dust,core,glow,bar,solarMarker,solarSystemPosition,kind:"galaxy",detail};
+  return{group,disk,dust,core,glow,bar,solarMarker,markerGlow,solarSystemPosition,kind:"galaxy",detail};
 }
 
 /* `avance` son cuadros de referencia transcurridos (ver tiempo.js): los

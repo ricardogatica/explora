@@ -292,8 +292,14 @@ test("nada de lo que gira lo hace por cuadro", () => {
 
 test("las escenas 3D miden el tiempo con el reloj compartido", () => {
   // Un reloj propio por escena es como se colaron los dos primeros defectos.
-  const escenas = readdirSync(ESCENAS).filter(nombre => nombre.endsWith(".js"));
-  assert.equal(escenas.length, 6, `esperaba las seis escenas, hay ${escenas.length}`);
+  /* Una escena es la que se monta: exporta un `montarAlgo`. En la carpeta hay
+     también piezas que usa una escena —los cuerpos menores del sistema solar—
+     que no llevan reloj propio porque el suyo se lo pasa quien las monta.
+     Contar archivos a secas hacía fallar esta prueba al añadir una pieza. */
+  const escenas = readdirSync(ESCENAS)
+    .filter(nombre => nombre.endsWith(".js"))
+    .filter(nombre => /export function montar/.test(readFileSync(join(ESCENAS, nombre), "utf8")));
+  assert.equal(escenas.length, 6, `esperaba las seis escenas montables, hay ${escenas.length}`);
   for (const escena of escenas) {
     const source = readFileSync(join(ESCENAS, escena), "utf8");
     assert.match(source, /from "@explora\/compartido\/tiempo\.js"/,

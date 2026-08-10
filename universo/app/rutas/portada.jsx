@@ -65,6 +65,7 @@ export default function Universo() {
           <Link className="boton boton--suave" to="/indice">Índice</Link>
           <button type="button" className="boton" onClick={() => escena.current?.enfocarTierra()}>Enfocar la Tierra</button>
           <button type="button" className="boton" onClick={() => escena.current?.enfocarSistemaSolar()}>Enfocar el sistema solar</button>
+          <button type="button" className="boton" onClick={() => escena.current?.enfocarViaLactea()}>Enfocar la Vía Láctea</button>
         </div>
       </section>
 

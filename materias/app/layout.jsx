@@ -16,7 +16,13 @@ export const metadata = {
    convivan. */
 export default function Layout({ children }) {
   return (
-    <html lang="es">
+    /* suppressHydrationWarning solo en <html>: hay extensiones —Google Tag
+       Assistant, gestores de contraseñas, traductores— que le añaden atributos
+       antes de que React hidrate, y React lo reporta como si el HTML del
+       servidor y el del cliente no coincidieran. No es cosa nuestra y no se
+       puede evitar desde aquí. Se limita a esta etiqueta: dentro seguimos
+       queriendo enterarnos de cualquier discrepancia de verdad. */
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

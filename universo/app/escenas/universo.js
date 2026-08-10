@@ -14,6 +14,7 @@ import {
 import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
 import { rutaDeTextura } from "../datos/texturas.js";
+import { crearCuerposMenores } from "./cuerpos-menores.js";
 
 /* La vista del universo: la escena grande, con su línea temporal.
 
@@ -47,6 +48,14 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      sigue la cámara sin abrir nada. */
   let fichaAbierta = false;
 
+  /* Un punto fijo al que mirar, que no es ningún cuerpo.
+
+     Cada cuadro la mira se lleva hacia el cuerpo elegido, y sin cuerpo elegido
+     `bodyPosition(null)` devuelve el origen: eso arrastraba la cámara de vuelta
+     al Sol en cuanto se soltaba, así que encuadrar la galaxia no llegaba a durar
+     un cuadro. Con un objetivo libre la mira se queda donde se la puso. */
+  let objetivoLibre=null;
+
   const avisar = () => alCambiar?.({
     etapa: selectedEvent,
     progreso: timelineProgress,
@@ -57,14 +66,84 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     elegido: fichaAbierta ? selectedBody : null,
     evento: TIMELINE_EVENTS[selectedEvent]
   });
-  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.00135);
+  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x020617,0.000018);  // ver la nota de escalas de abajo
   const camera=new THREE.PerspectiveCamera(55,ancho()/alto(),0.01,9000);camera.position.set(0,6,42);
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(ancho(),alto());renderer.outputColorSpace=THREE.SRGBColorSpace;contenedor.appendChild(renderer.domElement);
-  const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.05;controls.minDistance=3;controls.maxDistance=3800;controls.autoRotate=true;controls.autoRotateSpeed=0.18;controls.target.set(0,0,0);
+  const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.05;controls.minDistance=3;controls.maxDistance=26000;controls.autoRotate=true;controls.autoRotateSpeed=0.18;controls.target.set(0,0,0);
   scene.add(new THREE.AmbientLight(0x88aaff,0.55));const sunLight=new THREE.PointLight(0xffffff,4.2,0,2);sunLight.position.set(0,0,0);scene.add(sunLight);const fill=new THREE.DirectionalLight(0x7dd3fc,0.6);fill.position.set(-20,12,-12);scene.add(fill);
   function starField(count,radius,size,opacity){const g=new THREE.BufferGeometry(),positions=new Float32Array(count*3),colors=new Float32Array(count*3);for(let i=0;i<count;i++){const r=radius*(0.3+Math.random()*0.7),theta=Math.random()*Math.PI*2,phi=Math.acos(2*Math.random()-1);positions[i*3]=r*Math.sin(phi)*Math.cos(theta);positions[i*3+1]=r*Math.sin(phi)*Math.sin(theta);positions[i*3+2]=r*Math.cos(phi);const c=0.65+Math.random()*0.35;colors[i*3]=c;colors[i*3+1]=0.8+Math.random()*0.2;colors[i*3+2]=1}g.setAttribute("position",new THREE.BufferAttribute(positions,3));g.setAttribute("color",new THREE.BufferAttribute(colors,3));return new THREE.Points(g,new THREE.PointsMaterial({size,map:getGlowTexture(),vertexColors:true,transparent:true,opacity,depthWrite:false}))}
-  const backgroundStars=starField(10000,3600,1.35,0.92);scene.add(backgroundStars);
-  const galaxyParts=createMilkyWayObject(KNOWN_GALAXIES[0]),galaxy=galaxyParts.group;scene.add(galaxy);
+  /* ── Las tres escalas de la escena ──────────────────────────────────────
+
+     Antes había una sola: las 746 estrellas conocidas colgaban del grupo de la
+     galaxia y se repartían de 259 a 3606 unidades ALREDEDOR DEL CENTRO
+     GALÁCTICO, mientras el sistema solar estaba en el origen, a 780 de ese
+     centro y con Neptuno a 34. No es que las estrellas se vieran encima de los
+     planetas: es que estaban mezcladas con ellos, y en el sitio equivocado.
+
+     Ahora hay tres capas, cada una centrada donde le toca y con hueco vacío
+     entre ellas, que es lo que deja leer la profundidad:
+
+       sistema solar     0 – 35        hasta la órbita de Neptuno
+       vecindario      620 – 2400      las 745 estrellas, de 4 a 2509 años luz
+       Vía Láctea       disco ~10800   con el Sol puesto en el origen
+
+     Las proporciones siguen sin ser las reales —la estrella más cercana está a
+     4000 veces la órbita de Neptuno, no a 18— porque las de verdad no caben en
+     ninguna pantalla; de eso se ocupan las vistas de escala, que existen justo
+     para enseñar lo que aquí no cabe. Lo que sí es real es el ORDEN y la
+     separación: cada capa se lee como una capa. */
+  const backgroundStars=starField(10000,14000,4.2,0.72);scene.add(backgroundStars);
+
+  const vecindario=new THREE.Group();scene.add(vecindario);
+
+  const galaxyParts=createMilkyWayObject(KNOWN_GALAXIES[0]),galaxy=galaxyParts.group;
+  const viaLactea=new THREE.Group();viaLactea.add(galaxy);scene.add(viaLactea);
+  const ESCALA_GALAXIA=10.5;
+  viaLactea.scale.setScalar(ESCALA_GALAXIA);
+  /* Los puntos de la galaxia se dibujan en píxeles, no en unidades de mundo.
+
+     Con atenuación por distancia no hay tamaño que valga para esta escena: la
+     cámara va de 6 a 26.000 unidades, así que un punto que se ve bien desde
+     dentro del disco es invisible desde fuera —los brazos espirales
+     desaparecían y quedaba el núcleo flotando en negro— y uno que se ve desde
+     fuera tapa la pantalla desde dentro. Sin atenuación, la galaxia es siempre
+     un campo de puntos de dos píxeles, que es como la dibuja un planetario. */
+  /* El bulbo, cálido y achatado. En las fotos de galaxias espirales el centro
+     es amarillo anaranjado —estrellas viejas— y los brazos azulados —estrellas
+     jóvenes—; el contraste entre los dos es lo que hace que se lea como una
+     galaxia y no como una mancha. Y es una lenteja, no una bola. */
+  if(galaxyParts.core){
+    galaxyParts.core.material.color.set(0xffe3b0);
+    galaxyParts.core.scale.set(1.75,0.62,1.75);
+  }
+  if(galaxyParts.glow){
+    galaxyParts.glow.material.color.set(0xffcf9a);
+    galaxyParts.glow.material.opacity=0.34;
+    galaxyParts.glow.scale.multiplyScalar(2.6);
+  }
+
+  [[galaxyParts.disk,1.9],[galaxyParts.dust,1.5],[galaxyParts.bar,2.1]].forEach(([parte,tamano])=>{
+    if(!parte?.material)return;
+    parte.material.sizeAttenuation=false;
+    parte.material.size=tamano;
+    parte.material.needsUpdate=true;
+  });
+  /* El Sol tiene que caer en el origen de la escena, que es donde está el
+     sistema solar. Se calcula dónde queda su marcador dentro de la galaxia ya
+     escalada y se desplaza el conjunto para llevarlo al cero: así, al alejarse,
+     el vecindario aparece como una mota dentro de un brazo espiral, que es
+     exactamente dónde estamos. */
+  viaLactea.updateMatrixWorld(true);
+  viaLactea.position.sub(galaxyParts.solarMarker.getWorldPosition(new THREE.Vector3()));
+
+  /* El marcador «aquí estamos» de la galaxia queda, por definición, exactamente
+     donde está el sistema solar. Escalado con el disco mide 84 unidades y su
+     halo azul 735: desde dentro llenaban la pantalla de azul y tapaban la
+     escena entera. Solo tiene sentido cuando se mira la galaxia desde fuera,
+     así que aparece con la distancia. */
+  const MARCADOR_DESDE=3000;
+  const marcadorSolar=[galaxyParts.solarMarker,galaxyParts.markerGlow].filter(Boolean);
+
   const solar=new THREE.Group();scene.add(solar);
   const cosmicEvents=new THREE.Group();scene.add(cosmicEvents);
   function makePointSpriteTexture(){const canvas=document.createElement("canvas");canvas.width=64;canvas.height=64;const ctx=canvas.getContext("2d"),gradient=ctx.createRadialGradient(32,32,0,32,32,31);gradient.addColorStop(0,"rgba(255,255,255,1)");gradient.addColorStop(0.45,"rgba(210,235,255,.86)");gradient.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gradient;ctx.fillRect(0,0,64,64);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;return texture}
@@ -100,23 +179,58 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   createStageEffects();
   createPlanet("mars",materials.mars);createPlanet("jupiter",materials.jupiter);const saturnObj=createPlanet("saturn",materials.saturn);// El anillo lo construye body-renderer, con su textura real y las UV radiales.
   saturnRings=createSaturnRings(BODY_DATA.saturn.radius,{texture:rutaDeTextura(BODY_DATA.saturn.textures?.ring)});saturnObj.group.add(saturnRings);createPlanet("uranus",materials.uranus);createPlanet("neptune",materials.neptune);
+  /* De años luz a unidades de escena, dentro del cascarón del vecindario.
+
+     Logarítmico porque el catálogo abarca de 4 a 2509 años luz: lineal dejaría
+     el 95% de las estrellas amontonado contra el borde exterior. El cuásar no
+     entra en esta cuenta —está a 10.400 millones de años luz, no es del
+     vecindario— y se coloca más allá de la galaxia, que es donde está. */
+  const VECINDARIO={cerca:620,lejos:2400,masLejana:2509};
+  const DISTANCIA_DEL_CUASAR=26000;
+
+  function posicionEstelar(star){
+    const direccion=new THREE.Vector3(...star.direction);
+    if(star.kind==="quasar")return direccion.multiplyScalar(DISTANCIA_DEL_CUASAR);
+    const ly=Number.isFinite(star.distanceLy)?star.distanceLy:200;
+    const t=Math.log10(ly+1)/Math.log10(VECINDARIO.masLejana+1);
+    return direccion.multiplyScalar(THREE.MathUtils.lerp(VECINDARIO.cerca,VECINDARIO.lejos,Math.min(t,1)));
+  }
+  const POSICION_ESTELAR=new Map(KNOWN_STARS.map(star=>[star.slug,posicionEstelar(star)]));
+  const dondeEsta=star=>POSICION_ESTELAR.get(star.slug)??new THREE.Vector3(...star.position);
+
+  /* El cinturón, entre Marte y Júpiter y sin tocar a ninguno de los dos. Los
+     bordes salen de sus órbitas, así que si mañana se ajusta una órbita el
+     cinturón se ajusta con ella. */
+  const cuerposMenores=crearCuerposMenores({
+    interior:BODY_DATA.mars.orbitRadius*1.12,
+    exterior:BODY_DATA.jupiter.orbitRadius*0.88,
+    hacerEtiqueta:texto=>makeLabel(texto,{color:"rgba(203,213,225,.85)",scale:[7,1.75,1],font:"700 40px Inter, sans-serif"})
+  });
+  solar.add(cuerposMenores.grupo);
+
   function createKnownUniverse(){
     KNOWN_GALAXIES.forEach(item=>{
       const label=makeLabel(item.name,{color:"rgba(219,234,254,.96)",scale:[22,5.5,1],font:"900 46px Inter, sans-serif"});
-      label.position.set(94,78,0);label.userData.slug=item.slug;label.userData.kind="galaxy";label.userData.clickable=true;label.userData.visibleFrom=item.visibleFrom;
-      galaxy.add(label);universeObjects[item.slug]={object:galaxy,label,focusObject:galaxyParts.solarMarker,kind:"galaxy",visibleFrom:item.visibleFrom,focusDistance:420};
+      /* En la galaxia escalada, esta etiqueta iría a parar a decenas de miles
+         de unidades del Sol. Se pone en la capa del vecindario, mirando hacia
+         el centro galáctico, que es lo que nombra. */
+      label.position.set(0,-260,-2600);label.scale.multiplyScalar(9);label.userData.slug=item.slug;label.userData.kind="galaxy";label.userData.clickable=true;label.userData.visibleFrom=item.visibleFrom;
+      vecindario.add(label);universeObjects[item.slug]={object:viaLactea,label,focusObject:galaxyParts.solarMarker,kind:"galaxy",visibleFrom:item.visibleFrom,focusDistance:420};
     });
     KNOWN_STARS.forEach(star=>{
       const isQuasar=star.kind==="quasar",stellar=isQuasar?createQuasarObject(star):createStarObject(star),mesh=stellar.group;
+      // El objeto viene colocado con la posición vieja: se recoloca en su capa.
+      mesh.position.copy(dondeEsta(star));
       const labelScale=isQuasar?[22,5.5,1]:[16,4,1],label=makeLabel(star.name,{color:isQuasar?"rgba(255,225,180,.98)":"rgba(226,232,240,.98)",scale:labelScale,font:"800 46px Inter, sans-serif"});
-      label.position.set(star.position[0]+(isQuasar?42:24),star.position[1]+(isQuasar?28:18),star.position[2]);label.userData.slug=star.slug;label.userData.kind=star.kind||"star";label.userData.clickable=true;
-      galaxy.add(mesh);galaxy.add(label);universeObjects[star.slug]={...stellar,object:mesh,label,kind:star.kind||"star",visibleFrom:star.visibleFrom,focusDistance:isQuasar?260:120};
+      const donde=dondeEsta(star);
+      label.position.set(donde.x+(isQuasar?42:24),donde.y+(isQuasar?28:18),donde.z);label.userData.slug=star.slug;label.userData.kind=star.kind||"star";label.userData.clickable=true;
+      vecindario.add(mesh);vecindario.add(label);universeObjects[star.slug]={...stellar,object:mesh,label,kind:star.kind||"star",visibleFrom:star.visibleFrom,focusDistance:isQuasar?260:120};
     });
     CONSTELLATIONS.forEach(constellation=>{
       const stars=constellation.stars.map(slug=>KNOWN_STAR_BY_SLUG[slug]).filter(Boolean),parts=[];
-      if(stars.length>1){const points=stars.map(star=>new THREE.Vector3(...star.position));const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0x93c5fd,transparent:true,opacity:0.38}));galaxy.add(line);parts.push(line)}
+      if(stars.length>1){const points=stars.map(dondeEsta);const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0x93c5fd,transparent:true,opacity:0.38}));vecindario.add(line);parts.push(line)}
       const anchor=stars[0];
-      if(anchor){const label=makeLabel(constellation.name,{color:"rgba(167,139,250,.9)",scale:[12,3,1],font:"800 42px Inter, sans-serif"});label.position.set(anchor.position[0],anchor.position[1]+42,anchor.position[2]);label.userData.slug=constellation.slug;label.userData.kind="constellation";label.userData.clickable=true;galaxy.add(label);parts.push(label);universeObjects[constellation.slug]={object:label,parts,kind:"constellation",visibleFrom:constellation.visibleFrom}}
+      if(anchor){const label=makeLabel(constellation.name,{color:"rgba(167,139,250,.9)",scale:[12,3,1],font:"800 42px Inter, sans-serif"});const donde=dondeEsta(anchor);label.position.set(donde.x,donde.y+42,donde.z);label.userData.slug=constellation.slug;label.userData.kind="constellation";label.userData.clickable=true;vecindario.add(label);parts.push(label);universeObjects[constellation.slug]={object:label,parts,kind:"constellation",visibleFrom:constellation.visibleFrom}}
     })
   }
   createKnownUniverse();
@@ -141,21 +255,34 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   function fallbackFocusForPreferred(slug,event=currentEvent()){if(!slug)return null;if(BODY_DATA[slug]){if(existsAt(slug,event)&&(!isSolarFormationEvent(event)||slug==="sun"))return slug;if(eventIndex(event.id)>=eventIndex("solar-system-formation"))return "sun";return null}if(universeObjects[slug]&&universeExistsAt(universeObjects[slug],event))return slug;return null}
   function resolvePreferredFocus(){const resolved=fallbackFocusForPreferred(preferredFocus);if(resolved){focusOn(resolved,null,{remember:false})}else{focusTimelineEvent(null,{remember:false})}}
   function isActuallyVisible(object){let current=object;while(current){if(!current.visible)return false;current=current.parent}return true}
-  function updateTemporalVisibility(){const event=currentEvent(),firstStarsIndex=eventIndex("first-stars"),birthProgress=THREE.MathUtils.clamp(timelineProgress/firstStarsIndex,0,1),birthTransition=timelineProgress<firstStarsIndex,solarFormation=isSolarFormationEvent(event);const bg=new THREE.Color(0xffffff).lerp(new THREE.Color(0x020617),smoothRange(birthProgress,.04,.72));renderer.setClearColor(bg,1);scene.fog.color.copy(bg);backgroundStars.visible=!birthTransition&&eventIndex(event.id)>=firstStarsIndex;setEffectStrength(eventVisuals.bigBang,0);updatePrimordialTransition(birthProgress);setEffectActive(eventVisuals.firstStars,!birthTransition&&event.id==="first-stars");setEffectActive(eventVisuals.earlyGalaxy,event.id==="early-galaxies"||event.id==="early-milky-way");cosmicEvents.visible=primordialTransition.group.visible||eventVisuals.firstStars.visible||eventVisuals.earlyGalaxy.visible;setEffectActive(stageEffects.proto,solarFormation);setEffectActive(stageEffects.earthDust,event.id==="earth-formation");setEffectActive(stageEffects.moonDebris,event.id==="moon-formation");setEffectActive(stageEffects.oceans,event.id==="early-oceans");setEffectActive(stageEffects.oxidation,event.id==="great-oxidation");setEffectActive(stageEffects.life,event.id==="complex-life");earthClouds.visible=eventIndex(event.id)>=eventIndex("great-oxidation");atmosphere.visible=eventIndex(event.id)>=eventIndex("great-oxidation");BODY_ORDER.forEach(slug=>{const visible=!birthTransition&&existsAt(slug,event)&&(!solarFormation||slug==="sun"),group=planetObjects[slug],orbit=orbitObjects[slug];if(group)group.visible=visible;if(orbit)orbit.visible=visible&&slug!=="sun"&&!solarFormation});planetObjects.moon.visible=!birthTransition&&!solarFormation&&existsAt("moon",event);if(moonOrbit)moonOrbit.visible=!birthTransition&&!solarFormation&&existsAt("moon",event);const showGalaxy=!birthTransition&&eventIndex(event.id)>=firstStarsIndex&&!isCosmicEventFocus(event);galaxy.visible=showGalaxy&&(zoomActual/100>SOLAR_SYSTEM_BEHAVIOR.galaxyVisibilityZoom||eventIndex(event.id)<eventIndex("solar-system-formation"));galaxy.children.forEach(child=>{const visibleFrom=child.userData.visibleFrom;child.visible=showGalaxy&&(!visibleFrom||eventIndex(event.id)>=eventIndex(visibleFrom))});Object.entries(universeObjects).forEach(([slug,entry])=>{const visible=showGalaxy&&universeExistsAt(entry,event);entry.object.visible=visible;if(entry.label)entry.label.visible=visible;if(entry.parts)entry.parts.forEach(part=>{part.visible=visible})})}
+  function updateTemporalVisibility(){const event=currentEvent(),firstStarsIndex=eventIndex("first-stars"),birthProgress=THREE.MathUtils.clamp(timelineProgress/firstStarsIndex,0,1),birthTransition=timelineProgress<firstStarsIndex,solarFormation=isSolarFormationEvent(event);const bg=new THREE.Color(0xffffff).lerp(new THREE.Color(0x020617),smoothRange(birthProgress,.04,.72));renderer.setClearColor(bg,1);scene.fog.color.copy(bg);backgroundStars.visible=!birthTransition&&eventIndex(event.id)>=firstStarsIndex;setEffectStrength(eventVisuals.bigBang,0);updatePrimordialTransition(birthProgress);setEffectActive(eventVisuals.firstStars,!birthTransition&&event.id==="first-stars");setEffectActive(eventVisuals.earlyGalaxy,event.id==="early-galaxies"||event.id==="early-milky-way");cosmicEvents.visible=primordialTransition.group.visible||eventVisuals.firstStars.visible||eventVisuals.earlyGalaxy.visible;setEffectActive(stageEffects.proto,solarFormation);setEffectActive(stageEffects.earthDust,event.id==="earth-formation");setEffectActive(stageEffects.moonDebris,event.id==="moon-formation");setEffectActive(stageEffects.oceans,event.id==="early-oceans");setEffectActive(stageEffects.oxidation,event.id==="great-oxidation");setEffectActive(stageEffects.life,event.id==="complex-life");earthClouds.visible=eventIndex(event.id)>=eventIndex("great-oxidation");atmosphere.visible=eventIndex(event.id)>=eventIndex("great-oxidation");BODY_ORDER.forEach(slug=>{const visible=!birthTransition&&existsAt(slug,event)&&(!solarFormation||slug==="sun"),group=planetObjects[slug],orbit=orbitObjects[slug];if(group)group.visible=visible;if(orbit)orbit.visible=visible&&slug!=="sun"&&!solarFormation});planetObjects.moon.visible=!birthTransition&&!solarFormation&&existsAt("moon",event);if(moonOrbit)moonOrbit.visible=!birthTransition&&!solarFormation&&existsAt("moon",event);const showGalaxy=!birthTransition&&eventIndex(event.id)>=firstStarsIndex&&!isCosmicEventFocus(event);/* La galaxia ya no se esconde según el zoom. Antes había que esconderla
+     porque estaba encima del sistema solar; ahora su disco empieza a miles de
+     unidades y de lejos o de cerca se ve lo que corresponde. */
+    viaLactea.visible=showGalaxy;vecindario.visible=showGalaxy;
+    galaxy.children.forEach(child=>{const visibleFrom=child.userData.visibleFrom;child.visible=showGalaxy&&(!visibleFrom||eventIndex(event.id)>=eventIndex(visibleFrom))});Object.entries(universeObjects).forEach(([slug,entry])=>{const visible=showGalaxy&&universeExistsAt(entry,event);entry.object.visible=visible;if(entry.label)entry.label.visible=visible;if(entry.parts)entry.parts.forEach(part=>{part.visible=visible})})}
   function targetOrbitScale(){const zoom=zoomActual/100,zoomScale=1+(1-zoom)*(SOLAR_SYSTEM_BEHAVIOR.zoomOrbitScale-1),focusScale=BODY_DATA[selectedBody]?SOLAR_SYSTEM_BEHAVIOR.focusedOrbitScale:1;return Math.max(zoomScale,focusScale)}
   function syncOrbitScale(avance){currentOrbitScale=THREE.MathUtils.lerp(currentOrbitScale,targetOrbitScale(),suavizado(SOLAR_SYSTEM_BEHAVIOR.orbitScaleLerp,avance));Object.values(orbitObjects).forEach(orbit=>orbit.scale.setScalar(currentOrbitScale))}
   function getEarthMaterialByStage(stage){switch(stage){case"molten":return materials.earthMolten;case"archaean":return materials.earthArchaean;case"proterozoic":return materials.earthProterozoic;case"paleozoic":return materials.earthPaleozoic;case"pangaea":return materials.earthPangaea;case"breakup1":return materials.earthBreakup1;case"breakup2":return materials.earthBreakup2;default:return materials.earthModern}}
   function selectTimelineProgress(value,{focusMode="preserve",zoom=true}={}){timelineProgress=THREE.MathUtils.clamp(Number(value),0,TIMELINE_EVENTS.length-1);selectedEvent=Math.round(timelineProgress);const ev=currentEvent();earthMesh.material=getEarthMaterialByStage(ev.earthStage);if(zoom)setZoom(ev.zoom);updateTemporalVisibility();if(focusMode==="event"){const eventFocus=focusSlugForEvent(ev);if(isCosmicEventFocus(ev)){preferredFocus=null;focusTimelineEvent()}else{preferredFocus=eventFocus;focusOn(eventFocus)}}else{resolvePreferredFocus()}avisar()}
   function bodyPosition(slug){if(!slug)return new THREE.Vector3();if(slug==="moon"){return planetObjects.earth.position.clone().add(planetObjects.moon.position)}if(planetObjects[slug])return planetObjects[slug].position.clone();if(universeObjects[slug])return (universeObjects[slug].focusObject||universeObjects[slug].object).getWorldPosition(new THREE.Vector3());return new THREE.Vector3()}
-  function setZoom(value){zoomActual=value;const t=value/100;targetDistance=THREE.MathUtils.lerp(SOLAR_SYSTEM_BEHAVIOR.zoomDistance.min,SOLAR_SYSTEM_BEHAVIOR.zoomDistance.max,Math.pow(t,SOLAR_SYSTEM_BEHAVIOR.zoomDistance.curve))}
-  function focusTimelineEvent(distance=null,{remember=true}={}){if(remember)preferredFocus=null;selectedBody=null;controls.target.set(0,0,0);const eventDistance={["big-bang"]:58,inflation:74,["cosmic-background"]:92,["dark-ages"]:118,["first-stars"]:135,["early-galaxies"]:150,["early-milky-way"]:155};targetDistance=distance??eventDistance[currentEvent().id]??120;avisar()}
-  function focusOn(slug,distance=null,{remember=true}={}){if(!slug){focusTimelineEvent(distance,{remember});return}if(remember)preferredFocus=slug;const resolved=fallbackFocusForPreferred(slug);if(!resolved){focusTimelineEvent(distance,{remember:false});return}slug=resolved;selectedBody=slug;const p=bodyPosition(slug);controls.target.copy(p);if(distance==null){const body=BODY_DATA[slug],universeEntry=universeObjects[slug];if(body){distance=Math.max(body.radius*8,slug==="sun"?12:5);if(slug==="jupiter"||slug==="saturn")distance*=1.4;if(slug==="moon")distance=2.5}else if(universeEntry){distance=universeEntry.focusDistance||150}else{distance=180}}targetDistance=distance;avisar()}
+  /* Logarítmico y no lineal. La barra recorre de 6 a 26.000 unidades: con una
+   interpolación lineal, o su curva, el sistema solar entero cabía en el primer
+   tramo y el resto era vacío. Cada paso de la barra multiplica la distancia por
+   lo mismo, que es como se mira el cielo: por órdenes de magnitud. */
+  function setZoom(value){
+    zoomActual=value;
+    const {min,max}=SOLAR_SYSTEM_BEHAVIOR.zoomDistance;
+    targetDistance=min*Math.pow(max/min,THREE.MathUtils.clamp(value,0,100)/100);
+  }
+  function focusTimelineEvent(distance=null,{remember=true}={}){objetivoLibre=null;if(remember)preferredFocus=null;selectedBody=null;controls.target.set(0,0,0);const eventDistance={["big-bang"]:58,inflation:74,["cosmic-background"]:92,["dark-ages"]:118,["first-stars"]:135,["early-galaxies"]:150,["early-milky-way"]:155};targetDistance=distance??eventDistance[currentEvent().id]??120;avisar()}
+  function focusOn(slug,distance=null,{remember=true}={}){objetivoLibre=null;if(!slug){focusTimelineEvent(distance,{remember});return}if(remember)preferredFocus=slug;const resolved=fallbackFocusForPreferred(slug);if(!resolved){focusTimelineEvent(distance,{remember:false});return}slug=resolved;selectedBody=slug;const p=bodyPosition(slug);controls.target.copy(p);if(distance==null){const body=BODY_DATA[slug],universeEntry=universeObjects[slug];if(body){distance=Math.max(body.radius*8,slug==="sun"?12:5);if(slug==="jupiter"||slug==="saturn")distance*=1.4;if(slug==="moon")distance=2.5}else if(universeEntry){distance=universeEntry.focusDistance||150}else{distance=180}}targetDistance=distance;avisar()}
   /* Porcentaje de la barra de zoom que corresponde a una distancia: es la inversa
      de setZoom(). Sin esto, mover la cámara a mano deja la barra marcando otra cosa
      y el primer golpe de rueda salta de vuelta a lo que dice la barra. */
   function zoomParaDistancia(distancia){
-    const {min,max,curve}=SOLAR_SYSTEM_BEHAVIOR.zoomDistance;
-    return Math.pow(THREE.MathUtils.clamp((distancia-min)/(max-min),0,1),1/curve)*100;
+    const {min,max}=SOLAR_SYSTEM_BEHAVIOR.zoomDistance;
+    const t=Math.log(Math.max(distancia,min)/min)/Math.log(max/min);
+    return THREE.MathUtils.clamp(t,0,1)*100;
   }
 
   /* Encuadra el sistema completo: la órbita de Neptuno, que es la que manda, con
@@ -170,13 +297,39 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     if(existsAt("sun"))setZoom(zoomParaDistancia(alcance));
   }
 
+  /* Encuadra la galaxia entera, y desde fuera del plano.
+
+     Desde casa la Vía Láctea se ve de canto, como una banda: estamos dentro del
+     disco, y de ahí le viene el nombre. Para verla como en las fotos de galaxias
+     —un óvalo con brazos— hay que salirse del plano, así que este botón lleva la
+     cámara arriba y atrás. Enseñar las dos cosas, la banda y el óvalo, es media
+     lección de por qué el cielo se ve como se ve. */
+  function encuadrarViaLactea(){
+    preferredFocus=null;selectedBody=null;
+    const centro=galaxyParts.core.getWorldPosition(new THREE.Vector3());
+    objetivoLibre=centro.clone();
+    const distancia=21000;
+    controls.target.copy(centro);
+    camera.position.copy(centro).addScaledVector(new THREE.Vector3(0.34,0.66,0.67).normalize(),distancia);
+    targetDistance=distancia;
+    setZoom(zoomParaDistancia(distancia));
+  }
+
   function applyInitialLayout(){selectedEvent=TIMELINE_EVENTS.length-1;timelineProgress=selectedEvent;setZoom(SOLAR_SYSTEM_BEHAVIOR.initialZoom);earthMesh.material=getEarthMaterialByStage("modern");avisar();updateTemporalVisibility();focusOn("earth",SOLAR_SYSTEM_BEHAVIOR.initialFocusDistance)}
-  function updatePlanetPositions(time,avance){BODY_ORDER.forEach((slug,index)=>{const body=BODY_DATA[slug],group=planetObjects[slug];if(slug==="sun"){group.rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN*avance;return}const position=getOrbitPosition(body,time,index,currentOrbitScale);group.position.set(position.x,position.y,position.z);group.children[0].rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN*avance});const moonPosition=getMoonOrbitPosition(BODY_DATA.moon,time);planetObjects.moon.position.set(moonPosition.x,moonPosition.y,moonPosition.z);moonMesh.rotation.y+=BODY_DATA.moon.rotationSpeed/ROTATION_SLOWDOWN*avance;earthClouds.rotation.y+=0.0012*avance;atmosphere.rotation.y-=0.0003*avance;saturnRings.rotation.z+=0.0008*avance}
+  function updatePlanetPositions(time,avance){BODY_ORDER.forEach((slug,index)=>{const body=BODY_DATA[slug],group=planetObjects[slug];if(slug==="sun"){group.rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN*avance;return}const position=getOrbitPosition(body,time,index,currentOrbitScale);group.position.set(position.x,position.y,position.z);group.children[0].rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN*avance});const moonPosition=getMoonOrbitPosition(BODY_DATA.moon,time);planetObjects.moon.position.set(moonPosition.x,moonPosition.y,moonPosition.z);moonMesh.rotation.y+=BODY_DATA.moon.rotationSpeed/ROTATION_SLOWDOWN*avance;earthClouds.rotation.y+=0.0012*avance;atmosphere.rotation.y-=0.0003*avance;saturnRings.rotation.z+=0.0008*avance;cuerposMenores.actualizar(time,currentOrbitScale)}
   function animateStageEffects(time,avance){eventVisuals.bigBang.rotation.y+=0.0014*avance;eventVisuals.firstStars.rotation.y+=0.00055*avance;eventVisuals.earlyGalaxy.rotation.y+=0.0012*avance;primordialTransition.stageStar.rotation.y+=0.003*avance;primordialTransition.stageSupernova.rotation.z+=0.004*avance;primordialTransition.stageQuasar.rotation.z+=0.002*avance;primordialTransition.group.rotation.y+=0.00025*avance;stageEffects.proto.rotation.y+=0.0035*avance;stageEffects.proto.children.forEach(child=>{if(child.userData.spin)child.rotation.z+=child.userData.spin*avance;if(child.userData.orbitRadius){child.userData.orbitAngle+=child.userData.orbitSpeed*avance;child.position.x=Math.cos(child.userData.orbitAngle)*child.userData.orbitRadius;child.position.z=Math.sin(child.userData.orbitAngle)*child.userData.orbitRadius}});if(stageEffects.proto.userData.shock)stageEffects.proto.userData.shock.scale.setScalar(1+Math.sin(time*1.5)*.08);if(stageEffects.proto.userData.protoSun)stageEffects.proto.userData.protoSun.scale.setScalar(1+Math.sin(time*4.2)*.055);stageEffects.earthDust.rotation.y+=0.015*avance;stageEffects.earthDust.scale.setScalar(1+Math.sin(time*2.4)*0.055);stageEffects.moonDebris.rotation.y+=0.02*avance;stageEffects.moonDebris.rotation.z+=0.006*avance;stageEffects.oceans.rotation.y+=0.006*avance;stageEffects.oceans.scale.setScalar(1+Math.sin(time*1.8)*0.025);stageEffects.oxidation.rotation.y+=0.004*avance;stageEffects.oxidation.scale.setScalar(1+Math.sin(time*2.2)*0.035);stageEffects.life.rotation.y+=0.0055*avance;stageEffects.life.scale.setScalar(1+Math.sin(time*3.1)*0.045)}
   function animateUniverseObjects(time,avance){Object.values(universeObjects).forEach(entry=>{if(entry.kind==="star"||entry.kind==="quasar")animateStellarObject(entry,time,avance)})}
   function updateWheelZoom(avance){if(Math.abs(zoomVelocity)<0.001)return;setZoom(THREE.MathUtils.clamp(zoomActual+zoomVelocity*avance,0,100));zoomVelocity*=Math.pow(0.82,avance);updateTemporalVisibility()}
-  function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(9000,dist*8);camera.updateProjectionMatrix()}
-  function syncSelectedTarget(avance){controls.target.lerp(bodyPosition(selectedBody),suavizado(0.08,avance))}
+  function actualizarMarcadorSolar(){
+    const lejos=camera.position.length()>MARCADOR_DESDE;
+    marcadorSolar.forEach(parte=>{parte.visible=lejos&&viaLactea.visible;});
+  }
+
+  function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(40000,dist*8);camera.updateProjectionMatrix()}
+  function syncSelectedTarget(avance){
+    const destino=objetivoLibre??bodyPosition(selectedBody);
+    controls.target.lerp(destino,suavizado(0.08,avance));
+  }
   const reloj=crearReloj();
   /* `avance` son cuadros de referencia transcurridos: 1 a 120 Hz, 2 a 60. Todo lo
      que se mueve lo lleva como factor, así que la escena va igual de rápida en
@@ -230,10 +383,13 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     updateWheelZoom(avance); syncOrbitScale(avance);
     updatePlanetPositions(t, avance); animateStageEffects(t, avance); animateUniverseObjects(t, avance);
     syncSelectedTarget(avance);
-    galaxy.rotation.y += 0.00005 * avance;
-    galaxy.scale.setScalar(1 + (zoomActual / 100) * 0.2);
+    /* Ni gira ni se escala con el zoom. Girarla movía el Sol —que está clavado
+       en el origen— fuera de su sitio, y la escala por zoom era un parche de
+       cuando el disco medía lo mismo que el vecindario. Una galaxia da una
+       vuelta cada 200 millones de años: no hay giro que enseñar aquí. */
     updateTemporalVisibility();
     animateCamera(avance);
+    actualizarMarcadorSolar();
     controls.update();
     renderer.render(scene, camera);
     cuadro = requestAnimationFrame(animate);
@@ -254,6 +410,7 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     enfocar(slug) { focusOn(slug); fichaAbierta = true; avisar(); },
     enfocarTierra() { focusOn("earth", 7); fichaAbierta = true; avisar(); },
     enfocarSistemaSolar() { encuadrarSistemaSolar(); avisar(); },
+    enfocarViaLactea() { encuadrarViaLactea(); avisar(); },
     cerrarFicha() { fichaAbierta = false; avisar(); },
     desmontar() {
       if (!vivo) return;
