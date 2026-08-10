@@ -14,10 +14,10 @@ El CÓDIGO es otra obra y va bajo licencia MIT: ver LICENSE.
 ## Material de terceros incluido
 
 Estas partes no son del proyecto y conservan la licencia de su autor. Están
-citadas también en sistema_solar/referencias.html, que es la atribución visible
+citadas también en /universo/referencias, que es la atribución visible
 que exigen sus licencias.
 
-### sistema_solar/universe/sky-catalog.js — CC BY-SA 4.0
+### universo/cielo/universe/sky-catalog.js — CC BY-SA 4.0
 
 Obra derivada de dos catálogos:
 
@@ -27,7 +27,7 @@ Obra derivada de dos catálogos:
 Ambos son CC BY-SA 4.0, así que el archivo generado lo es también y arrastra el
 ShareAlike a cualquier adaptación suya. Su cabecera lo dice y no debe quitarse.
 
-### sistema_solar/textures/ — CC BY 4.0
+### universo/public/universo/textures/ — CC BY 4.0
 
 Mapas de superficie del Sol, los planetas, la Luna y los anillos de Saturno, de
 Solar System Scope — https://www.solarsystemscope.com/textures/
@@ -41,7 +41,7 @@ Hay dos conjuntos de datos aproximados, marcados como tales donde viven, para
 que nadie los confunda con mediciones:
 
 - Las posiciones de las placas continentales por época, en
-  sistema_solar/earth-epochs.js: reconstrucción de conocimiento general, no
+  universo/cielo/earth-epochs.js: reconstrucción de conocimiento general, no
   tomada de un dataset paleogeográfico.
 - Las bandas de edad de las preguntas de lenguaje: estimación sobre a qué edad
   se enseña cada tema, no tomada de las bases curriculares chilenas. El aviso

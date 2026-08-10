@@ -5,12 +5,12 @@ import {
   KNOWN_GALAXIES, KNOWN_GALAXY_BY_SLUG, KNOWN_STARS, KNOWN_STAR_BY_SLUG,
   SOLAR_SYSTEM_BEHAVIOR, TIMELINE_EVENTS, TIMELINE_INDEX_BY_ID,
   getMoonOrbitPosition, getOrbitPosition
-} from "../../../sistema_solar/data.js";
-import { createBodyMaterials, createSaturnRings } from "../../../sistema_solar/body-renderer.js";
-import { createMilkyWayObject } from "../../../sistema_solar/galaxy-renderer.js";
+} from "../../cielo/data.js";
+import { createBodyMaterials, createSaturnRings } from "../../render/body-renderer.js";
+import { createMilkyWayObject } from "../../render/galaxy-renderer.js";
 import {
   animateStellarObject, createQuasarObject, createStarObject, getGlowTexture
-} from "../../../sistema_solar/star-renderer.js";
+} from "../../render/star-renderer.js";
 import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
 import { rutaDeTextura } from "../datos/texturas.js";

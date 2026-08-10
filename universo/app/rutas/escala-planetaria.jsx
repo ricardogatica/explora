@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { BODY_DATA } from "../../../sistema_solar/data.js";
+import { BODY_DATA } from "../../cielo/data.js";
 import { RADIOS } from "../escenas/escala-planetaria.js";
 
 export function meta() {

@@ -5,21 +5,19 @@
    índice de los buscadores, y romperlas es tirar a la basura lo único que no se
    puede reconstruir de un sitio: los enlaces que ya apuntan a él.
 
-   El mapa se genera del catálogo y no se escribe a mano porque el catálogo sabe
-   a qué grupo pertenece cada slug —cuerpo, estrella, galaxia— y esa es
-   justamente la parte que se equivoca uno escribiendo a mano.
+   La carpeta ya no existe, así que qué páginas hubo es un dato histórico y se
+   guarda aquí escrito. Los destinos, en cambio, se calculan del catálogo, que
+   es quien sabe si un slug es cuerpo, estrella o galaxia —y esa es justamente
+   la parte que se equivoca uno a mano.
 
    Uso: node tools/construir-redirecciones.mjs > infra/redirecciones.conf */
-import { readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-import { buildCatalog } from "../sistema_solar/nav-model.js";
+import { buildCatalog } from "../universo/cielo/nav-model.js";
 import { rutaDeEntrada } from "../universo/app/datos/rutas.js";
 
-const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PREFIJO = "/universo";
 
-/* Las páginas que no son fichas: vistas y páginas sueltas. `star.html` no está
+/* Las páginas que no eran fichas: vistas y páginas sueltas. `star.html` no está
    aquí porque llevaba el slug en la query y se resuelve aparte, en nginx. */
 const PAGINAS = {
   "index.html": "/",
@@ -32,37 +30,42 @@ const PAGINAS = {
   "tierra_threejs_ultra.html": "/cuerpos/earth"
 };
 
-/* Cada slug del catálogo, con el grupo que le corresponde. */
+/* Los slugs que tuvieron página propia. El catálogo tiene 415 fichas y solo
+   estas veinte existían como archivo: redirigir lo que nunca existió es ruido. */
+const FICHAS_QUE_HUBO = [
+  "acrux", "antares", "betelgeuse", "earth", "jupiter", "mars", "mercury",
+  "milky-way", "moon", "neptune", "polaris", "proxima-centauri", "rigel",
+  "saturn", "sirius", "sun", "ton-618", "uranus", "vega", "venus"
+];
+
+/* Dónde vive hoy cada slug, según el grupo que le da el catálogo. */
 export function destinosDeFicha() {
   const destinos = {};
   for (const grupo of buildCatalog()) {
     for (const entrada of grupo.entries) {
-      destinos[`${entrada.slug}.html`] = rutaDeEntrada(grupo.id, entrada.slug);
+      destinos[entrada.slug] = rutaDeEntrada(grupo.id, entrada.slug);
     }
   }
   return destinos;
 }
 
-/* Solo las páginas que existían: el catálogo tiene 400 estrellas y solo unas
-   pocas tenían HTML propio. Redirigir lo que nunca existió es ruido. */
 export function redirecciones() {
-  const heredadas = new Set(readdirSync(join(RAIZ, "sistema_solar")).filter(n => n.endsWith(".html")));
   const fichas = destinosDeFicha();
   const mapa = {};
-  for (const archivo of [...heredadas].sort()) {
-    if (archivo === "star.html") continue;          // lleva el slug en la query
-    const destino = PAGINAS[archivo] ?? fichas[archivo];
-    if (destino) mapa[`/sistema_solar/${archivo}`] = PREFIJO + destino;
+  for (const [archivo, destino] of Object.entries(PAGINAS)) {
+    mapa[`/sistema_solar/${archivo}`] = PREFIJO + destino;
   }
-  return mapa;
+  for (const slug of FICHAS_QUE_HUBO) {
+    if (fichas[slug]) mapa[`/sistema_solar/${slug}.html`] = PREFIJO + fichas[slug];
+  }
+  return Object.fromEntries(Object.entries(mapa).sort(([a], [b]) => a.localeCompare(b)));
 }
 
-/* Las que quedan sin destino: si aparece alguna, es que hay una página que el
-   catálogo no conoce y habría que decidir a dónde va. */
+/* Las que quedan sin destino: si aparece alguna es que el catálogo ya no conoce
+   un slug que sí tuvo página, y habría que decidir a dónde va. */
 export function sinDestino() {
-  const heredadas = readdirSync(join(RAIZ, "sistema_solar")).filter(n => n.endsWith(".html"));
   const fichas = destinosDeFicha();
-  return heredadas.filter(n => n !== "star.html" && !PAGINAS[n] && !fichas[n]).sort();
+  return FICHAS_QUE_HUBO.filter(slug => !fichas[slug]).sort();
 }
 
 function comoNginx() {

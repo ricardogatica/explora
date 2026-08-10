@@ -1,4 +1,4 @@
-/* Genera sistema_solar/universe/sky-catalog.js cruzando dos catálogos reales.
+/* Genera universo/cielo/universe/sky-catalog.js cruzando dos catálogos reales.
 
    Se ejecuta a mano, no en cada carga:
 
@@ -209,10 +209,10 @@ export const SKY_FIGURES = ${JSON.stringify(constelaciones.map(c => ({
 })))};
 `;
 
-writeFileSync("sistema_solar/universe/sky-catalog.js", salida);
+writeFileSync("universo/cielo/universe/sky-catalog.js", salida);
 
 const segmentos = constelaciones.reduce((n, c) => n + c.lineas.reduce((m, l) => m + l.length - 1, 0), 0);
 console.log(`figuras: ${constelaciones.length} constelaciones, ${segmentos} segmentos`);
 console.log(`estrellas: ${filas.length} (${filas.filter(f => f[10]).length} con nombre propio)`);
 if (perdidas.length) console.log(`sin datos en el catálogo: ${perdidas.join(", ")}`);
-console.log(`escrito sistema_solar/universe/sky-catalog.js`);
+console.log(`escrito universo/cielo/universe/sky-catalog.js`);

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Migas } from "../componentes.jsx";
-import { buildCatalog, normalizeSearch } from "../../../sistema_solar/nav-model.js";
+import { buildCatalog, normalizeSearch } from "../../cielo/nav-model.js";
 import { rutaDeEntrada } from "../datos/rutas.js";
 
 export function meta() {

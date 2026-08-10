@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "../../../sistema_solar/data.js";
-import { getGlowTexture } from "../../../sistema_solar/star-renderer.js";
-import { baseGalactica, baseLocal } from "../../../sistema_solar/universe/sky.js";
+import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "../../cielo/data.js";
+import { getGlowTexture } from "../../render/star-renderer.js";
+import { baseGalactica, baseLocal } from "../../cielo/universe/sky.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena, } from "@explora/compartido/desmontar.js";
 

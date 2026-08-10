@@ -12,7 +12,7 @@
 
 import {
   BODY_DATA, CONSTELLATION_BY_SLUG, KNOWN_GALAXY_BY_SLUG, KNOWN_STAR_BY_SLUG
-} from "../../../sistema_solar/data.js";
+} from "../../cielo/data.js";
 import { rutaDeEntrada } from "./rutas.js";
 
 const sinVacios = pares => pares.filter(([, valor]) => valor !== undefined && valor !== null && valor !== "");

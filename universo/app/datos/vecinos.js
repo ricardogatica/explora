@@ -8,7 +8,7 @@
    Se apoya en nav-model.js, que es lógica pura y tiene sus propios tests desde
    antes de esta migración: aquí solo se traduce su salida a rutas nuevas. */
 
-import { siblingsFor } from "../../../sistema_solar/nav-model.js";
+import { siblingsFor } from "../../cielo/nav-model.js";
 import { rutaDeEntrada } from "./rutas.js";
 
 export function hermanosDe(grupo, slug) {

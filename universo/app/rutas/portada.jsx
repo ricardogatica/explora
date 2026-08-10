@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { TIMELINE_EVENTS } from "../../../sistema_solar/data.js";
+import { TIMELINE_EVENTS } from "../../cielo/data.js";
 import { fichaDe } from "../datos/fichas.js";
 import { rutaDeEntrada } from "../datos/rutas.js";
 

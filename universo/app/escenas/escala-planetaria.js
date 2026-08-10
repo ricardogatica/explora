@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { BODY_DATA } from "../../../sistema_solar/data.js";
-import { createBodyMesh, createSaturnRings, createSunGlow } from "../../../sistema_solar/body-renderer.js";
-import { addStarfield } from "../../../sistema_solar/starfield.js";
+import { BODY_DATA } from "../../cielo/data.js";
+import { createBodyMesh, createSaturnRings, createSunGlow } from "../../render/body-renderer.js";
+import { addStarfield } from "../../render/starfield.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
 import { conRutasDeTextura } from "../datos/texturas.js";

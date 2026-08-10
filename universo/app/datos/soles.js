@@ -1,4 +1,4 @@
-import { BODY_DATA, KNOWN_STAR_BY_SLUG } from "../../../sistema_solar/data.js";
+import { BODY_DATA, KNOWN_STAR_BY_SLUG } from "../../cielo/data.js";
 
 /* Los datos de la escala de soles, en un sitio: los usan la escena, que escribe
    el radio en cada rótulo, y la ficha, que lo repite con sus comparaciones. Con

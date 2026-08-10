@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "../../../sistema_solar/data.js";
+import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "../../cielo/data.js";
 
 export function meta() {
   return [

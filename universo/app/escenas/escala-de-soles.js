@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { getGlowTexture, starSurfaceMaterial } from "../../../sistema_solar/star-renderer.js";
-import { addStarfield } from "../../../sistema_solar/starfield.js";
+import { getGlowTexture, starSurfaceMaterial } from "../../render/star-renderer.js";
+import { addStarfield } from "../../render/starfield.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
 import { ESCALONES, estrella, numero } from "../datos/soles.js";

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { drawEpochLand } from "./earth-epochs.js";
+import { drawEpochLand } from "../cielo/earth-epochs.js";
 import { getGlowTexture } from "./star-renderer.js";
 
 export function makePlanetTexture(kind,colorHex){

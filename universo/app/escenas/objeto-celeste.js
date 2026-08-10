@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { animateGalaxyObject, createMilkyWayObject } from "../../../sistema_solar/galaxy-renderer.js";
-import { animateStellarObject, createQuasarObject, createStarObject } from "../../../sistema_solar/star-renderer.js";
-import { addStarfield } from "../../../sistema_solar/starfield.js";
+import { animateGalaxyObject, createMilkyWayObject } from "../../render/galaxy-renderer.js";
+import { animateStellarObject, createQuasarObject, createStarObject } from "../../render/star-renderer.js";
+import { addStarfield } from "../../render/starfield.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
 

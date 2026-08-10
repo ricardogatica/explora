@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 // El módulo de la máscara usa atob, que en Node no es global en todas las versiones.
 globalThis.atob ??= s => Buffer.from(s, "base64").toString("binary");
 
-const { EPOCHS, drawEpochLand } = await import("../sistema_solar/earth-epochs.js");
-const mask = await import("../sistema_solar/earth-landmask.js");
+const { EPOCHS, drawEpochLand } = await import("../universo/cielo/earth-epochs.js");
+const mask = await import("../universo/cielo/earth-landmask.js");
 
 /** Lienzo falso: registra en una rejilla qué píxeles se pintarían. */
 function lienzo(width, height) {

@@ -12,10 +12,9 @@ estrellas y constelaciones.
 | `contenido/` | El contenido y su contrato: páginas, preguntas, bandas y validador |
 | `materias/` | La aplicación de las materias (Next.js) |
 | `compartido/` | Andamiaje 3D: canvas con desmontaje, reloj y primitivas |
-| `universo/` | La aplicación del universo (React Router), con las cuatro vistas 3D y 422 fichas |
-| `sistema_solar/` | El sitio anterior, con los módulos de render y las texturas que `universo/` todavía lee |
+| `universo/` | La aplicación del universo (React Router): `cielo/` los datos, `render/` los materiales de Three.js, `app/` las rutas y las escenas |
 | `infra/` | Dockerfile, nginx y el mapa de redirecciones |
-| `tests/` | 161 tests |
+| `tests/` | 124 tests |
 | `tools/` | Generadores, como el del catálogo del cielo |
 | `docs/superpowers/` | Specs y planes de las reformas en curso |
 
@@ -26,12 +25,10 @@ Dos aplicaciones, cada una con su stack:
 ```sh
 cd materias && npm run dev    # las materias, en http://localhost:3000
 cd universo && npm run dev    # el universo, en http://localhost:5173/universo/
-./run.sh 6767                 # el sitio anterior, en http://localhost:6767
 ```
 
-El sitio anterior sigue en pie mientras dure la convivencia. `run.sh` manda
-`Cache-Control: no-store` a propósito: sin eso el navegador sirve módulos viejos
-después de editarlos y se depura código que ya no existe.
+El sitio anterior —`sistema_solar/`, un HTML por página— ya no existe: sus
+módulos viven en `universo/` y sus URL redirigen a las nuevas.
 
 ## Cómo se publica
 

@@ -3,7 +3,7 @@
    Se leen del catálogo, no de una lista escrita a mano: son 415 fichas y
    mantener una lista al día es imposible. Cuando se añada una estrella al
    catálogo, su página existirá sin que nadie se acuerde de nada. */
-import { buildCatalog } from "../../../sistema_solar/nav-model.js";
+import { buildCatalog } from "../../cielo/nav-model.js";
 
 export function rutasParaPrerenderizar() {
   const fijas = ["/", "/indice", "/referencias", "/escala-planetaria", "/escala-de-soles", "/constelaciones"];
