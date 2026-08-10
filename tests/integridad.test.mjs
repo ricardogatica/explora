@@ -534,3 +534,48 @@ test("la atribución sigue visible en el universo nuevo", async () => {
   assert.ok(referencias.tarjetas.length >= 12,
     `esperaba al menos 12 fichas de referencia, hay ${referencias.tarjetas.length}`);
 });
+
+test("la Vía Láctea se coloca donde está, no sobre el ecuador celeste", async () => {
+  /* Las texturas de la Vía Láctea vienen en proyección galáctica: la banda recta
+     por el medio de la imagen. Pegarla sin girar la deja sobre el ecuador
+     celeste, y el plano galáctico llega a ±63° de declinación. Una textura
+     realista en el sitio equivocado engaña más que una banda dibujada a mano.
+
+     Se comprueba que la base lleva el marco de la textura al del cielo: su eje X
+     al centro galáctico y su eje Y al polo norte galáctico. */
+  const { baseGalactica, direccionDesdeRaDec, CENTRO_GALACTICO, POLO_NORTE_GALACTICO } =
+    await import("../sistema_solar/universe/sky.js");
+
+  const base = baseGalactica();
+  const angulo = (a, b) => Math.acos(
+    Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]))
+  ) * 180 / Math.PI;
+
+  const centro = direccionDesdeRaDec(CENTRO_GALACTICO.ra, CENTRO_GALACTICO.dec);
+  const polo = direccionDesdeRaDec(POLO_NORTE_GALACTICO.ra, POLO_NORTE_GALACTICO.dec);
+  assert.ok(angulo(base.x, centro) < 0.05, `el eje X se desvía ${angulo(base.x, centro).toFixed(3)}° del centro galáctico`);
+  assert.ok(angulo(base.y, polo) < 0.05, `el eje Y se desvía ${angulo(base.y, polo).toFixed(3)}° del polo galáctico`);
+
+  // Y que sea una base de verdad: perpendicular y unitaria, o deformaría la textura.
+  const norma = v => Math.hypot(...v);
+  for (const [nombre, eje] of Object.entries(base)) {
+    assert.ok(Math.abs(norma(eje) - 1) < 1e-6, `el eje ${nombre} no es unitario`);
+  }
+  const perpendicular = (a, b) => Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+  assert.ok(perpendicular(base.x, base.y) < 1e-6, "los ejes X e Y no son perpendiculares");
+  assert.ok(perpendicular(base.y, base.z) < 1e-6, "los ejes Y y Z no son perpendiculares");
+
+  /* Y la comprobación que de verdad importa: el plano galáctico tiene que
+     alcanzar declinaciones altas. Si alguien «simplifica» la base a la
+     identidad, la banda se aplana sobre el ecuador y esto lo ve. */
+  let maximaDeclinacion = 0;
+  for (let grados = 0; grados < 360; grados += 2) {
+    const a = grados * Math.PI / 180;
+    // un punto del ecuador galáctico, expresado en el marco ecuatorial
+    const v = base.x.map((_, i) => base.x[i] * Math.cos(a) + base.z[i] * Math.sin(a));
+    maximaDeclinacion = Math.max(maximaDeclinacion, Math.abs(Math.asin(v[1]) * 180 / Math.PI));
+  }
+  assert.ok(maximaDeclinacion > 60,
+    `el plano galáctico solo llega a ${maximaDeclinacion.toFixed(0)}° de declinación; ` +
+    "debería pasar de 60° y si no, la banda está aplanada sobre el ecuador");
+});

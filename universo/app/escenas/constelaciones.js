@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { CONSTELLATIONS, CONSTELLATION_BY_SLUG, KNOWN_STAR_BY_SLUG } from "../../../sistema_solar/data.js";
 import { getGlowTexture } from "../../../sistema_solar/star-renderer.js";
-import { baseLocal } from "../../../sistema_solar/universe/sky.js";
+import { baseGalactica, baseLocal } from "../../../sistema_solar/universe/sky.js";
 import { crearReloj } from "@explora/compartido/tiempo.js";
 import { liberarEscena, } from "@explora/compartido/desmontar.js";
 
@@ -103,35 +103,38 @@ export function montarConstelaciones(contenedor, { alElegirFigura, alElegirEstre
     pulsables.push(objeto);
   };
 
-  // Fondo: estrellas repartidas y la banda de la Vía Láctea.
+  /* El fondo es una foto del cielo entero, girada a su sitio.
+
+     Antes eran dos nubes de puntos: 8.200 estrellas repartidas al azar y una
+     «Vía Láctea» que era una onda senoidal de ±9° pegada al ecuador celeste. Lo
+     segundo es sencillamente falso —el plano galáctico llega a ±63°— y con las
+     figuras dibujadas sobre estrellas reales, tener el fondo inventado
+     desentonaba: Sagitario quedaba en una zona vacía cuando ahí está el centro
+     de la galaxia.
+
+     La textura viene en proyección galáctica, como casi todas: la banda recta
+     por el medio de la imagen. La base de sky.js la gira al marco ecuatorial,
+     que es donde están nuestras estrellas. */
   {
-    const cuantas = 8200, posiciones = new Float32Array(cuantas * 3);
-    for (let i = 0; i < cuantas; i++) {
-      const ra = Math.random() * 24;
-      const dec = THREE.MathUtils.radToDeg(Math.asin(Math.random() * 2 - 1));
-      const p = posicionCeleste(ra, dec, RADIO * .995);
-      posiciones.set([p.x, p.y, p.z], i * 3);
-    }
-    const geometria = new THREE.BufferGeometry();
-    geometria.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
-    cielo.add(new THREE.Points(geometria, new THREE.PointsMaterial({
-      color: 0xffffff, size: .12, map: getGlowTexture(), transparent: true, opacity: .72, depthWrite: false
-    })));
-  }
-  {
-    const cuantas = 5200, posiciones = new Float32Array(cuantas * 3), colores = new Float32Array(cuantas * 3);
-    for (let i = 0; i < cuantas; i++) {
-      const p = posicionCeleste(i / cuantas * 24, Math.sin(i * .035) * 9 + (Math.random() - .5) * 10, RADIO * .99);
-      posiciones.set([p.x, p.y, p.z], i * 3);
-      colores.set([.62, .78, 1], i * 3);
-    }
-    const geometria = new THREE.BufferGeometry();
-    geometria.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
-    geometria.setAttribute("color", new THREE.BufferAttribute(colores, 3));
-    cielo.add(new THREE.Points(geometria, new THREE.PointsMaterial({
-      size: .24, map: getGlowTexture(), vertexColors: true, transparent: true,
-      opacity: .32, blending: THREE.AdditiveBlending, depthWrite: false
-    })));
+    const base = baseGalactica();
+    const esfera = new THREE.Mesh(
+      new THREE.SphereGeometry(RADIO * 1.04, 64, 48),
+      /* El color por encima de 1 multiplica la textura: la foto del cielo es
+         tenue por naturaleza —está hecha para verse en una pantalla a oscuras—
+         y sin ganancia el mapa parecía casi vacío junto a las figuras. */
+      new THREE.MeshBasicMaterial({ side: THREE.BackSide, depthWrite: false, color: new THREE.Color(1.7, 1.7, 1.7) })
+    );
+    esfera.applyMatrix4(new THREE.Matrix4().makeBasis(
+      new THREE.Vector3(...base.x), new THREE.Vector3(...base.y), new THREE.Vector3(...base.z)
+    ));
+    new THREE.TextureLoader().load("/universo/cielo/via-lactea-8k.jpg", textura => {
+      textura.colorSpace = THREE.SRGBColorSpace;
+      esfera.material.map = textura;
+      esfera.material.needsUpdate = true;
+    });
+    // Se dibuja primero: es el fondo de todo lo demás.
+    esfera.renderOrder = -1;
+    cielo.add(esfera);
   }
 
   const circulo = (puntos, material) => cielo.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(puntos), material));

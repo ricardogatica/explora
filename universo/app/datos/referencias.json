@@ -18,6 +18,7 @@
       "titulo": "Solar System Scope",
       "parrafos": [
         "Las superficies del Sol, los ocho planetas y la Luna son mapas equirectangulares de 2048×1024 de <strong>Solar System Scope</strong>. La Tierra usa cinco (superficie, nubes, luces nocturnas, normales y especular), Venus dos y Saturno lleva además la textura de sus anillos.",
+        "El fondo del mapa celeste es su panorama de la Vía Láctea, de 8192×4096. Viene en <strong>proyección galáctica</strong> —la banda recta por el medio de la imagen— y se gira al marco ecuatorial para que caiga donde de verdad está: sin ese giro quedaría sobre el ecuador celeste, y el plano galáctico llega a ±63° de declinación.",
         "De la superficie diurna de la Tierra se deriva también la máscara de continentes con la que se dibujan las ocho etapas de la línea temporal.",
         "<strong>Publicadas bajo licencia Creative Commons Attribution 4.0 International (CC BY 4.0)</strong>, que permite usarlas, adaptarlas y compartirlas, incluso con fines comerciales, citando la fuente. Esta ficha es esa cita."
       ],

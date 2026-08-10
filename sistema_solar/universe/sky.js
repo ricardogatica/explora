@@ -89,6 +89,43 @@ export function baseLocal(raHoras, decGrados) {
   return { center, east, north: norte.map(v => v / modulo) };
 }
 
+/* De coordenadas galácticas a ecuatoriales.
+
+   Los panoramas de la Vía Láctea se publican casi siempre en proyección
+   galáctica: la banda va recta por el medio de la imagen y el centro de la
+   galaxia queda justo en el centro. Nuestro cielo, en cambio, se dibuja en
+   ascensión recta y declinación, que es donde están las estrellas del catálogo.
+
+   Pegar una de esas texturas sin girarla pone la Vía Láctea sobre el ecuador
+   celeste, que es donde NO está: el plano galáctico llega a ±63° de declinación.
+   Y una textura realista en el sitio equivocado engaña más que una banda
+   dibujada a mano, porque parece un dato.
+
+   La rotación se construye con dos direcciones medidas: el polo norte galáctico
+   y el centro galáctico. Devuelve la matriz por columnas —los ejes X, Y y Z del
+   marco galáctico expresados en el ecuatorial— para no depender de Three.js:
+   este módulo no tiene dependencias y no debe adquirirlas. */
+export const POLO_NORTE_GALACTICO = { ra: 12.85643, dec: 27.12825 };
+export const CENTRO_GALACTICO = { ra: 17.76112, dec: -28.93617 };
+
+export function baseGalactica() {
+  const producto = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const normalizar = v => { const m = Math.hypot(...v) || 1; return v.map(x => x / m); };
+  const cruz = (a, b) => [
+    a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]
+  ];
+
+  const y = normalizar(direccionDesdeRaDec(POLO_NORTE_GALACTICO.ra, POLO_NORTE_GALACTICO.dec));
+  const centro = direccionDesdeRaDec(CENTRO_GALACTICO.ra, CENTRO_GALACTICO.dec);
+  /* El centro medido y el polo medido no son exactamente perpendiculares por el
+     redondeo de sus coordenadas: se ortogonaliza para que la base no deforme la
+     textura. */
+  const proyeccion = producto(centro, y);
+  const x = normalizar(centro.map((v, i) => v - y[i] * proyeccion));
+  const z = normalizar(cruz(x, y));
+  return { x, y, z };
+}
+
 /* La escala radial es logarítmica en años luz: sin ella, Sirio a 8,6 y una
    supergigante a 860 no cabrían en la misma escena. */
 export function radioDesdeDistancia(aniosLuz) {
