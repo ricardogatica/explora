@@ -351,3 +351,15 @@ a.boton { text-decoration: none; display: inline-block; }
   .tarjeta-vista { right: 18px; width: auto; max-height: 46vh; }
   .ficha-flotante { left: 18px; right: 18px; width: auto; }
 }
+
+/* La lista de las 88 constelaciones */
+.lista-figuras { display: grid; gap: 6px; max-height: 44vh; overflow: auto; margin: 14px 0; padding-right: 4px; }
+.figura-btn {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  border: 1px solid rgba(148,163,184,.16); border-radius: 12px;
+  background: rgba(15,23,42,.58); color: #f8fafc; font: inherit; padding: .5rem .7rem;
+}
+.figura-btn:hover, .figura-btn.es-activa { border-color: rgba(56,189,248,.75); background: rgba(15,23,42,.95); }
+.figura-btn strong { display: block; font-size: 14px; }
+.figura-btn span { font-size: 11px; color: #94a3b8; }
+.ficha-flotante--alta { max-height: calc(100vh - 36px); overflow: auto; }
