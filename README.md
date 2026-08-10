@@ -23,8 +23,22 @@ estrellas y constelaciones.
 Dos aplicaciones, cada una con su stack:
 
 ```sh
-cd materias && npm run dev    # las materias, en http://localhost:3000
-cd universo && npm run dev    # el universo, en http://localhost:5173/universo/
+./run.sh          # todo junto, en http://localhost:6767
+./run.sh 8080     # otro puerto
+./run.sh docker   # la imagen de verdad, en http://localhost:8080
+```
+
+`./run.sh` levanta las dos aplicaciones y delante un proxy que reparte por
+prefijo igual que nginx. Así hay una sola dirección y los enlaces de una
+aplicación a otra —«Entrar al Universo» desde el portal— también funcionan en
+local, que es lo que no pasa levantando cada una por su cuenta. Los puertos
+internos los busca libres al arrancar; el único que se elige es el del proxy.
+
+Para trabajar en una sola, sin proxy:
+
+```sh
+npm run dev --workspace=materias    # http://localhost:3000
+npm run dev --workspace=universo    # http://localhost:5173/universo/
 ```
 
 El sitio anterior —`sistema_solar/`, un HTML por página— ya no existe: sus

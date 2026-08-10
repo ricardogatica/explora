@@ -58,3 +58,8 @@ build/
 
 # React Router genera estos tipos en cada build
 .react-router/
+
+# next dev escribe estas instrucciones para agentes cada vez que arranca. No son
+# código ni contenido del proyecto y se regeneran solas, así que no se versionan.
+materias/AGENTS.md
+materias/CLAUDE.md
