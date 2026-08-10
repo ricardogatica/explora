@@ -148,26 +148,33 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      desaparecían y quedaba el núcleo flotando en negro— y uno que se ve desde
      fuera tapa la pantalla desde dentro. Sin atenuación, la galaxia es siempre
      un campo de puntos de dos píxeles, que es como la dibuja un planetario. */
-  /* El bulbo, cálido y achatado. En las fotos de galaxias espirales el centro
-     es amarillo anaranjado —estrellas viejas— y los brazos azulados —estrellas
-     jóvenes—; el contraste entre los dos es lo que hace que se lea como una
-     galaxia y no como una mancha. Y es una lenteja, no una bola. */
-  if(galaxyParts.core){
-    galaxyParts.core.material.color.set(0xffe3b0);
-    galaxyParts.core.scale.set(1.75,0.62,1.75);
-  }
-  if(galaxyParts.glow){
-    galaxyParts.glow.material.color.set(0xffcf9a);
-    galaxyParts.glow.material.opacity=0.34;
-    galaxyParts.glow.scale.multiplyScalar(2.6);
-  }
+  /* El bulbo no se dibuja como un cuerpo. Era una esfera achatada con su halo,
+     y por muy aditiva y cálida que fuera seguía siendo un huevo: una galaxia no
+     tiene una superficie ahí en medio, tiene MÁS ESTRELLAS. El disco ya las
+     concentra hacia el centro —los puntos se reparten con la raíz del radio—,
+     así que quitando la esfera el centro se lee por densidad, que es lo que es.
 
-  [[galaxyParts.disk,1.9],[galaxyParts.dust,1.5],[galaxyParts.bar,2.1]].forEach(([parte,tamano])=>{
-    if(!parte?.material)return;
-    parte.material.sizeAttenuation=false;
-    parte.material.size=tamano;
-    parte.material.needsUpdate=true;
+     Se sacan del grafo y no se ocultan: `updateTemporalVisibility` recorre todos
+     los hijos de la galaxia en cada cuadro y reescribe su `visible`, así que
+     apagarlas duraba exactamente un cuadro y el huevo volvía. Se liberan a mano
+     porque, fuera del grafo, el desmontaje ya no las encuentra. La textura del
+     halo no se toca: está compartida con las demás estrellas. */
+  [galaxyParts.core,galaxyParts.glow].forEach(parte=>{
+    if(!parte)return;
+    parte.removeFromParent();
+    parte.geometry?.dispose?.();
+    parte.material?.dispose?.();
   });
+
+  const nubesDeLaGalaxia=[[galaxyParts.disk,1.9],[galaxyParts.dust,1.5],[galaxyParts.bar,2.1]]
+    .filter(([parte])=>parte?.material)
+    .map(([parte,tamano])=>{
+      parte.material.sizeAttenuation=false;
+      parte.material.size=tamano;
+      parte.material.needsUpdate=true;
+      // Se guarda la opacidad de partida: es el techo del desvanecido.
+      return {parte,opacidadPlena:parte.material.opacity};
+    });
   /* El Sol tiene que caer en el origen de la escena, que es donde está el
      sistema solar. Se calcula dónde queda su marcador dentro de la galaxia ya
      escalada y se desplaza el conjunto para llevarlo al cero: así, al alejarse,
@@ -346,7 +353,9 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      lección de por qué el cielo se ve como se ve. */
   function encuadrarViaLactea(){
     preferredFocus=null;selectedBody=null;
-    const centro=galaxyParts.core.getWorldPosition(new THREE.Vector3());
+    /* El origen del grupo de la galaxia ES su centro: ahí estaba el núcleo antes
+       de quitarlo, y el disco se construye centrado en él. */
+    const centro=galaxy.getWorldPosition(new THREE.Vector3());
     objetivoLibre=centro.clone();
     const distancia=21000;
     controls.target.copy(centro);
@@ -365,12 +374,26 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     const lejos=distancia>MARCADOR_DESDE;
     marcadorSolar.forEach(parte=>{parte.visible=lejos&&viaLactea.visible;});
 
-    /* El cielo fotográfico se apaga al salir del vecindario: a partir de ahí
-       sería una pared pintada delante de la galaxia de verdad. */
-    const apagado=THREE.MathUtils.clamp(
+    /* Fundido cruzado entre las dos maneras de dibujar la misma galaxia.
+
+       La panorámica es la Vía Láctea vista desde dentro; el disco de puntos, la
+       misma vista desde fuera. Enseñar las dos a la vez es dibujarla dos veces,
+       y se notaba: la banda del cielo por un lado y el centro galáctico flotando
+       por el otro, a la vez y sin relación aparente.
+
+       Así que se turnan. Cerca del Sol solo la foto; al salir del vecindario la
+       foto se apaga y el disco aparece en su sitio. El tramo del cambio es lo
+       que cuenta: se ve cómo esa banda se convierte en ese disco. */
+    const fuera=THREE.MathUtils.clamp(
       (distancia-CIELO.desdeAqui)/(CIELO.hastaAlli-CIELO.desdeAqui),0,1);
-    cieloFoto.material.opacity=1-apagado;
-    cieloFoto.visible=apagado<1&&backgroundStars.visible;
+
+    cieloFoto.material.opacity=1-fuera;
+    cieloFoto.visible=fuera<1&&backgroundStars.visible;
+
+    nubesDeLaGalaxia.forEach(({parte,opacidadPlena})=>{
+      parte.material.opacity=opacidadPlena*fuera;
+      parte.visible=fuera>0.02;
+    });
   }
 
   function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(40000,dist*8);camera.updateProjectionMatrix()}
