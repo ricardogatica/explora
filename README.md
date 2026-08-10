@@ -13,8 +13,9 @@ estrellas y constelaciones.
 | `materias/` | La aplicación de las materias (Next.js) |
 | `compartido/` | Andamiaje 3D: canvas con desmontaje, reloj y primitivas |
 | `universo/` | La aplicación del universo (React Router): `cielo/` los datos, `render/` los materiales de Three.js, `app/` las rutas y las escenas |
+| `api/` | El servicio que guarda el progreso (NestJS y Postgres). `dominio/` es lógica pura y con pruebas; Nest solo transporta |
 | `infra/` | Dockerfile, nginx y el mapa de redirecciones |
-| `tests/` | 124 tests |
+| `tests/` | 133 tests |
 | `tools/` | Generadores, como el del catálogo del cielo |
 | `docs/superpowers/` | Specs y planes de las reformas en curso |
 
@@ -46,15 +47,15 @@ módulos viven en `universo/` y sus URL redirigen a las nuevas.
 
 ## Cómo se publica
 
-Un contenedor, nginx y nada de Node en producción: las dos aplicaciones compilan
-a archivos.
+Tres servicios: la web —nginx con las dos aplicaciones compiladas dentro, sin
+Node—, la API del progreso y su Postgres.
 
 ```sh
 docker compose -f infra/compose.yaml up --build   # http://localhost:8080
 ```
 
-El reparto es por prefijo: `/universo/*` va a la aplicación del universo y todo
-lo demás a materias. Por eso el universo no pide nada fuera de su prefijo —sus
+El reparto es por prefijo: `/api/*` a la API, `/universo/*` a la aplicación del
+universo y todo lo demás a materias. Por eso el universo no pide nada fuera de su prefijo —sus
 assets, sus texturas y su favicon cuelgan de `/universo/`—; una petición suya a
 la raíz acabaría en la otra aplicación.
 
@@ -64,6 +65,25 @@ Las URL del sitio anterior (`/sistema_solar/vega.html` y compañía) redirigen c
 ```sh
 node tools/construir-redirecciones.mjs > infra/redirecciones.conf
 ```
+
+## El progreso
+
+Al entrar por primera vez se pregunta cómo guardarlo. Hoy solo hay una respuesta
+posible —datos locales—; crear cuenta está anunciado y no implementado.
+
+Con datos locales, el progreso que se ve vive en el navegador: es la fuente de
+verdad de lo que pinta la interfaz, y por eso practicar funciona con la API
+caída. En paralelo se manda una copia anónima de cada respuesta a Postgres —qué
+pregunta, si se acertó, cuánto se tardó— para poder ver qué falla todo el mundo
+y arreglar el contenido.
+
+No se guarda nombre, ni correo, ni edad real. El identificador es un uuid
+aleatorio que genera el navegador: si se pierde, se pierde el progreso, y eso lo
+dice el propio modal sin letra pequeña. Mientras nadie elija modo no se guarda
+nada, tampoco en el navegador.
+
+`./run.sh` no levanta la API: hacerlo obligaría a montar Postgres para escribir
+una página de contenido. Para trabajar en ella, `./run.sh docker`.
 
 ## Tests
 

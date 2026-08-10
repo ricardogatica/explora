@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { esCorrecta, puntaje, puntajeMaximo, comentario } from "@explora/contenido/corregir.js";
+import { anotarRespuesta } from "./sesion.js";
 
 /* El visor de preguntas: uno para los cinco tipos y las dos materias.
 
@@ -214,6 +215,12 @@ export default function Practica({ preguntas }) {
   const [revisada, setRevisada] = useState(false);
   const [resultados, setResultados] = useState([]);
 
+  /* Cuánto se tarda en responder. Es el dato que distingue «esta pregunta la
+     falla todo el mundo» de «esta pregunta nadie la entiende»: fallar en tres
+     segundos y fallar en dos minutos no son el mismo problema. */
+  const mostradaEn = useRef(Date.now());
+  useEffect(() => { mostradaEn.current = Date.now(); }, [indice]);
+
   if (preguntas.length === 0) return null;
 
   const terminado = indice >= preguntas.length;
@@ -248,6 +255,23 @@ export default function Practica({ preguntas }) {
     setResultados([...resultados, {
       id: pregunta.id, puntos: puntaje(pregunta, valor), maximo: puntajeMaximo(pregunta)
     }]);
+
+    /* La pregunta ya trae de qué materia y banda es, así que no hay que
+       pasárselo a este componente por otro sitio: un segundo camino para el
+       mismo dato es un segundo camino para que discrepen.
+
+       Solo se guarda lo tecleado en las de escribir. En las demás el «valor»
+       es una opción o un mapa de emparejamientos, y eso ya lo dice el id de la
+       pregunta junto con si acertó. */
+    anotarRespuesta({
+      materia: pregunta.materia,
+      banda: pregunta.banda,
+      familia: pregunta.familia,
+      pregunta: pregunta.id,
+      correcta: esCorrecta(pregunta, valor),
+      escrito: pregunta.tipo === "fill" && typeof valor === "string" ? valor : null,
+      ms: Date.now() - mostradaEn.current
+    });
   };
   const siguiente = () => { setIndice(indice + 1); setValor(null); setRevisada(false); };
 

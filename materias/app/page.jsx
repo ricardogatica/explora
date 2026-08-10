@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Bienvenida from "./bienvenida.jsx";
 import { BANDAS } from "@explora/contenido/bandas.js";
 import { MATERIAS, paginasDe, preguntasDe } from "../lib/contenido.js";
 
@@ -40,6 +41,7 @@ export default function Portada() {
 
   return (
     <>
+      <Bienvenida />
       <header className="masthead">
         <p className="wordmark">Atlas · ricardogatica.com</p>
         <h1 className="title">Explora</h1>

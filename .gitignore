@@ -56,6 +56,9 @@ tmp/
 out/
 build/
 
+# TypeScript compilado (la API)
+dist/
+
 # React Router genera estos tipos en cada build
 .react-router/
 

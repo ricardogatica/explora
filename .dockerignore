@@ -12,6 +12,7 @@ materias/out
 materias/.next
 universo/build
 universo/.react-router
+api/dist
 
 .git
 .playwright-mcp

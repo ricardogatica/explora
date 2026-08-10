@@ -19,6 +19,18 @@ import { readdirSync } from "node:fs";
 
 const [puerto, puertoMaterias, puertoUniverso] = process.argv.slice(2).map(Number);
 
+/* La API del progreso, si es que está levantada. `run.sh` no la arranca: guardar
+   estadísticas necesita Postgres, y montar una base de datos para escribir una
+   página de contenido sería absurdo. Quien trabaje en la API usa
+   `./run.sh docker`, que levanta las tres piezas.
+
+   Aun así /api tiene que apuntar aquí y no a materias. Materias redirige con 308
+   lo que no acaba en barra, y un 308 es permanente: bastaría un POST a
+   /api/respuestas para que el navegador se quedara redirigiendo esa ruta el
+   resto de la sesión. Mejor un 502 honesto, que es exactamente lo que verá la
+   web el día que la API se caiga de verdad. */
+const PUERTO_API = Number(process.env.PUERTO_API ?? 3100);
+
 /* «localhost» y no «127.0.0.1»: el servidor del universo escucha solo en el
    bucle IPv6 —[::1]:5173— y conectar por IPv4 daba conexión rechazada, que
    desde el navegador se veía como un 502 del proxy y no como lo que era. Con
@@ -46,7 +58,10 @@ const DE_VITE = ["/@", "/node_modules/", "/__manifest", ...carpetasDelUniverso];
 const esDelUniverso = url =>
   url === "/universo" || url.startsWith("/universo/") || DE_VITE.some(prefijo => url.startsWith(prefijo));
 
-const destino = url => (esDelUniverso(url) ? puertoUniverso : puertoMaterias);
+const destino = url => {
+  if (url === "/api" || url.startsWith("/api/")) return PUERTO_API;
+  return esDelUniverso(url) ? puertoUniverso : puertoMaterias;
+};
 
 /* Una barra final de más en estas rutas se perdona, y no por gusto.
 

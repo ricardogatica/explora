@@ -1,4 +1,4 @@
-# Un solo servicio: el sitio entero es estático.
+# Tres servicios: la web estática, la API que guarda el progreso y su base.
 #
 #   docker compose -f infra/compose.yaml up --build
 #
@@ -10,14 +10,63 @@ services:
     build:
       context: ..
       dockerfile: infra/Dockerfile
-    image: explora:local
+      target: web
+    image: explora-web:local
     ports:
       - "8080:80"
     restart: unless-stopped
+    depends_on:
+      - api
     healthcheck:
       # Una página del universo, no la raíz: comprueba de paso que el reparto por
       # prefijo funciona, que es lo único que esta configuración puede romper.
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost/universo/"]
+      #
+      # Por 127.0.0.1 y no «localhost»: dentro del contenedor ese nombre resuelve
+      # primero a ::1, y estos dos servidores escuchan en IPv4. Con el nombre, el
+      # healthcheck daba «connection refused» y marcaba como enfermo un
+      # contenedor que servía perfectamente.
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1/universo/"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: api
+    image: explora-api:local
+    restart: unless-stopped
+    environment:
+      # La contraseña por defecto solo vale en local: en el servidor se pasa por
+      # el entorno y no se escribe aquí.
+      DATABASE_URL: "postgres://explora:${POSTGRES_PASSWORD:-explora}@postgres:5432/explora"
+      PORT: "3100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3100/api/salud"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: explora
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-explora}"
+      POSTGRES_DB: explora
+    volumes:
+      # Sin esto, cada despliegue empieza de cero: el volumen es la diferencia
+      # entre tener estadísticas y tener las de esta semana.
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U explora -d explora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  datos:
