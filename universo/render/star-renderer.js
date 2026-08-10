@@ -72,6 +72,24 @@ export function starSurfaceMaterial(baseColor,{spots=0.5}={}){
         return suma;
       }
 
+      /* Celdas con borde, para la granulación de verdad.
+
+         La superficie del Sol no es una nube suave: es un mosaico de celdas de
+         convección de unos mil kilómetros, cada una con su interior brillante y
+         un SURCO OSCURO alrededor por donde el plasma, ya frío, vuelve a bajar.
+         Ese entramado de surcos es lo que hace que una foto del Sol se reconozca
+         al instante, y con ruido suave no sale: sale un algodón.
+
+         Un Worley de verdad cuesta veintisiete celdas por píxel. El mínimo de
+         tres capas de |ruido| desplazadas entre sí da el mismo efecto —valles
+         estrechos donde el valor se acerca a cero— con tres consultas. */
+      float celdas(vec3 p){
+        float a=abs(noise(p)*2.0-1.0);
+        float b=abs(noise(p*1.20+vec3(13.0,7.0,19.0))*2.0-1.0);
+        float c=abs(noise(p*0.85+vec3(-7.0,23.0,11.0))*2.0-1.0);
+        return min(a,min(b,c));
+      }
+
       void main(){
         vec3 dir=normalize(vPos);
 
@@ -87,9 +105,16 @@ export function starSurfaceMaterial(baseColor,{spots=0.5}={}){
         float mu=max(dot(normalize(vNormal),normalize(-vViewPos)),0.0);
         float limbo=0.32+0.72*mu-0.04*mu*mu;
 
+        /* Los surcos entre gránulos. La escala va con la del ruido fino para
+           que el mosaico y el plasma cuenten lo mismo, y se mueve despacio:
+           una celda de convección vive unos minutos. */
+        float surco=smoothstep(0.0,0.16,celdas(dir*24.0+vec3(0.0,uTime*0.03,0.0)));
+
         // El centro de cada gránulo tira a blanco; los surcos, al color propio.
         vec3 caliente=mix(uColor,vec3(1.0),0.52);
         vec3 color=mix(uColor*0.60,caliente,superficie);
+        // El surco oscurece sin llegar a negro: por ahí también sale luz.
+        color*=mix(0.62,1.0,surco);
         color*=limbo;
         color=mix(color,uColor*0.42,mancha*uSpots);
 

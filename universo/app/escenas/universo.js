@@ -15,6 +15,7 @@ import { crearReloj, suavizado } from "@explora/compartido/tiempo.js";
 import { liberarEscena } from "@explora/compartido/desmontar.js";
 import { rutaDeTextura } from "../datos/texturas.js";
 import { crearCuerposMenores } from "./cuerpos-menores.js";
+import { baseGalactica } from "../../cielo/universe/sky.js";
 
 /* La vista del universo: la escena grande, con su línea temporal.
 
@@ -95,6 +96,45 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   const backgroundStars=starField(10000,14000,4.2,0.72);scene.add(backgroundStars);
 
   const vecindario=new THREE.Group();scene.add(vecindario);
+
+  /* ── El cielo fotográfico, y por qué se desvanece ───────────────────────
+
+     Es el panorama de 8192×4096 de la Vía Láctea, el mismo que usa el mapa de
+     constelaciones. Pintado por dentro de una esfera enorme da lo que ningún
+     campo de puntos consigue: la banda de la galaxia tal como se ve.
+
+     Pero una panorámica del cielo es una foto TOMADA DESDE AQUÍ, proyectada
+     sobre una esfera centrada en nosotros. Vale mientras la cámara no se aleje
+     del Sol. En cuanto se sale del vecindario deja de ser verdad: la galaxia no
+     está pintada en una pared alrededor, está ahí delante, y es la que se
+     dibuja con su disco de puntos.
+
+     Así que la esfera se apaga con la distancia. Cerca del Sol, foto; lejos, la
+     galaxia de verdad, vista desde fuera. Y el tramo intermedio, en el que una
+     se apaga mientras la otra aparece, es justo lo que hay que entender: que
+     esa banda del cielo y ese disco son la misma cosa vista desde dos sitios. */
+  const CIELO={radio:4200,desdeAqui:1400,hastaAlli:3400};
+  const cieloFoto=new THREE.Mesh(
+    new THREE.SphereGeometry(CIELO.radio,64,48),
+    new THREE.MeshBasicMaterial({side:THREE.BackSide,depthWrite:false,transparent:true,color:new THREE.Color(1.5,1.5,1.5)})
+  );
+  {
+    /* La panorámica viene en proyección galáctica —la banda recta por el medio
+       de la imagen— y se gira al marco ecuatorial, que es el de nuestras
+       estrellas. Sin el giro caería sobre el ecuador celeste, y el plano
+       galáctico llega a ±63° de declinación. */
+    const base=baseGalactica();
+    cieloFoto.applyMatrix4(new THREE.Matrix4().makeBasis(
+      new THREE.Vector3(...base.x),new THREE.Vector3(...base.y),new THREE.Vector3(...base.z)
+    ));
+    new THREE.TextureLoader().load("/universo/cielo/via-lactea-8k.jpg",textura=>{
+      textura.colorSpace=THREE.SRGBColorSpace;
+      cieloFoto.material.map=textura;
+      cieloFoto.material.needsUpdate=true;
+    });
+    cieloFoto.renderOrder=-2;   // detrás de todo, incluso del campo de estrellas
+    scene.add(cieloFoto);
+  }
 
   const galaxyParts=createMilkyWayObject(KNOWN_GALAXIES[0]),galaxy=galaxyParts.group;
   const viaLactea=new THREE.Group();viaLactea.add(galaxy);scene.add(viaLactea);
@@ -321,8 +361,16 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
   function animateUniverseObjects(time,avance){Object.values(universeObjects).forEach(entry=>{if(entry.kind==="star"||entry.kind==="quasar")animateStellarObject(entry,time,avance)})}
   function updateWheelZoom(avance){if(Math.abs(zoomVelocity)<0.001)return;setZoom(THREE.MathUtils.clamp(zoomActual+zoomVelocity*avance,0,100));zoomVelocity*=Math.pow(0.82,avance);updateTemporalVisibility()}
   function actualizarMarcadorSolar(){
-    const lejos=camera.position.length()>MARCADOR_DESDE;
+    const distancia=camera.position.length();
+    const lejos=distancia>MARCADOR_DESDE;
     marcadorSolar.forEach(parte=>{parte.visible=lejos&&viaLactea.visible;});
+
+    /* El cielo fotográfico se apaga al salir del vecindario: a partir de ahí
+       sería una pared pintada delante de la galaxia de verdad. */
+    const apagado=THREE.MathUtils.clamp(
+      (distancia-CIELO.desdeAqui)/(CIELO.hastaAlli-CIELO.desdeAqui),0,1);
+    cieloFoto.material.opacity=1-apagado;
+    cieloFoto.visible=apagado<1&&backgroundStars.visible;
   }
 
   function animateCamera(avance){const desired=controls.target.clone().add(camera.position.clone().sub(controls.target).normalize().multiplyScalar(targetDistance));camera.position.lerp(desired,suavizado(0.055,avance));const dist=camera.position.distanceTo(controls.target);camera.near=Math.max(0.01,dist/3000);camera.far=Math.max(40000,dist*8);camera.updateProjectionMatrix()}
