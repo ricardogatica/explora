@@ -12,6 +12,7 @@ export default [
   route("constelaciones", "rutas/constelaciones.jsx"),
   route("constelaciones/:slug", "rutas/constelacion.jsx"),
   route("galaxias/:slug", "rutas/galaxia.jsx"),
+  route("sistema-solar", "rutas/sistema-solar.jsx"),
   route("escala-planetaria", "rutas/escala-planetaria.jsx"),
   route("escala-de-soles", "rutas/escala-de-soles.jsx")
 ];

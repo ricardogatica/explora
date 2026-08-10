@@ -52,6 +52,7 @@ export default function EscalaPlanetaria() {
           <Link className="boton boton--suave" to="/">Volver al universo</Link>
           <Link className="boton boton--suave" to="/escala-de-soles">Ver escala de soles</Link>
           <Link className="boton boton--suave" to="/indice">Índice</Link>
+          <Link className="boton boton--suave" to="/sistema-solar">Ficha del Sistema Solar</Link>
           <button type="button" className="boton" onClick={() => escena.current?.verGeneral()}>Reset</button>
         </div>
       </section>

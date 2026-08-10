@@ -299,7 +299,11 @@ test("las escenas 3D miden el tiempo con el reloj compartido", () => {
   const escenas = readdirSync(ESCENAS)
     .filter(nombre => nombre.endsWith(".js"))
     .filter(nombre => /export function montar/.test(readFileSync(join(ESCENAS, nombre), "utf8")));
-  assert.equal(escenas.length, 6, `esperaba las seis escenas montables, hay ${escenas.length}`);
+  /* Un suelo y no una igualdad: añadir una escena es legítimo y no debe romper
+     esta prueba. Lo que se comprueba es que TODAS usen el reloj compartido; el
+     suelo solo protege de que el filtro deje de encontrar archivos y el bucle
+     pase en vacío. */
+  assert.ok(escenas.length >= 6, `esperaba al menos seis escenas montables, hay ${escenas.length}`);
   for (const escena of escenas) {
     const source = readFileSync(join(ESCENAS, escena), "utf8");
     assert.match(source, /from "@explora\/compartido\/tiempo\.js"/,

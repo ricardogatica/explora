@@ -6,7 +6,7 @@
 import { buildCatalog } from "../../cielo/nav-model.js";
 
 export function rutasParaPrerenderizar() {
-  const fijas = ["/", "/indice", "/referencias", "/escala-planetaria", "/escala-de-soles", "/constelaciones"];
+  const fijas = ["/", "/indice", "/referencias", "/sistema-solar", "/escala-planetaria", "/escala-de-soles", "/constelaciones"];
   const fichas = buildCatalog().flatMap(grupo =>
     grupo.entries.map(entrada => rutaDeEntrada(grupo.id, entrada.slug))
   );

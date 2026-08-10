@@ -37,6 +37,12 @@ export default function Indice() {
         {TOTAL} fichas entre cuerpos del sistema solar, estrellas, constelaciones y galaxias.
       </p>
 
+      {/* Fuera de la lista a propósito: es la ficha del conjunto, no una entrada
+          más del catálogo, y meterla dentro obligaría a inventarle un grupo. */}
+      <p className="destacado">
+        ¿Buscas el conjunto? <Link to="/sistema-solar">Ficha del Sistema Solar</Link>
+      </p>
+
       <div className="buscador">
         <input
           className="buscador__campo" type="search" value={consulta}
