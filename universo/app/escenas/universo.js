@@ -221,10 +221,43 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
 
   /* El disco pintado se desvanece con las nubes pero no lleva tamaño de punto:
      es una malla con textura, no un campo de partículas. */
-  if(galaxyParts.pintado){
-    const mapa=galaxyParts.pintado.material.map;
+  /* ── El relevo entre el dibujo y las estrellas ───────────────────────────
+
+     El disco pintado es una textura, y una textura tiene un límite: sus téxeles.
+     El plano mide 97.000 unidades de ancho y la textura 1024, así que cada téxel
+     abarca 95 unidades. A la distancia del botón —96.000— un téxel mide justo un
+     píxel y se ve nítido; al acercarse se estira, y a 20.000 ya son cinco
+     píxeles y se nota.
+
+     Así que el dibujo se retira antes de que se le vean las costuras y deja el
+     relevo a las nubes de puntos. Y eso no es solo un truco de resolución: de
+     cerca, una galaxia NO es un dibujo nítido, son estrellas. Un brazo espiral
+     perfectamente definido visto desde dentro se leería como una calcomanía
+     plana, diciendo que hay una superficie donde no hay ninguna.
+
+     El umbral no se elige a ojo: se calcula cuántos píxeles de pantalla ocuparía
+     un téxel a la distancia actual. Así se porta igual en un móvil que en un
+     monitor ancho, y si algún día cambia el tamaño de la textura o del disco, el
+     relevo se ajusta solo. */
+  const discoPintado=galaxyParts.pintado??null;
+  let opacidadDelDibujo=0;
+  const TEXEL=discoPintado
+    ? (discoPintado.geometry.parameters.width*ESCALA_GALAXIA)/(discoPintado.material.map?.image?.width??1024)
+    : 0;
+
+  if(discoPintado){
+    const mapa=discoPintado.material.map;
     if(mapa){mapa.anisotropy=renderer.capabilities.getMaxAnisotropy();mapa.needsUpdate=true;}
-    nubesDeLaGalaxia.push({parte:galaxyParts.pintado,opacidadPlena:galaxyParts.pintado.material.opacity});
+    opacidadDelDibujo=discoPintado.material.opacity;
+    discoPintado.material.transparent=true;
+  }
+
+  /* Cuánto del dibujo se enseña a la distancia dada: entero mientras un téxel no
+     llegue a píxel y medio, nada a partir de tres. */
+  function nitidezDelDibujo(distancia){
+    const unidadesPorPixel=2*Math.tan(THREE.MathUtils.degToRad(camera.fov)/2)*distancia/Math.max(alto(),1);
+    const pixelesPorTexel=TEXEL/Math.max(unidadesPorPixel,1e-6);
+    return 1-THREE.MathUtils.clamp((pixelesPorTexel-1.5)/1.5,0,1);
   }
   /* El Sol tiene que caer en el origen de la escena, que es donde está el
      sistema solar. Se calcula dónde queda su marcador dentro de la galaxia ya
@@ -252,6 +285,11 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      halo azul 735: desde dentro llenaban la pantalla de azul y tapaban la
      escena entera. Solo tiene sentido cuando se mira la galaxia desde fuera,
      así que aparece con la distancia. */
+  /* El centro de la galaxia en coordenadas de la escena. Es fijo desde que se
+     coloca, así que se calcula una vez. */
+  viaLactea.updateMatrixWorld(true);
+  const centroGalactico=galaxy.getWorldPosition(new THREE.Vector3());
+
   const MARCADOR_DESDE=3000;
   const marcadorSolar=[galaxyParts.solarMarker,galaxyParts.markerGlow].filter(Boolean);
 
@@ -502,6 +540,18 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
       parte.material.opacity=opacidadPlena*fuera;
       parte.visible=fuera>0.02;
     });
+
+    /* El relevo: el dibujo se retira al acercarse y las nubes de puntos suben un
+       poco para que el brillo no dé un bajón en el cambio. */
+    if(discoPintado){
+      const nitidez=nitidezDelDibujo(camera.position.distanceTo(centroGalactico));
+      discoPintado.material.opacity=opacidadDelDibujo*fuera*nitidez;
+      discoPintado.visible=fuera>0.02&&nitidez>0.01;
+      const compensacion=1+(1-nitidez)*0.55;
+      nubesDeLaGalaxia.forEach(({parte,opacidadPlena})=>{
+        parte.material.opacity=Math.min(opacidadPlena*fuera*compensacion,1);
+      });
+    }
 
     /* Las mil y pico piezas del vecindario solo se retocan cuando el desvanecido
        cambia de verdad. Recorrerlas en cada cuadro para escribir el mismo número
