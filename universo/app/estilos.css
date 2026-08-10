@@ -481,3 +481,54 @@ a.boton { text-decoration: none; display: inline-block; }
   letter-spacing: .06em; text-transform: uppercase;
   color: #94a3b8;
 }
+
+/* ── El viaje por el universo ─────────────────────────────────────────────── */
+
+/* El botón, justo encima de la barra de zoom. Vertical como ella, para que se
+   lean como una sola columna de mandos y no como dos cosas sueltas. */
+.boton--viaje {
+  position: absolute; right: 18px; top: 24px;
+  z-index: 5;
+  padding: .55rem 1rem;
+  background: rgba(56,189,248,.16);
+  border: 1px solid rgba(56,189,248,.55);
+  color: #e0f2fe;
+}
+.boton--viaje:hover { background: rgba(56,189,248,.28); }
+
+/* El panel del viaje ocupa el sitio que deja la línea temporal, y no es tan
+   alto: durante el viaje lo que importa es la escena. */
+.viaje {
+  position: absolute; left: 18px; right: 96px; bottom: 18px;
+  border: 1px solid rgba(148,163,184,.2); border-radius: 20px;
+  background: rgba(7,12,28,.9); backdrop-filter: blur(16px);
+  padding: 16px 22px 18px;
+  animation: viaje-entra .35s ease-out;
+}
+@keyframes viaje-entra { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+
+.viaje h2 {
+  font-family: var(--display); font-size: clamp(20px, 2.4vw, 27px);
+  margin: .1rem 0 .35rem; color: #f1f5f9;
+}
+.viaje__texto {
+  margin: 0; max-width: 68ch;
+  font-size: 15px; line-height: 1.5; color: #cbd5e1;
+}
+
+/* Las paradas, como una tira de marcas: dice cuánto queda sin números. */
+.viaje__paradas { display: flex; gap: 5px; margin-bottom: .7rem; }
+.viaje__paradas i {
+  flex: 1; height: 3px; border-radius: 999px;
+  background: rgba(148,163,184,.22);
+  transition: background .4s;
+}
+.viaje__paradas i.es-vista { background: #38bdf8; }
+
+.viaje__mandos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
+.viaje__mandos .boton:disabled { opacity: .38; cursor: not-allowed; }
+
+@media (max-width: 780px) {
+  .viaje { right: 88px; padding: 14px 16px 16px; }
+  .viaje__texto { font-size: 14px; }
+}

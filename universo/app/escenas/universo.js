@@ -58,6 +58,14 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      un cuadro. Con un objetivo libre la mira se queda donde se la puso. */
   let objetivoLibre=null;
 
+  /* Cuánta luz débil se enseña. 1 es la escena de siempre; por debajo, lo que
+     vería un ojo en un instante; por encima, lo que recoge una cámara con
+     exposición larga. Solo afecta a lo tenue —el velo de la Vía Láctea y las
+     estrellas de relleno—, que es justo lo que un ojo pierde y un sensor gana.
+     No toca planetas ni estrellas brillantes: esas se ven igual de las dos
+     maneras, y en eso está la lección. */
+  let sensibilidad=1;
+
   const avisar = () => alCambiar?.({
     etapa: selectedEvent,
     progreso: timelineProgress,
@@ -270,12 +278,12 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
      estamos —el punto, su halo y el aro de su órbita alrededor del centro— para
      que no se separen entre ellas. */
   const AFUERA=1.97;
+  const OPACIDAD_DE_LOS_AROS=0.16;
   [galaxyParts.solarMarker,galaxyParts.markerGlow].forEach(parte=>{
     if(parte)parte.position.multiplyScalar(AFUERA);
   });
-  galaxy.children
-    .filter(hijo=>hijo.geometry?.type==="RingGeometry")
-    .forEach(aro=>aro.scale.multiplyScalar(AFUERA));
+  const arosGalacticos=galaxy.children.filter(hijo=>hijo.geometry?.type==="RingGeometry");
+  arosGalacticos.forEach(aro=>{aro.scale.multiplyScalar(AFUERA);aro.material.transparent=true;});
 
   viaLactea.updateMatrixWorld(true);
   viaLactea.position.sub(galaxyParts.solarMarker.getWorldPosition(new THREE.Vector3()));
@@ -505,6 +513,59 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     setZoom(zoomParaDistancia(distancia),{soltarObjetivo:false});
   }
 
+  /* Mirar el barrio desde fuera del sistema solar pero desde dentro del
+     vecindario: es donde las constelaciones tienen sentido, porque son dibujos
+     que solo funcionan vistos desde aquí. */
+  function encuadrarVecindario(){
+    objetivoLibre=null;
+    /* A 900 y no a 2.600. Fuera del sistema solar —Neptuno está a 34— pero
+       DENTRO del cascarón de estrellas y por debajo de donde empieza a apagarse
+       el cielo fotográfico. A 2.600 la escena estaba a mitad del fundido: las
+       constelaciones al 40% y el cielo desapareciendo, así que la parada que
+       habla de constelaciones las enseñaba a medias y la que compara el ojo con
+       el sensor salía más oscura cuanto más subía la sensibilidad. */
+    focusOn("sun",900,{remember:false});
+    setZoom(zoomParaDistancia(900),{soltarObjetivo:false});
+  }
+
+  /* Las escalas de un vistazo: el vecindario entero y la galaxia detrás.
+
+     La primera versión de esta parada volaba hasta el cuásar, a 130.000 de aquí,
+     y salía la pantalla en negro. El motivo es que `focusOn` conserva la
+     dirección desde la que se miraba: cambia a qué apunta y a qué distancia,
+     pero no desde dónde, así que con un objetivo muy lejano se acaba mirando al
+     vacío. Aquí la cámara se coloca a mano, del lado contrario al centro
+     galáctico, para que al mirar al Sol la galaxia quede de fondo. */
+  function encuadrarEscalas(){
+    preferredFocus=null;selectedBody=null;objetivoLibre=null;
+    const distancia=9000;
+    controls.target.set(0,0,0);
+    const desdeElCentro=new THREE.Vector3().sub(centroGalactico).normalize();
+    camera.position.copy(desdeElCentro).multiplyScalar(distancia).add(new THREE.Vector3(0,distancia*0.28,0));
+    targetDistance=distancia;
+    setZoom(zoomParaDistancia(distancia),{soltarObjetivo:false});
+  }
+
+  /* La órbita del Sol alrededor del centro galáctico: el aro. Se mira desde más
+     cerca que la galaxia entera y algo más de canto, para que el aro se lea como
+     un camino y no como un círculo plano. */
+  function encuadrarOrbitaDelSol(){
+    preferredFocus=null;selectedBody=null;
+    const centro=centroGalactico.clone();
+    objetivoLibre=centro;
+    const distancia=64000;
+    controls.target.copy(centro);
+    const normal=new THREE.Vector3(0,1,0)
+      .applyQuaternion(galaxyParts.disk.getWorldQuaternion(new THREE.Quaternion())).normalize();
+    const haciaElSol=new THREE.Vector3().sub(centro).projectOnPlane(normal).normalize();
+    const inclinacion=THREE.MathUtils.degToRad(34);
+    camera.position.copy(centro).addScaledVector(
+      normal.multiplyScalar(Math.sin(inclinacion)).addScaledVector(haciaElSol,Math.cos(inclinacion)).normalize(),
+      distancia);
+    targetDistance=distancia;
+    setZoom(zoomParaDistancia(distancia),{soltarObjetivo:false});
+  }
+
   function applyInitialLayout(){selectedEvent=TIMELINE_EVENTS.length-1;timelineProgress=selectedEvent;setZoom(SOLAR_SYSTEM_BEHAVIOR.initialZoom);earthMesh.material=getEarthMaterialByStage("modern");avisar();updateTemporalVisibility();focusOn("earth",SOLAR_SYSTEM_BEHAVIOR.initialFocusDistance)}
   function updatePlanetPositions(time,avance){BODY_ORDER.forEach((slug,index)=>{const body=BODY_DATA[slug],group=planetObjects[slug];if(slug==="sun"){group.rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN*avance;return}const position=getOrbitPosition(body,time,index,currentOrbitScale);group.position.set(position.x,position.y,position.z);group.children[0].rotation.y+=body.rotationSpeed/ROTATION_SLOWDOWN*avance});const moonPosition=getMoonOrbitPosition(BODY_DATA.moon,time);planetObjects.moon.position.set(moonPosition.x,moonPosition.y,moonPosition.z);moonMesh.rotation.y+=BODY_DATA.moon.rotationSpeed/ROTATION_SLOWDOWN*avance;earthClouds.rotation.y+=0.0012*avance;atmosphere.rotation.y-=0.0003*avance;saturnRings.rotation.z+=0.0008*avance;cuerposMenores.actualizar(time,currentOrbitScale)}
   function animateStageEffects(time,avance){eventVisuals.bigBang.rotation.y+=0.0014*avance;eventVisuals.firstStars.rotation.y+=0.00055*avance;eventVisuals.earlyGalaxy.rotation.y+=0.0012*avance;primordialTransition.stageStar.rotation.y+=0.003*avance;primordialTransition.stageSupernova.rotation.z+=0.004*avance;primordialTransition.stageQuasar.rotation.z+=0.002*avance;primordialTransition.group.rotation.y+=0.00025*avance;stageEffects.proto.rotation.y+=0.0035*avance;stageEffects.proto.children.forEach(child=>{if(child.userData.spin)child.rotation.z+=child.userData.spin*avance;if(child.userData.orbitRadius){child.userData.orbitAngle+=child.userData.orbitSpeed*avance;child.position.x=Math.cos(child.userData.orbitAngle)*child.userData.orbitRadius;child.position.z=Math.sin(child.userData.orbitAngle)*child.userData.orbitRadius}});if(stageEffects.proto.userData.shock)stageEffects.proto.userData.shock.scale.setScalar(1+Math.sin(time*1.5)*.08);if(stageEffects.proto.userData.protoSun)stageEffects.proto.userData.protoSun.scale.setScalar(1+Math.sin(time*4.2)*.055);stageEffects.earthDust.rotation.y+=0.015*avance;stageEffects.earthDust.scale.setScalar(1+Math.sin(time*2.4)*0.055);stageEffects.moonDebris.rotation.y+=0.02*avance;stageEffects.moonDebris.rotation.z+=0.006*avance;stageEffects.oceans.rotation.y+=0.006*avance;stageEffects.oceans.scale.setScalar(1+Math.sin(time*1.8)*0.025);stageEffects.oxidation.rotation.y+=0.004*avance;stageEffects.oxidation.scale.setScalar(1+Math.sin(time*2.2)*0.035);stageEffects.life.rotation.y+=0.0055*avance;stageEffects.life.scale.setScalar(1+Math.sin(time*3.1)*0.045)}
@@ -528,17 +589,25 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     const fuera=THREE.MathUtils.clamp(
       (distancia-CIELO.desdeAqui)/(CIELO.hastaAlli-CIELO.desdeAqui),0,1);
 
-    cieloFoto.material.opacity=1-fuera;
+    cieloFoto.material.opacity=(1-fuera)*sensibilidad;
     cieloFoto.visible=fuera<1&&backgroundStars.visible;
 
     /* El relleno de estrellas se apaga con la foto: es lo mismo, el cielo visto
        desde aquí. Con el disco de la galaxia a 47.000, ese campo de radio 14.000
        quedaría de lejos como una pelota densa pegada al Sol, que no es nada. */
-    backgroundStars.material.opacity=OPACIDAD_DEL_RELLENO*(1-fuera);
+    backgroundStars.material.opacity=OPACIDAD_DEL_RELLENO*(1-fuera)*sensibilidad;
 
     nubesDeLaGalaxia.forEach(({parte,opacidadPlena})=>{
       parte.material.opacity=opacidadPlena*fuera;
       parte.visible=fuera>0.02;
+    });
+
+    /* Los aros —la órbita del Sol alrededor del centro— se apagan con lo demás.
+       Sin esto, dentro del vecindario seguían a plena opacidad y cruzaban la
+       pantalla como una banda azul que no venía de nada. */
+    arosGalacticos.forEach(aro=>{
+      aro.material.opacity=OPACIDAD_DE_LOS_AROS*fuera;
+      aro.visible=fuera>0.02;
     });
 
     /* El relevo: el dibujo se retira al acercarse y las nubes de puntos suben un
@@ -717,6 +786,73 @@ export function montarUniverso(contenedor, { alCambiar } = {}) {
     enfocarTierra() { focusOn("earth", 7); fichaAbierta = true; avisar(); },
     enfocarSistemaSolar() { encuadrarSistemaSolar(); avisar(); },
     enfocarViaLactea() { encuadrarViaLactea(); avisar(); },
+
+    /* Lo que el viaje pide por su nombre. Cada uno deja la escena en un sitio y
+       no sabe nada de textos ni de tiempos: de eso se encarga quien lo guía. */
+    enfocarVecindario() { encuadrarVecindario(); avisar(); },
+    enfocarOrbitaDelSol() { encuadrarOrbitaDelSol(); avisar(); },
+    enfocarEscalas() { encuadrarEscalas(); fichaAbierta = false; avisar(); },
+    enfocarPolaris() { focusOn("polaris"); fichaAbierta = false; avisar(); },
+    enfocarVega() { focusOn("vega", 26); fichaAbierta = false; avisar(); },
+    enfocarCinturon() { encuadrarSistemaSolar(); setZoom(zoomActual - 6); avisar(); },
+
+    /* La demostración del ojo contra el sensor: se baja la luz débil a lo que
+       ve un ojo y se sube a lo que recoge una cámara. Devuelve una función para
+       dejarlo como estaba, que la usa quien guía el viaje al cambiar de parada.  */
+    compararOjoYSensor() {
+      /* Mirando a la banda de la Vía Láctea, que es lo que cambia: si la cámara
+         apunta a otro lado, el ojo y el sensor se ven casi igual y la parada no
+         demuestra nada. Se coloca del lado contrario al centro galáctico para
+         tenerlo enfrente, a 900 del Sol —dentro del cascarón de estrellas y por
+         debajo de donde el cielo empieza a apagarse—. */
+      preferredFocus=null;selectedBody=null;objetivoLibre=null;
+      const distancia=900;
+      controls.target.set(0,0,0);
+      camera.position.copy(centroGalactico).normalize().multiplyScalar(-distancia);
+      camera.position.y+=distancia*0.12;
+      targetDistance=distancia;
+      setZoom(zoomParaDistancia(distancia),{soltarObjetivo:false});
+      /* La rampa, en tres tiempos y con techo en 1.
+
+         La primera versión subía de 0,22 a 1,72 en una curva continua, y no se
+         apreciaba: la opacidad se recorta en 1, así que todo lo que pasaba de ahí
+         se tiraba, y a los tres segundos ya iba por 0,73. La diferencia visible
+         acabó siendo de 0,73 a 1, casi nada.
+
+         Ahora se queda quieta en el ojo el tiempo suficiente para verlo, sube en
+         cinco segundos y se queda quieta arriba. Lo que se compara son dos
+         estados, no una transición: hay que poder mirar cada uno. */
+      /* 0,06 y no 0,16. El material del cielo lleva una ganancia de 1,5 para que
+         la panorámica no salga lavada, así que a 0,16 la banda de la Vía Láctea
+         todavía se veía bien y las dos mitades de la comparación salían casi
+         iguales. Se comprobó bajándolo a 0: ahí quedan solo las estrellas
+         brillantes y sus figuras, que es exactamente lo que ve un ojo desde una
+         ciudad. Un pelo por encima de cero deja intuir la banda, como en un
+         cielo oscuro de verdad. */
+      const OJO = 0.06, SENSOR = 1;
+      sensibilidad = OJO;
+      const empezo = performance.now();
+      const paso = ms => {
+        if (!vivo) return;
+        const segundos = (ms - empezo) / 1000;
+        const t = THREE.MathUtils.clamp((segundos - 4) / 5, 0, 1);
+        // Suavizado en las dos puntas: ni arranca de golpe ni frena en seco.
+        sensibilidad = OJO + (SENSOR - OJO) * (t * t * (3 - 2 * t));
+        if (segundos < 10) requestAnimationFrame(paso);
+      };
+      requestAnimationFrame(paso);
+      avisar();
+      return () => { sensibilidad = 1; };
+    },
+
+    /* Al salir del viaje, la escena vuelve a su estado normal. */
+    restablecerSensibilidad() { sensibilidad = 1; },
+
+    /* Durante el viaje la cámara no deriva. El giro lento está bien para
+       trastear, pero en un recorrido guiado se lleva el encuadre poco a poco: la
+       parada del ojo y el sensor perdía de vista la banda de la galaxia justo
+       mientras se iluminaba, que era lo único que había que mirar. */
+    pausarGiroAutomatico(pausado) { controls.autoRotate = !pausado; },
     cerrarFicha() { fichaAbierta = false; avisar(); },
     desmontar() {
       if (!vivo) return;

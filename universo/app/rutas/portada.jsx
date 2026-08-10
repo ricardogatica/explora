@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { TIMELINE_EVENTS } from "../../cielo/data.js";
 import { fichaDe } from "../datos/fichas.js";
 import { rutaDeEntrada } from "../datos/rutas.js";
+import { PARADAS } from "../datos/viaje.js";
 
 export function meta() {
   return [
@@ -38,6 +39,63 @@ export default function Universo() {
     return () => { cancelado = true; montada?.desmontar(); escena.current = null; };
   }, []);
 
+  /* ── El viaje ────────────────────────────────────────────────────────────
+
+     `parada` es null cuando no hay viaje; si no, el índice de la que se está
+     viendo. `pausado` detiene el reloj sin salirse.
+
+     Mientras dura, la tarjeta del título y la línea temporal se esconden: el
+     viaje es para mirar, y esas dos cosas son para trastear. */
+  const [viaje, setViaje] = useState(null);   // { parada, pausado }
+  const enViaje = viaje !== null;
+  const parada = enViaje ? PARADAS[viaje.parada] : null;
+  const deshacerParada = useRef(null);
+
+  /* Cada parada le pide a la escena su encuadre. Si la escena devuelve algo —la
+     comparación del ojo y el sensor devuelve cómo deshacerse—, se guarda para
+     llamarlo al cambiar de parada. */
+  useEffect(() => {
+    if (!parada) return;
+    deshacerParada.current?.();
+    deshacerParada.current = escena.current?.[parada.hacer]?.() ?? null;
+  }, [parada]);
+
+  /* El reloj que pasa de parada en parada. Un temporizador por parada y no uno
+     global: así pausar es no programar el siguiente, sin cuentas de tiempo
+     restante que se desincronizan. */
+  useEffect(() => {
+    if (!enViaje || viaje.pausado || !parada) return;
+    const id = setTimeout(() => {
+      setViaje(actual => {
+        if (actual === null) return null;
+        const siguiente = actual.parada + 1;
+        return siguiente < PARADAS.length ? { ...actual, parada: siguiente } : null;
+      });
+    }, parada.segundos * 1000);
+    return () => clearTimeout(id);
+  }, [enViaje, viaje?.parada, viaje?.pausado, parada]);
+
+  /* Al salir, por el botón o al terminar, la escena vuelve a la normalidad. */
+  useEffect(() => {
+    if (enViaje) return;
+    deshacerParada.current?.();
+    deshacerParada.current = null;
+    escena.current?.restablecerSensibilidad?.();
+  }, [enViaje]);
+
+  /* El giro lento de la cámara se para mientras dura el viaje: en un recorrido
+     guiado, derivar es perder el encuadre que se acaba de elegir. */
+  useEffect(() => {
+    escena.current?.pausarGiroAutomatico?.(enViaje);
+  }, [enViaje]);
+
+  const empezarViaje = () => setViaje({ parada: 0, pausado: false });
+  const salirDelViaje = () => setViaje(null);
+  const irAParada = indice => setViaje(actual => actual && {
+    ...actual,
+    parada: Math.min(Math.max(indice, 0), PARADAS.length - 1)
+  });
+
   useEffect(() => {
     const activa = tira.current?.querySelector(".etapa.es-activa");
     if (!activa || !tira.current) return;
@@ -51,6 +109,7 @@ export default function Universo() {
     <div className="vista">
       <div ref={contenedor} className="vista__lienzo" />
 
+      {!enViaje && (
       <section className="tarjeta-vista tarjeta-vista--universo">
         <p className="eyebrow">Explorador 3D educativo</p>
         <h1>Universo, Tierra y Sistema Solar</h1>
@@ -68,6 +127,14 @@ export default function Universo() {
           <button type="button" className="boton" onClick={() => escena.current?.enfocarViaLactea()}>Enfocar la Vía Láctea</button>
         </div>
       </section>
+      )}
+
+      {/* Sobre la barra de zoom, como pidió quien lo va a usar. */}
+      {!enViaje && (
+        <button type="button" className="boton boton--viaje" onClick={empezarViaje}>
+          Iniciar el viaje
+        </button>
+      )}
 
       <aside className="zoom">
         <span className="zoom__etiqueta">Zoom</span>
@@ -107,6 +174,28 @@ export default function Universo() {
         </aside>
       )}
 
+      {enViaje && parada && (
+        <section className="viaje" aria-live="polite">
+          <div className="viaje__paradas" aria-hidden="true">
+            {PARADAS.map((p, i) => (
+              <i key={p.id} className={i <= viaje.parada ? "es-vista" : ""} />
+            ))}
+          </div>
+          <p className="eyebrow">Parada {viaje.parada + 1} de {PARADAS.length}</p>
+          <h2>{parada.titulo}</h2>
+          <p className="viaje__texto">{parada.texto}</p>
+          <div className="viaje__mandos">
+            <button type="button" className="boton boton--suave" onClick={() => irAParada(viaje.parada - 1)} disabled={viaje.parada === 0}>‹ Anterior</button>
+            <button type="button" className="boton" onClick={() => setViaje(a => a && { ...a, pausado: !a.pausado })}>
+              {viaje.pausado ? "Continuar" : "Pausa"}
+            </button>
+            <button type="button" className="boton boton--suave" onClick={() => irAParada(viaje.parada + 1)} disabled={viaje.parada === PARADAS.length - 1}>Siguiente ›</button>
+            <button type="button" className="boton boton--suave" onClick={salirDelViaje}>Salir del viaje</button>
+          </div>
+        </section>
+      )}
+
+      {!enViaje && (
       <section className="linea-temporal">
         <header className="linea-temporal__cabecera">
           <strong>Línea temporal del universo y la Tierra</strong>
@@ -145,6 +234,7 @@ export default function Universo() {
           ))}
         </div>
       </section>
+      )}
     </div>
   );
 }
