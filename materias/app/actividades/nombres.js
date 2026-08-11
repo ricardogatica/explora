@@ -10,4 +10,4 @@
    nombre aquí sin componente detrás sería un hueco en la página, y un componente
    sin nombre aquí sería código que nadie puede usar. */
 
-export const NOMBRES_DE_ACTIVIDAD = ["potencias"];
+export const NOMBRES_DE_ACTIVIDAD = ["potencias", "racionales"];

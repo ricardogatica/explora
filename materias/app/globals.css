@@ -456,3 +456,26 @@ a.boton { text-decoration: none; display: inline-block; }
 .repaso__lista a { color: var(--mate); }
 
 .acciones--sueltas { margin-top: 2rem; }
+
+/* ── La fracción y su barra ───────────────────────────────────────────────── */
+
+/* Escrita como se escribe a mano: uno encima del otro con la raya en medio. En una
+   línea —3/4— se lee como una división, que es verdad pero es la otra lectura. */
+.fraccion { display: inline-grid; justify-items: center; font-family: var(--mono); line-height: 1.05; }
+.fraccion b { font-size: clamp(1.3rem, 3.5vw, 1.7rem); color: var(--mate); }
+.fraccion i { display: block; width: 100%; height: 2px; background: var(--mate); margin: 2px 0; }
+
+/* El periodo, marcado. Lo que se repite para siempre tiene que verse distinto de lo
+   que no; con la rayita de encima, que es lo que se usa en clase. */
+.periodo { border-top: 2px solid currentColor; padding-top: 1px; }
+
+.barras { display: grid; gap: 6px; margin: 1.5rem 0 0; }
+.barra {
+  display: flex; gap: 2px;
+  border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: #fff;
+}
+.barra i { flex: 1; height: 34px; background: #e7edf2; }
+.barra i.es-lleno { background: var(--mate); }
+
+.notas { margin: 1.25rem 0 0; padding-left: 1.1rem; display: grid; gap: 6px; font-size: 14px; }
+.notas b { font-family: var(--mono); }

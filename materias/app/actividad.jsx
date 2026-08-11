@@ -1,4 +1,5 @@
 import Potencias from "./actividades/potencias.jsx";
+import Racionales from "./actividades/racionales.jsx";
 
 /* El despachador de actividades: del nombre escrito en un markdown al componente.
 
@@ -8,7 +9,8 @@ import Potencias from "./actividades/potencias.jsx";
    actividades/nombres.js, porque el lector de contenido la necesita para validar
    sin poder importar JSX; una prueba comprueba que las dos coinciden. */
 const ACTIVIDADES = {
-  potencias: Potencias
+  potencias: Potencias,
+  racionales: Racionales
 };
 
 export default function Actividad({ nombre, ...parametros }) {

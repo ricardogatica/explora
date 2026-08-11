@@ -22,6 +22,85 @@ El **b ≠ 0** no es un capricho: dividir por cero no da infinito, no da nada. S
 6/0 valiera algún número *n*, entonces n × 0 tendría que ser 6, y cualquier número
 por cero da cero.
 
+## Cómo se construye uno
+
+Se eligen dos números enteros y se pone uno sobre otro. Eso es todo, y cada uno
+tiene su papel:
+
+- El de **abajo** —el denominador— dice **en cuántos trozos se corta el entero**.
+- El de **arriba** —el numerador— dice **cuántos de esos trozos se toman**.
+
+Los dos papeles no son intercambiables, y de ahí sale la sorpresa: subir el
+denominador hace la fracción **más pequeña**, porque los trozos son más finos.
+
+::actividad{tipo=racionales numerador=3 denominador=4 titulo="Constrúyela: cuántos trozos tomas, y de cuántos"}
+
+## Ejemplos, y de dónde salen
+
+Todos estos son racionales, aunque no lo parezcan a primera vista:
+
+| Número | Como fracción | De dónde sale |
+|---|---|---|
+| 7 | 7/1 | todo entero lo es: cortar en una parte es no cortar |
+| 0,5 | 1/2 | media pizza |
+| 0,75 | 3/4 | tres cuartos de hora, 45 minutos |
+| 2,5 | 5/2 | dos litros y medio |
+| 0,333… | 1/3 | un tercio de un chocolate de tres onzas |
+| −4 | −4/1 | cuatro grados bajo cero |
+| −0,2 | −1/5 | un quinto por debajo |
+| 0 | 0/9 | cero trozos de lo que sea |
+| 0,125 | 1/8 | un octavo de tarta |
+
+Y estos **no** lo son, por más que se parezcan:
+
+| Número | Por qué no |
+|---|---|
+| π = 3,14159… | sus decimales no terminan ni se repiten nunca |
+| √2 = 1,41421… | igual: infinitos decimales sin ningún patrón |
+
+La diferencia no es que tengan muchos decimales. 1/3 también tiene infinitos. La
+diferencia es que los de 1/3 **se repiten**, y los de π no.
+
+## De decimal a fracción, y al revés
+
+Las dos direcciones se recorren, y saber hacerlo en los dos sentidos es lo que
+convence de que son el mismo número escrito de dos maneras.
+
+**De fracción a decimal:** se divide. 3 ÷ 4 = 0,75.
+
+**De decimal exacto a fracción:** se escribe sobre la potencia de 10 que
+corresponda y se simplifica.
+
+```
+0,75  =  75/100  =  3/4        (dos decimales → entre 100)
+0,4   =  4/10    =  2/5
+0,125 = 125/1000 =  1/8
+```
+
+**De decimal periódico a fracción:** hay un truco que parece magia y no lo es.
+
+```
+Sea x = 0,333…
+Entonces  10x = 3,333…
+Restando:  9x = 3          (los decimales infinitos se cancelan)
+Luego       x = 3/9 = 1/3
+```
+
+Funciona porque los dos números tienen exactamente la misma cola infinita, y al
+restar desaparece. Con 0,8333… se multiplica por 10 y por 100 en vez de por 10 y 1,
+pero la idea es la misma.
+
+## Dónde aparecen sin avisar
+
+Casi siempre que se mide o se reparte:
+
+- **Media hora** son 1/2 h; **un cuarto de hora**, 1/4 h. El reloj está lleno de
+  fracciones.
+- **Una receta para 6 que se hace para 4**: todo se multiplica por 4/6 = 2/3.
+- **Un descuento del 25 %** es multiplicar por 3/4.
+- **Un partido va 2 de 3 sets**: eso es 2/3.
+- **Un tornillo de 3/8 de pulgada**: la ferretería sigue midiendo en fracciones.
+
 ## Fracción y decimal son la misma cosa
 
 Toda fracción se convierte en decimal dividiendo, y el resultado solo puede ser de
