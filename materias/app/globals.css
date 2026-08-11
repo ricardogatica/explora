@@ -234,7 +234,10 @@ a.boton { text-decoration: none; display: inline-block; }
 @media (min-width: 640px) { .figura { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; } }
 /* El lienzo necesita alto propio: un canvas sin altura declarada colapsa a cero
    y la figura no se ve, sin dar ningún error. */
-.figura__lienzo { width: 100%; height: 260px; display: block; touch-action: none; cursor: grab; }
+/* La caja la pone el JSX y el lienzo lo crea el componente en cada montaje, así que
+   el alto vive aquí y el lienzo solo la llena. */
+.figura__caja { width: 100%; height: 260px; }
+.figura__lienzo { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .figura__lienzo:active { cursor: grabbing; }
 .figura__pie { font-size: 14px; }
 .figura__pie strong { display: block; margin-bottom: .5rem; }

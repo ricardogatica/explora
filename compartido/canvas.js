@@ -40,7 +40,23 @@ export function montarEscena(lienzo, {
   camara.position.set(...posicionCamara);
   camara.lookAt(...objetivo);
 
-  const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true, alpha: fondo === null });
+  /* Un lienzo al que ya se le mató el contexto no sirve para nada más, y aquí es
+     donde se nota: `getContext` devuelve algo que parece un contexto, pero
+     `getShaderPrecisionFormat` da null y three revienta leyéndole `.precision`. Ese
+     error —«Cannot read properties of null (reading 'precision')»— no dice nada de
+     lo que pasó, así que se traduce. Quien llama es responsable de dar un lienzo
+     nuevo en cada montaje. */
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true, alpha: fondo === null });
+  } catch (causa) {
+    throw new Error(
+      "No se pudo crear el contexto WebGL de este lienzo. Suele ser una de dos: el " +
+      "navegador no tiene WebGL, o se está reutilizando un lienzo cuyo contexto ya se " +
+      "liberó, y eso no tiene vuelta atrás: hace falta un elemento nuevo.",
+      { cause: causa }
+    );
+  }
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(ancho(), alto(), false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;

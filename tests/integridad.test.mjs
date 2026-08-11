@@ -438,3 +438,41 @@ test("la Vía Láctea se coloca donde está, no sobre el ecuador celeste", async
     `el plano galáctico solo llega a ${maximaDeclinacion.toFixed(0)}° de declinación; ` +
     "debería pasar de 60° y si no, la banda está aplanada sobre el ecuador");
 });
+
+test("el lienzo de una figura no vive en el JSX", () => {
+  /* Se creó por un fallo que solo daba la cara al remontar, y que en desarrollo
+     saltaba en cada recarga: «Cannot read properties of null (reading 'precision')».
+
+     El desmontaje mata el contexto WebGL a propósito —es la única forma de
+     devolverlo, y sin eso el sitio agota los ~16 que permite el navegador—, pero un
+     lienzo al que se le mató el contexto no admite otro nunca más: getContext
+     devuelve algo que parece válido y three revienta leyéndole la precisión. Con el
+     lienzo en el JSX, React reutiliza el mismo elemento al remontar y el segundo
+     montaje se cae. La única salida es un elemento nuevo por montaje.
+
+     Comprobado en su día en el navegador: sobre el mismo lienzo,
+     getShaderPrecisionFormat devuelve null después de loseContext(); sobre uno
+     nuevo, devuelve un objeto. */
+  const fuente = readFileSync(join(RAIZ, "materias/app/figura.jsx"), "utf8");
+
+  assert.doesNotMatch(fuente, /<canvas/,
+    "figura.jsx vuelve a tener un <canvas> en el JSX: al remontar se reutilizará y " +
+    "el segundo montaje fallará con «reading 'precision'»");
+  assert.match(fuente, /document\.createElement\("canvas"\)/,
+    "el lienzo tiene que crearse en cada montaje");
+  assert.match(fuente, /lienzo\.remove\(\)/,
+    "y retirarse al desmontar: su contexto ya no vale para nada");
+});
+
+test("un fallo de WebGL no se lleva por delante la página", () => {
+  /* El texto que rodea a una figura es la explicación; la figura acompaña. Sin
+     capturar, un navegador sin WebGL deja la ruta entera en una pantalla de error y
+     no se puede leer nada. */
+  const fuente = readFileSync(join(RAIZ, "materias/app/figura.jsx"), "utf8");
+  assert.match(fuente, /catch/, "figura.jsx no captura el fallo de montaje");
+  assert.match(fuente, /setError\("Esta figura necesita WebGL/);
+
+  const canvas = readFileSync(join(RAIZ, "compartido/canvas.js"), "utf8");
+  assert.match(canvas, /No se pudo crear el contexto WebGL/,
+    "montarEscena debería traducir el error de three, que no dice nada de lo que pasó");
+});

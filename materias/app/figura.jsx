@@ -13,10 +13,19 @@ import { crearFigura, iluminar } from "@explora/compartido/primitivas.js";
    La función que devuelve `useEffect` es lo que impide la fuga: sin ella, cada
    figura por la que se navega deja su escena en la memoria de la tarjeta
    gráfica, y al pasar de los ~16 contextos que permite el navegador los canvas
-   se quedan en negro sin un solo error en la consola. */
+   se quedan en negro sin un solo error en la consola.
+
+   Y el lienzo se crea aquí dentro, en cada montaje, en vez de venir del JSX. Ese
+   desmontaje mata el contexto a propósito —es la única forma de devolverlo— y un
+   lienzo al que se le mató el contexto no admite otro: `getContext` devuelve algo
+   que parece válido pero está muerto, y three revienta con «Cannot read properties
+   of null (reading 'precision')». Con el lienzo en el JSX, React reutiliza el mismo
+   elemento al remontar y el segundo montaje se cae. Pasaba en desarrollo en cada
+   recarga, porque React monta, desmonta y vuelve a montar para destapar justo esta
+   clase de fallo. */
 
 export default function Figura({ tipo, titulo, ...parametros }) {
-  const lienzo = useRef(null);
+  const contenedor = useRef(null);
   const [error, setError] = useState(null);
   const [medidas, setMedidas] = useState([]);
 
@@ -30,15 +39,36 @@ export default function Figura({ tipo, titulo, ...parametros }) {
     }
     setMedidas(figura.medidas);
 
-    const escena = montarEscena(lienzo.current, {
-      fondo: null,             // transparente: la página ya tiene su papel
-      camara: [2.6, 2.2, 3.4],
-      alAnimar: ({ segundos }) => { figura.objeto.rotation.y += segundos * 0.35; }
-    });
+    const lienzo = document.createElement("canvas");
+    lienzo.className = "figura__lienzo";
+    contenedor.current.append(lienzo);
+
+    let escena;
+    try {
+      escena = montarEscena(lienzo, {
+        fondo: null,             // transparente: la página ya tiene su papel
+        camara: [2.6, 2.2, 3.4],
+        alAnimar: ({ segundos }) => { figura.objeto.rotation.y += segundos * 0.35; }
+      });
+    } catch (fallo) {
+      /* Una figura que no se puede dibujar no debería llevarse por delante la
+         página entera: el texto que la rodea es la explicación, y la figura la
+         acompaña. Sin esto, un navegador sin WebGL deja la ruta en una pantalla de
+         error y no se puede leer nada. */
+      lienzo.remove();
+      setError("Esta figura necesita WebGL y este navegador no ha podido darlo.");
+      console.error(fallo);
+      return;
+    }
+
     iluminar(escena.escena);
     escena.escena.add(figura.objeto);
 
-    return escena.desmontar;
+    return () => {
+      escena.desmontar();
+      // El lienzo se va con la escena: su contexto ya no vale para nada.
+      lienzo.remove();
+    };
     // Los parámetros se comparan serializados: son números y cadenas sueltos, y
     // un objeto nuevo en cada render remontaría la escena en cada cuadro.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,7 +78,7 @@ export default function Figura({ tipo, titulo, ...parametros }) {
 
   return (
     <figure className="figura">
-      <canvas ref={lienzo} className="figura__lienzo" />
+      <div ref={contenedor} className="figura__caja" />
       <figcaption className="figura__pie">
         {titulo && <strong>{titulo}</strong>}
         <dl className="figura__medidas">
