@@ -414,3 +414,45 @@ a.boton { text-decoration: none; display: inline-block; }
   font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
   color: var(--ink-soft); margin: 0 0 .75rem;
 }
+
+/* ── Elegir la edad dentro de una materia ─────────────────────────────────────
+
+   El paso que faltaba entre entrar en una materia y hacer ejercicios. Va antes que
+   el buscador porque es como se entra cuando se acompaña a alguien concreto; buscar
+   una regla suelta es el otro uso, y no el principal. */
+.edades { margin: 2rem 0; }
+.edades__titulo { font-family: var(--display); font-size: clamp(18px, 3vw, 22px); margin: 0 0 1rem; }
+.edades__lista {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+.edad {
+  display: grid; gap: 2px;
+  padding: .85rem 1rem;
+  border: 1px solid var(--rule); border-radius: 14px;
+  background: #f4f7f8; color: var(--ink); text-decoration: none;
+}
+.edad:hover { border-color: var(--mate); }
+.edad strong { font-size: 16px; }
+.edad span { font-size: 13px; color: var(--ink-soft); }
+.edad__cuenta { font-family: var(--mono); font-size: 11px; }
+/* Un tramo sin contenido se dice en vez de esconderse: un botón que lleva a una
+   página en blanco gasta más confianza que una etiqueta que avisa. */
+.edad--vacia { opacity: .55; }
+
+/* ── La puerta de atrás dentro de un ejercicio ─────────────────────────────── */
+.repaso { margin: 1.25rem 0 0; }
+.repaso__llave {
+  border: 0; background: none; padding: 0; cursor: pointer;
+  font: inherit; font-size: 14px; color: var(--mate); text-decoration: underline;
+}
+.repaso__cuerpo {
+  margin-top: .75rem; padding: .9rem 1rem;
+  border: 1px solid var(--rule); border-left: 3px solid var(--mate); border-radius: 12px;
+  background: #f4f7f8;
+}
+.repaso__intro { margin: 0 0 .5rem; font-size: 14px; color: var(--ink-soft); }
+.repaso__lista { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; }
+.repaso__lista a { color: var(--mate); }
+
+.acciones--sueltas { margin-top: 2rem; }

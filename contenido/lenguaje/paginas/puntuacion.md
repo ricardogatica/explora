@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Coma, punto, punto y coma, dos puntos y signos dobles.
 bandas: [11-12]
-orden: 60
+orden: 110
 ---
 
 # Puntuación

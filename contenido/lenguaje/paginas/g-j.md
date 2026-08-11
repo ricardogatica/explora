@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Reglas para sonidos fuertes con g y j.
 bandas: [9-10]
-orden: 100
+orden: 60
 ---
 
 # Uso de g y j

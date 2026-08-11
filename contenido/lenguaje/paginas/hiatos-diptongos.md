@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Combinaciones vocálicas y uso de tilde.
 bandas: [11-12]
-orden: 50
+orden: 100
 ---
 
 # Hiatos, diptongos y triptongos

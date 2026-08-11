@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Diferencia palabras iguales con funciones distintas.
 bandas: [11-12]
-orden: 30
+orden: 80
 ---
 
 # Tilde diacrítica

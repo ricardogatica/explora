@@ -4,7 +4,7 @@ materia: matematicas
 categoria: Números y operaciones
 descripcion: Qué es una potencia, base y exponente, y de dónde vienen los nombres cuadrado y cubo.
 bandas: [9-10]
-orden: 103
+orden: 102
 ---
 
 # Potencias

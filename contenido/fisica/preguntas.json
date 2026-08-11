@@ -4,11 +4,16 @@
     "materia": "fisica",
     "banda": "5-6",
     "familia": "practica",
+    "pagina": "empujar-tirar-rodar",
     "tipo": "multiple-choice",
     "pregunta": "Para abrir un cajón, ¿qué haces?",
     "categoria": "Fuerzas",
     "explicacion": "Lo acercas hacia ti, y eso es tirar. Para cerrarlo lo alejas: eso es empujar.",
-    "opciones": ["Empujar", "Tirar", "Soplar"],
+    "opciones": [
+      "Empujar",
+      "Tirar",
+      "Soplar"
+    ],
     "respuesta": "Tirar"
   },
   {
@@ -16,11 +21,17 @@
     "materia": "fisica",
     "banda": "5-6",
     "familia": "practica",
+    "pagina": "empujar-tirar-rodar",
     "tipo": "multiple-choice",
     "pregunta": "Si sueltas una pelota en el aire, ¿hacia dónde va?",
     "categoria": "Gravedad",
     "explicacion": "Siempre hacia abajo. Nunca hacia un lado ni hacia arriba, y se puede probar todas las veces que quieras.",
-    "opciones": ["Hacia arriba", "Hacia abajo", "Hacia un lado", "Se queda quieta"],
+    "opciones": [
+      "Hacia arriba",
+      "Hacia abajo",
+      "Hacia un lado",
+      "Se queda quieta"
+    ],
     "respuesta": "Hacia abajo"
   },
   {
@@ -28,11 +39,16 @@
     "materia": "fisica",
     "banda": "5-6",
     "familia": "practica",
+    "pagina": "empujar-tirar-rodar",
     "tipo": "multiple-choice",
     "pregunta": "Empujas una pelota y un cubo de construcción por una tabla inclinada. ¿Cuál rueda?",
     "categoria": "Fuerzas",
     "explicacion": "La pelota rueda porque es redonda; el cubo se arrastra porque tiene caras planas. La forma decide.",
-    "opciones": ["La pelota", "El cubo", "Los dos igual"],
+    "opciones": [
+      "La pelota",
+      "El cubo",
+      "Los dos igual"
+    ],
     "respuesta": "La pelota"
   },
   {
@@ -40,11 +56,16 @@
     "materia": "fisica",
     "banda": "5-6",
     "familia": "practica",
+    "pagina": "luz-y-sombra",
     "tipo": "multiple-choice",
     "pregunta": "Para que haya una sombra, ¿qué hace falta?",
     "categoria": "Luz",
     "explicacion": "Sin luz no hay sombra: en un cuarto totalmente oscuro no hay sombras de nada.",
-    "opciones": ["Una luz y algo que la tape", "Solo que sea de noche", "Que el objeto sea oscuro"],
+    "opciones": [
+      "Una luz y algo que la tape",
+      "Solo que sea de noche",
+      "Que el objeto sea oscuro"
+    ],
     "respuesta": "Una luz y algo que la tape"
   },
   {
@@ -56,8 +77,18 @@
     "pregunta": "Al pedirle que empuje y después que tire de un objeto, ¿hace dos cosas distintas?",
     "habilidad": "Empujar y tirar",
     "retroalimentacion": "Distinguir alejar de acercar es la primera idea de fuerza, y se sostiene con las manos antes que con palabras.",
-    "opciones": ["Sí", "A veces", "No observado", "No"],
-    "puntaje": { "Sí": 2, "A veces": 1, "No observado": 0, "No": 0 }
+    "opciones": [
+      "Sí",
+      "A veces",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "A veces": 1,
+      "No observado": 0,
+      "No": 0
+    }
   },
   {
     "id": "fis-d-5-6-2",
@@ -68,8 +99,18 @@
     "pregunta": "Con una linterna, ¿se da cuenta de que la sombra se agranda al acercar la mano a la luz?",
     "habilidad": "Luz y sombra",
     "retroalimentacion": "Notar que la sombra cambia de tamaño sin que cambie la mano es el primer paso para entender que la sombra no es parte del objeto.",
-    "opciones": ["Sí", "Con ayuda", "No observado", "No"],
-    "puntaje": { "Sí": 2, "Con ayuda": 1, "No observado": 0, "No": 0 }
+    "opciones": [
+      "Sí",
+      "Con ayuda",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "Con ayuda": 1,
+      "No observado": 0,
+      "No": 0
+    }
   },
   {
     "id": "fis-d-5-6-3",
@@ -81,13 +122,28 @@
     "habilidad": "Empujar y tirar",
     "retroalimentacion": "Reconocer empujar y tirar en gestos de todos los días muestra que la idea salió del ejercicio y se aplica sola.",
     "elementos": [
-      { "id": "abrir-cajon", "etiqueta": "Abrir un cajón" },
-      { "id": "cerrar-puerta", "etiqueta": "Cerrar una puerta" },
-      { "id": "columpio", "etiqueta": "Impulsar un columpio desde atrás" }
+      {
+        "id": "abrir-cajon",
+        "etiqueta": "Abrir un cajón"
+      },
+      {
+        "id": "cerrar-puerta",
+        "etiqueta": "Cerrar una puerta"
+      },
+      {
+        "id": "columpio",
+        "etiqueta": "Impulsar un columpio desde atrás"
+      }
     ],
     "destinos": [
-      { "id": "tirar", "etiqueta": "Tirar" },
-      { "id": "empujar", "etiqueta": "Empujar" }
+      {
+        "id": "tirar",
+        "etiqueta": "Tirar"
+      },
+      {
+        "id": "empujar",
+        "etiqueta": "Empujar"
+      }
     ],
     "respuesta": {
       "abrir-cajon": "tirar",
@@ -106,14 +162,32 @@
     "habilidad": "Materiales y luz",
     "retroalimentacion": "Clasificar objetos por si dejan pasar la luz prepara la distinción entre transparente, translúcido y opaco.",
     "elementos": [
-      { "id": "vaso", "etiqueta": "Vaso de agua" },
-      { "id": "libro", "etiqueta": "Libro" },
-      { "id": "ventana", "etiqueta": "Ventana" },
-      { "id": "mano", "etiqueta": "Tu mano" }
+      {
+        "id": "vaso",
+        "etiqueta": "Vaso de agua"
+      },
+      {
+        "id": "libro",
+        "etiqueta": "Libro"
+      },
+      {
+        "id": "ventana",
+        "etiqueta": "Ventana"
+      },
+      {
+        "id": "mano",
+        "etiqueta": "Tu mano"
+      }
     ],
     "destinos": [
-      { "id": "pasa", "etiqueta": "La luz pasa" },
-      { "id": "no-pasa", "etiqueta": "La luz no pasa" }
+      {
+        "id": "pasa",
+        "etiqueta": "La luz pasa"
+      },
+      {
+        "id": "no-pasa",
+        "etiqueta": "La luz no pasa"
+      }
     ],
     "respuesta": {
       "vaso": "pasa",
@@ -128,6 +202,7 @@
     "materia": "fisica",
     "banda": "7-8",
     "familia": "practica",
+    "pagina": "flotar-y-hundirse",
     "tipo": "multiple-choice",
     "pregunta": "Una bola de plastilina se hunde. Con la misma plastilina haces un barquito y flota. ¿Por qué?",
     "categoria": "Flotación",
@@ -144,6 +219,7 @@
     "materia": "fisica",
     "banda": "7-8",
     "familia": "practica",
+    "pagina": "calor-y-temperatura",
     "tipo": "multiple-choice",
     "pregunta": "Tocas la pata de metal y la madera de la misma mesa. El metal parece más frío. ¿Qué marca el termómetro?",
     "categoria": "Calor",
@@ -160,11 +236,16 @@
     "materia": "fisica",
     "banda": "7-8",
     "familia": "practica",
+    "pagina": "calor-y-temperatura",
     "tipo": "multiple-choice",
     "pregunta": "Tienes dos cubos de hielo: uno envuelto en una toalla y otro al aire. ¿Cuál dura más?",
     "categoria": "Calor",
     "explicacion": "El envuelto. Un abrigo no da calor: impide que el calor de la habitación llegue al hielo.",
-    "opciones": ["El envuelto en la toalla", "El que está al aire", "Los dos igual"],
+    "opciones": [
+      "El envuelto en la toalla",
+      "El que está al aire",
+      "Los dos igual"
+    ],
     "respuesta": "El envuelto en la toalla"
   },
   {
@@ -172,12 +253,17 @@
     "materia": "fisica",
     "banda": "7-8",
     "familia": "practica",
+    "pagina": "calor-y-temperatura",
     "tipo": "fill",
     "pregunta": "El instrumento que sirve para medir la temperatura se llama…",
     "categoria": "Medición",
     "explicacion": "El termómetro. Mide temperatura, no calor: son dos cosas distintas.",
     "respuesta": "termometro",
-    "aceptadas": ["termómetro", "el termometro", "el termómetro"]
+    "aceptadas": [
+      "termómetro",
+      "el termometro",
+      "el termómetro"
+    ]
   },
   {
     "id": "fis-d-7-8-1",
@@ -188,8 +274,18 @@
     "pregunta": "¿Predice si un objeto va a flotar antes de echarlo al agua, y explica por qué?",
     "habilidad": "Predecir y comprobar",
     "retroalimentacion": "Arriesgar una predicción antes de probar es lo que separa observar de experimentar. Equivocarse prediciendo enseña más que acertar mirando.",
-    "opciones": ["Sí, y explica", "Predice sin explicar", "No observado", "No predice"],
-    "puntaje": { "Sí, y explica": 2, "Predice sin explicar": 1, "No observado": 0, "No predice": 0 }
+    "opciones": [
+      "Sí, y explica",
+      "Predice sin explicar",
+      "No observado",
+      "No predice"
+    ],
+    "puntaje": {
+      "Sí, y explica": 2,
+      "Predice sin explicar": 1,
+      "No observado": 0,
+      "No predice": 0
+    }
   },
   {
     "id": "fis-d-7-8-2",
@@ -201,12 +297,29 @@
     "habilidad": "Escala de temperatura",
     "retroalimentacion": "Ordenar temperaturas de la vida diaria muestra que la temperatura es una escala continua y no solo «frío o caliente».",
     "elementos": [
-      { "id": "sopa", "etiqueta": "Sopa recién servida" },
-      { "id": "hielo", "etiqueta": "Un cubo de hielo" },
-      { "id": "grifo", "etiqueta": "Agua del grifo" },
-      { "id": "cuerpo", "etiqueta": "Tu propio cuerpo" }
+      {
+        "id": "sopa",
+        "etiqueta": "Sopa recién servida"
+      },
+      {
+        "id": "hielo",
+        "etiqueta": "Un cubo de hielo"
+      },
+      {
+        "id": "grifo",
+        "etiqueta": "Agua del grifo"
+      },
+      {
+        "id": "cuerpo",
+        "etiqueta": "Tu propio cuerpo"
+      }
     ],
-    "respuesta": ["hielo", "grifo", "cuerpo", "sopa"],
+    "respuesta": [
+      "hielo",
+      "grifo",
+      "cuerpo",
+      "sopa"
+    ],
     "pista": "El cuerpo está a unos 37 grados y el agua del grifo bastante menos."
   },
   {
@@ -218,26 +331,41 @@
     "pregunta": "Al medir dos vasos de agua, uno al sol y otro a la sombra, ¿anota los números y los compara?",
     "habilidad": "Registrar medidas",
     "retroalimentacion": "Anotar en vez de recordar es el primer hábito de laboratorio, y el que permite darse cuenta de que un dato no cuadra.",
-    "opciones": ["Sí", "Con ayuda", "No observado", "No"],
-    "puntaje": { "Sí": 2, "Con ayuda": 1, "No observado": 0, "No": 0 }
+    "opciones": [
+      "Sí",
+      "Con ayuda",
+      "No observado",
+      "No"
+    ],
+    "puntaje": {
+      "Sí": 2,
+      "Con ayuda": 1,
+      "No observado": 0,
+      "No": 0
+    }
   },
   {
     "id": "fis-p-9",
     "materia": "fisica",
     "banda": "9-10",
     "familia": "practica",
+    "pagina": "fuerzas-y-movimiento",
     "tipo": "fill",
     "pregunta": "Alguien recorre 10 metros en 5 segundos. Su rapidez, en metros por segundo, es…",
     "categoria": "Movimiento",
     "explicacion": "Rapidez = distancia ÷ tiempo = 10 ÷ 5 = 2 m/s.",
     "respuesta": "2",
-    "aceptadas": ["2 m/s", "2m/s"]
+    "aceptadas": [
+      "2 m/s",
+      "2m/s"
+    ]
   },
   {
     "id": "fis-p-10",
     "materia": "fisica",
     "banda": "9-10",
     "familia": "practica",
+    "pagina": "fuerzas-y-movimiento",
     "tipo": "multiple-choice",
     "pregunta": "Un coche de juguete empujado igual llega más lejos en la baldosa que en la alfombra. ¿Por qué se detiene antes en la alfombra?",
     "categoria": "Movimiento",
@@ -254,6 +382,7 @@
     "materia": "fisica",
     "banda": "9-10",
     "familia": "practica",
+    "pagina": "sonido-y-ondas",
     "tipo": "multiple-choice",
     "pregunta": "En una tormenta ves el rayo y después oyes el trueno. ¿Cuándo ocurrieron?",
     "categoria": "Sonido",
@@ -270,11 +399,17 @@
     "materia": "fisica",
     "banda": "9-10",
     "familia": "practica",
+    "pagina": "sonido-y-ondas",
     "tipo": "multiple-choice",
     "pregunta": "¿Por dónde no puede viajar el sonido?",
     "categoria": "Sonido",
     "explicacion": "Por el vacío. El sonido es la vibración pasando de una partícula a otra, así que necesita aire, agua o un sólido.",
-    "opciones": ["Por el agua", "Por el vacío del espacio", "Por la madera", "Por el aire"],
+    "opciones": [
+      "Por el agua",
+      "Por el vacío del espacio",
+      "Por la madera",
+      "Por el aire"
+    ],
     "respuesta": "Por el vacío del espacio"
   },
   {
@@ -287,16 +422,40 @@
     "habilidad": "Instrumentos de medida",
     "retroalimentacion": "Saber qué mide cada instrumento evita el error de dar un número sin saber de qué magnitud es.",
     "elementos": [
-      { "id": "cronometro", "etiqueta": "Cronómetro" },
-      { "id": "cinta", "etiqueta": "Cinta métrica" },
-      { "id": "termometro", "etiqueta": "Termómetro" },
-      { "id": "balanza", "etiqueta": "Balanza" }
+      {
+        "id": "cronometro",
+        "etiqueta": "Cronómetro"
+      },
+      {
+        "id": "cinta",
+        "etiqueta": "Cinta métrica"
+      },
+      {
+        "id": "termometro",
+        "etiqueta": "Termómetro"
+      },
+      {
+        "id": "balanza",
+        "etiqueta": "Balanza"
+      }
     ],
     "destinos": [
-      { "id": "tiempo", "etiqueta": "Tiempo" },
-      { "id": "longitud", "etiqueta": "Longitud" },
-      { "id": "temperatura", "etiqueta": "Temperatura" },
-      { "id": "masa", "etiqueta": "Masa" }
+      {
+        "id": "tiempo",
+        "etiqueta": "Tiempo"
+      },
+      {
+        "id": "longitud",
+        "etiqueta": "Longitud"
+      },
+      {
+        "id": "temperatura",
+        "etiqueta": "Temperatura"
+      },
+      {
+        "id": "masa",
+        "etiqueta": "Masa"
+      }
     ],
     "respuesta": {
       "cronometro": "tiempo",
@@ -315,12 +474,29 @@
     "habilidad": "Órdenes de magnitud",
     "retroalimentacion": "Comparar rapideces muy distintas prepara la idea de orden de magnitud, que después sirve para estimar sin calcular.",
     "elementos": [
-      { "id": "sonido", "etiqueta": "El sonido en el aire" },
-      { "id": "luz", "etiqueta": "La luz" },
-      { "id": "persona", "etiqueta": "Una persona andando" },
-      { "id": "coche", "etiqueta": "Un coche por la carretera" }
+      {
+        "id": "sonido",
+        "etiqueta": "El sonido en el aire"
+      },
+      {
+        "id": "luz",
+        "etiqueta": "La luz"
+      },
+      {
+        "id": "persona",
+        "etiqueta": "Una persona andando"
+      },
+      {
+        "id": "coche",
+        "etiqueta": "Un coche por la carretera"
+      }
     ],
-    "respuesta": ["luz", "sonido", "coche", "persona"],
+    "respuesta": [
+      "luz",
+      "sonido",
+      "coche",
+      "persona"
+    ],
     "pista": "El sonido va a unos 340 metros por segundo; un coche, a unos 25."
   },
   {
@@ -332,14 +508,23 @@
     "pregunta": "Al medir cuánto tarda alguien en recorrer 10 metros, ¿repite la medida más de una vez?",
     "habilidad": "Repetir la medida",
     "retroalimentacion": "Repetir y comparar es lo que revela que una medida sola puede engañar. Es la base de la idea de incertidumbre.",
-    "opciones": ["Sí, varias veces", "Una sola vez", "No observado"],
-    "puntaje": { "Sí, varias veces": 2, "Una sola vez": 1, "No observado": 0 }
+    "opciones": [
+      "Sí, varias veces",
+      "Una sola vez",
+      "No observado"
+    ],
+    "puntaje": {
+      "Sí, varias veces": 2,
+      "Una sola vez": 1,
+      "No observado": 0
+    }
   },
   {
     "id": "fis-p-13",
     "materia": "fisica",
     "banda": "11-12",
     "familia": "practica",
+    "pagina": "gravedad-masa-peso",
     "tipo": "multiple-choice",
     "pregunta": "Una persona de 50 kg viaja a la Luna. ¿Qué le pasa a su masa?",
     "categoria": "Masa y peso",
@@ -356,11 +541,16 @@
     "materia": "fisica",
     "banda": "11-12",
     "familia": "practica",
+    "pagina": "gravedad-masa-peso",
     "tipo": "multiple-choice",
     "pregunta": "Sin aire, se sueltan a la vez una pluma y un martillo. ¿Qué llega primero al suelo?",
     "categoria": "Gravedad",
     "explicacion": "Llegan juntos. La gravedad tira más fuerte del martillo, pero al martillo también le cuesta más arrancar, y las dos cosas se compensan exactamente. Se hizo de verdad en la Luna.",
-    "opciones": ["El martillo", "La pluma", "Llegan juntos"],
+    "opciones": [
+      "El martillo",
+      "La pluma",
+      "Llegan juntos"
+    ],
     "respuesta": "Llegan juntos"
   },
   {
@@ -368,18 +558,23 @@
     "materia": "fisica",
     "banda": "11-12",
     "familia": "practica",
+    "pagina": "gravedad-masa-peso",
     "tipo": "fill",
     "pregunta": "Completa la relación: peso = masa × …",
     "categoria": "Masa y peso",
     "explicacion": "Peso = masa × gravedad. En la Tierra la gravedad vale unos 9,8 newtons por kilo.",
     "respuesta": "gravedad",
-    "aceptadas": ["la gravedad", "g"]
+    "aceptadas": [
+      "la gravedad",
+      "g"
+    ]
   },
   {
     "id": "fis-p-16",
     "materia": "fisica",
     "banda": "11-12",
     "familia": "practica",
+    "pagina": "energia",
     "tipo": "multiple-choice",
     "pregunta": "Empujas una caja por el suelo y al final te cansas. ¿Qué pasó con la energía que usaste?",
     "categoria": "Energía",
@@ -400,8 +595,18 @@
     "pregunta": "Al preguntarle la diferencia entre masa y peso, ¿la explica con un ejemplo propio?",
     "habilidad": "Masa y peso",
     "retroalimentacion": "Repetir la definición es fácil; poner un ejemplo nuevo —la Luna, el espacio, una balanza— muestra que la distinción se entendió.",
-    "opciones": ["Sí, con ejemplo propio", "Repite la definición", "No observado", "Las confunde"],
-    "puntaje": { "Sí, con ejemplo propio": 2, "Repite la definición": 1, "No observado": 0, "Las confunde": 0 }
+    "opciones": [
+      "Sí, con ejemplo propio",
+      "Repite la definición",
+      "No observado",
+      "Las confunde"
+    ],
+    "puntaje": {
+      "Sí, con ejemplo propio": 2,
+      "Repite la definición": 1,
+      "No observado": 0,
+      "Las confunde": 0
+    }
   },
   {
     "id": "fis-d-11-12-2",
@@ -413,16 +618,40 @@
     "habilidad": "Formas de energía",
     "retroalimentacion": "Reconocer la forma de energía en situaciones cotidianas es lo que después permite seguir una cadena de transformaciones.",
     "elementos": [
-      { "id": "balon", "etiqueta": "Un balón rodando" },
-      { "id": "libro", "etiqueta": "Un libro en un estante alto" },
-      { "id": "taza", "etiqueta": "Una taza de café caliente" },
-      { "id": "pila", "etiqueta": "Una pila nueva" }
+      {
+        "id": "balon",
+        "etiqueta": "Un balón rodando"
+      },
+      {
+        "id": "libro",
+        "etiqueta": "Un libro en un estante alto"
+      },
+      {
+        "id": "taza",
+        "etiqueta": "Una taza de café caliente"
+      },
+      {
+        "id": "pila",
+        "etiqueta": "Una pila nueva"
+      }
     ],
     "destinos": [
-      { "id": "movimiento", "etiqueta": "De movimiento" },
-      { "id": "posicion", "etiqueta": "De posición" },
-      { "id": "termica", "etiqueta": "Térmica" },
-      { "id": "quimica", "etiqueta": "Química" }
+      {
+        "id": "movimiento",
+        "etiqueta": "De movimiento"
+      },
+      {
+        "id": "posicion",
+        "etiqueta": "De posición"
+      },
+      {
+        "id": "termica",
+        "etiqueta": "Térmica"
+      },
+      {
+        "id": "quimica",
+        "etiqueta": "Química"
+      }
     ],
     "respuesta": {
       "balon": "movimiento",
@@ -440,14 +669,25 @@
     "pregunta": "¿Reconoce que envolver un hielo en una toalla lo mantiene helado más tiempo, y explica por qué?",
     "habilidad": "Calor y aislamiento",
     "retroalimentacion": "Entender que un abrigo no produce calor sino que frena su paso corrige de una vez la idea de que «el frío entra».",
-    "opciones": ["Sí, y explica", "Lo acierta sin explicar", "No observado", "Cree que la toalla lo derrite antes"],
-    "puntaje": { "Sí, y explica": 2, "Lo acierta sin explicar": 1, "No observado": 0, "Cree que la toalla lo derrite antes": 0 }
+    "opciones": [
+      "Sí, y explica",
+      "Lo acierta sin explicar",
+      "No observado",
+      "Cree que la toalla lo derrite antes"
+    ],
+    "puntaje": {
+      "Sí, y explica": 2,
+      "Lo acierta sin explicar": 1,
+      "No observado": 0,
+      "Cree que la toalla lo derrite antes": 0
+    }
   },
   {
     "id": "fis-p-17",
     "materia": "fisica",
     "banda": "13-14",
     "familia": "practica",
+    "pagina": "electricidad-magnetismo",
     "tipo": "multiple-choice",
     "pregunta": "Tres bombillas en serie y se funde una. ¿Qué ocurre?",
     "categoria": "Circuitos",
@@ -464,6 +704,7 @@
     "materia": "fisica",
     "banda": "13-14",
     "familia": "practica",
+    "pagina": "electricidad-magnetismo",
     "tipo": "multiple-choice",
     "pregunta": "Cortas un imán de barra exactamente por la mitad. ¿Qué obtienes?",
     "categoria": "Magnetismo",
@@ -480,11 +721,17 @@
     "materia": "fisica",
     "banda": "13-14",
     "familia": "practica",
+    "pagina": "electricidad-magnetismo",
     "tipo": "multiple-choice",
     "pregunta": "¿A cuál de estos materiales no atrae un imán?",
     "categoria": "Magnetismo",
     "explicacion": "Al aluminio. Los imanes atraen hierro, níquel y cobalto; no atraen aluminio, cobre, oro ni plástico, aunque sean metales.",
-    "opciones": ["Hierro", "Níquel", "Aluminio", "Cobalto"],
+    "opciones": [
+      "Hierro",
+      "Níquel",
+      "Aluminio",
+      "Cobalto"
+    ],
     "respuesta": "Aluminio"
   },
   {
@@ -492,11 +739,16 @@
     "materia": "fisica",
     "banda": "13-14",
     "familia": "practica",
+    "pagina": "optica",
     "tipo": "multiple-choice",
     "pregunta": "Un lápiz dentro de un vaso de agua parece partido en la superficie. ¿Cómo se llama eso?",
     "categoria": "Óptica",
     "explicacion": "Refracción: la luz cambia de rapidez al pasar del agua al aire y eso le hace torcer el camino. La luz se tuerce de verdad; lo que engaña es que el cerebro supone que vino recta.",
-    "opciones": ["Reflexión", "Refracción", "Absorción"],
+    "opciones": [
+      "Reflexión",
+      "Refracción",
+      "Absorción"
+    ],
     "respuesta": "Refracción"
   },
   {
@@ -504,12 +756,16 @@
     "materia": "fisica",
     "banda": "13-14",
     "familia": "practica",
+    "pagina": "electricidad-magnetismo",
     "tipo": "fill",
     "pregunta": "En la ley de Ohm, la tensión es igual a la intensidad multiplicada por la…",
     "categoria": "Circuitos",
     "explicacion": "Tensión = intensidad × resistencia. En símbolos, V = I × R.",
     "respuesta": "resistencia",
-    "aceptadas": ["la resistencia", "r"]
+    "aceptadas": [
+      "la resistencia",
+      "r"
+    ]
   },
   {
     "id": "fis-d-13-14-1",
@@ -521,14 +777,32 @@
     "habilidad": "Reflexión y refracción",
     "retroalimentacion": "Separar rebote de cambio de dirección al atravesar es la distinción que sostiene toda la óptica posterior.",
     "elementos": [
-      { "id": "espejo", "etiqueta": "Verte en un espejo" },
-      { "id": "lapiz", "etiqueta": "El lápiz partido en el vaso" },
-      { "id": "piscina", "etiqueta": "La piscina parece menos profunda" },
-      { "id": "charco", "etiqueta": "El cielo reflejado en un charco" }
+      {
+        "id": "espejo",
+        "etiqueta": "Verte en un espejo"
+      },
+      {
+        "id": "lapiz",
+        "etiqueta": "El lápiz partido en el vaso"
+      },
+      {
+        "id": "piscina",
+        "etiqueta": "La piscina parece menos profunda"
+      },
+      {
+        "id": "charco",
+        "etiqueta": "El cielo reflejado en un charco"
+      }
     ],
     "destinos": [
-      { "id": "reflexion", "etiqueta": "Reflexión" },
-      { "id": "refraccion", "etiqueta": "Refracción" }
+      {
+        "id": "reflexion",
+        "etiqueta": "Reflexión"
+      },
+      {
+        "id": "refraccion",
+        "etiqueta": "Refracción"
+      }
     ],
     "respuesta": {
       "espejo": "reflexion",
@@ -547,8 +821,20 @@
     "pregunta": "Con una pila, cables y una bombilla, ¿consigue montar un circuito que encienda?",
     "habilidad": "Montar un circuito",
     "retroalimentacion": "Montarlo obliga a entender que el camino tiene que estar cerrado. Es la diferencia entre haber visto un esquema y haber entendido un circuito.",
-    "opciones": ["Solo, al primer intento", "Solo, probando varias veces", "Con ayuda", "No observado", "No lo consigue"],
-    "puntaje": { "Solo, al primer intento": 2, "Solo, probando varias veces": 2, "Con ayuda": 1, "No observado": 0, "No lo consigue": 0 }
+    "opciones": [
+      "Solo, al primer intento",
+      "Solo, probando varias veces",
+      "Con ayuda",
+      "No observado",
+      "No lo consigue"
+    ],
+    "puntaje": {
+      "Solo, al primer intento": 2,
+      "Solo, probando varias veces": 2,
+      "Con ayuda": 1,
+      "No observado": 0,
+      "No lo consigue": 0
+    }
   },
   {
     "id": "fis-d-13-14-3",
@@ -560,23 +846,45 @@
     "habilidad": "Electricidad y magnetismo",
     "retroalimentacion": "Ordenar el procedimiento muestra si se entendió que el magnetismo aparece con la corriente y desaparece sin ella.",
     "elementos": [
-      { "id": "clavo", "etiqueta": "Coger un clavo grande de hierro" },
-      { "id": "enrollar", "etiqueta": "Enrollar cable de cobre a su alrededor" },
-      { "id": "conectar", "etiqueta": "Conectar las puntas del cable a una pila" },
-      { "id": "probar", "etiqueta": "Acercar clips y ver si los atrae" }
+      {
+        "id": "clavo",
+        "etiqueta": "Coger un clavo grande de hierro"
+      },
+      {
+        "id": "enrollar",
+        "etiqueta": "Enrollar cable de cobre a su alrededor"
+      },
+      {
+        "id": "conectar",
+        "etiqueta": "Conectar las puntas del cable a una pila"
+      },
+      {
+        "id": "probar",
+        "etiqueta": "Acercar clips y ver si los atrae"
+      }
     ],
-    "respuesta": ["clavo", "enrollar", "conectar", "probar"]
+    "respuesta": [
+      "clavo",
+      "enrollar",
+      "conectar",
+      "probar"
+    ]
   },
   {
     "id": "fis-p-22",
     "materia": "fisica",
     "banda": "15-17",
     "familia": "practica",
+    "pagina": "cinematica",
     "tipo": "multiple-choice",
     "pregunta": "Un coche circula por una recta a 100 km/h constantes. ¿Cuánto vale su aceleración?",
     "categoria": "Cinemática",
     "explicacion": "Cero. La aceleración mide cómo cambia la velocidad, y aquí no cambia. Velocidad grande y aceleración nula conviven sin problema.",
-    "opciones": ["100 km/h", "Cero", "9,8 m/s²"],
+    "opciones": [
+      "100 km/h",
+      "Cero",
+      "9,8 m/s²"
+    ],
     "respuesta": "Cero"
   },
   {
@@ -584,6 +892,7 @@
     "materia": "fisica",
     "banda": "15-17",
     "familia": "practica",
+    "pagina": "cinematica",
     "tipo": "multiple-choice",
     "pregunta": "Lanzas una piedra hacia arriba. En el punto más alto, ¿cuánto vale su aceleración?",
     "categoria": "Cinemática",
@@ -600,18 +909,23 @@
     "materia": "fisica",
     "banda": "15-17",
     "familia": "practica",
+    "pagina": "leyes-de-newton",
     "tipo": "fill",
     "pregunta": "Sobre un carrito de 4 kg actúa una fuerza neta de 12 N. Su aceleración, en m/s², es…",
     "categoria": "Leyes de Newton",
     "explicacion": "a = F / m = 12 / 4 = 3 m/s².",
     "respuesta": "3",
-    "aceptadas": ["3 m/s2", "3 m/s²"]
+    "aceptadas": [
+      "3 m/s2",
+      "3 m/s²"
+    ]
   },
   {
     "id": "fis-p-25",
     "materia": "fisica",
     "banda": "15-17",
     "familia": "practica",
+    "pagina": "leyes-de-newton",
     "tipo": "multiple-choice",
     "pregunta": "Al caminar, ¿qué fuerza te impulsa hacia delante?",
     "categoria": "Leyes de Newton",
@@ -628,11 +942,16 @@
     "materia": "fisica",
     "banda": "15-17",
     "familia": "practica",
+    "pagina": "medir-e-incertidumbre",
     "tipo": "multiple-choice",
     "pregunta": "Mides 2,5 cm por 3,42 cm. ¿Cómo se escribe el área?",
     "categoria": "Medición",
     "explicacion": "8,6 cm². El dato peor medido tiene dos cifras significativas, así que el resultado no puede tener más, aunque la calculadora muestre 8,55.",
-    "opciones": ["8,55 cm²", "8,6 cm²", "8,550 cm²"],
+    "opciones": [
+      "8,55 cm²",
+      "8,6 cm²",
+      "8,550 cm²"
+    ],
     "respuesta": "8,6 cm²"
   },
   {
@@ -640,6 +959,7 @@
     "materia": "fisica",
     "banda": "15-17",
     "familia": "practica",
+    "pagina": "medir-e-incertidumbre",
     "tipo": "multiple-choice",
     "pregunta": "Una báscula está descalibrada y siempre suma 3 kg. ¿Cómo se describe?",
     "categoria": "Medición",
@@ -661,16 +981,40 @@
     "habilidad": "Unidades del SI",
     "retroalimentacion": "Comprobar que las unidades cuadran a los dos lados de una ecuación es la forma más rápida de cazar un error, y funciona sin resolver el problema.",
     "elementos": [
-      { "id": "fuerza", "etiqueta": "Fuerza" },
-      { "id": "energia", "etiqueta": "Energía" },
-      { "id": "potencia", "etiqueta": "Potencia" },
-      { "id": "masa", "etiqueta": "Masa" }
+      {
+        "id": "fuerza",
+        "etiqueta": "Fuerza"
+      },
+      {
+        "id": "energia",
+        "etiqueta": "Energía"
+      },
+      {
+        "id": "potencia",
+        "etiqueta": "Potencia"
+      },
+      {
+        "id": "masa",
+        "etiqueta": "Masa"
+      }
     ],
     "destinos": [
-      { "id": "newton", "etiqueta": "Newton (N)" },
-      { "id": "julio", "etiqueta": "Julio (J)" },
-      { "id": "vatio", "etiqueta": "Vatio (W)" },
-      { "id": "kilogramo", "etiqueta": "Kilogramo (kg)" }
+      {
+        "id": "newton",
+        "etiqueta": "Newton (N)"
+      },
+      {
+        "id": "julio",
+        "etiqueta": "Julio (J)"
+      },
+      {
+        "id": "vatio",
+        "etiqueta": "Vatio (W)"
+      },
+      {
+        "id": "kilogramo",
+        "etiqueta": "Kilogramo (kg)"
+      }
     ],
     "respuesta": {
       "fuerza": "newton",
@@ -688,8 +1032,18 @@
     "pregunta": "Al terminar un problema, ¿comprueba que las unidades del resultado tienen sentido?",
     "habilidad": "Comprobar el resultado",
     "retroalimentacion": "Quien revisa las unidades caza sus propios errores sin ayuda. Quien entrega el número de la calculadora depende de que alguien lo corrija.",
-    "opciones": ["Siempre", "A veces", "No observado", "Nunca"],
-    "puntaje": { "Siempre": 2, "A veces": 1, "No observado": 0, "Nunca": 0 }
+    "opciones": [
+      "Siempre",
+      "A veces",
+      "No observado",
+      "Nunca"
+    ],
+    "puntaje": {
+      "Siempre": 2,
+      "A veces": 1,
+      "No observado": 0,
+      "Nunca": 0
+    }
   },
   {
     "id": "fis-d-15-17-3",
@@ -700,7 +1054,17 @@
     "pregunta": "Ante un resultado absurdo —una piedra que cae de una mesa a 5 000 km/h— ¿se extraña y lo revisa?",
     "habilidad": "Sentido de magnitud",
     "retroalimentacion": "Extrañarse es la señal más fiable de que el concepto se entendió: significa que hay una expectativa propia con la que comparar.",
-    "opciones": ["Sí, y busca el error", "Duda pero no revisa", "No observado", "Lo acepta sin extrañarse"],
-    "puntaje": { "Sí, y busca el error": 2, "Duda pero no revisa": 1, "No observado": 0, "Lo acepta sin extrañarse": 0 }
+    "opciones": [
+      "Sí, y busca el error",
+      "Duda pero no revisa",
+      "No observado",
+      "Lo acepta sin extrañarse"
+    ],
+    "puntaje": {
+      "Sí, y busca el error": 2,
+      "Duda pero no revisa": 1,
+      "No observado": 0,
+      "Lo acepta sin extrañarse": 0
+    }
   }
 ]

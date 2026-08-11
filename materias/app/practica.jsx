@@ -209,11 +209,49 @@ const CUERPOS = {
   "drag-order": Ordenar
 };
 
+/* La puerta de atrás: qué repasar cuando esto no sale.
+
+   Va abierta o cerrada, pero siempre está. Es la diferencia entre «lo he fallado y
+   me quedo igual» y «lo he fallado y sé por dónde volver», que es lo que convierte
+   un ejercicio en algo que enseña.
+
+   El enlace es un enlace de verdad y no un panel que explica aquí mismo: repasar es
+   leer una página entera, no un párrafo de consuelo. Se abre en la misma pestaña
+   porque volver es el botón de atrás, que todo el mundo sabe usar. */
+function Repaso({ paginas, abierto, alternar }) {
+  if (!paginas?.length) return null;
+  return (
+    <div className={`repaso${abierto ? " es-abierto" : ""}`}>
+      <button type="button" className="repaso__llave" onClick={alternar} aria-expanded={abierto}>
+        ¿Se te hace difícil? <span aria-hidden="true">{abierto ? "▴" : "▾"}</span>
+      </button>
+      {abierto && (
+        <div className="repaso__cuerpo">
+          <p className="repaso__intro">Vuelve a esto y prueba otra vez:</p>
+          <ul className="repaso__lista">
+            {paginas.map(pagina => (
+              <li key={pagina.ruta}>
+                <a href={pagina.ruta}>{pagina.titulo}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Practica({ preguntas }) {
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState(null);
   const [revisada, setRevisada] = useState(false);
   const [resultados, setResultados] = useState([]);
+
+  /* El repaso se abre solo a partir del segundo fallo de la tanda. Al primero no:
+     una equivocación suelta no es atascarse, y saltar con ayuda a la primera trata
+     de torpe a quien va bien. */
+  const [repasoAbierto, setRepasoAbierto] = useState(false);
+  const fallos = resultados.filter(r => r.fallada).length;
 
   /* Cuánto se tarda en responder. Es el dato que distingue «esta pregunta la
      falla todo el mundo» de «esta pregunta nadie la entiende»: fallar en tres
@@ -237,7 +275,7 @@ export default function Practica({ preguntas }) {
         <button
           type="button"
           className="boton"
-          onClick={() => { setIndice(0); setValor(null); setRevisada(false); setResultados([]); }}
+          onClick={() => { setIndice(0); setValor(null); setRevisada(false); setResultados([]); setRepasoAbierto(false); }}
         >
           Empezar de nuevo
         </button>
@@ -252,9 +290,13 @@ export default function Practica({ preguntas }) {
 
   const revisar = () => {
     setRevisada(true);
+    const acertada = esCorrecta(pregunta, valor);
     setResultados([...resultados, {
-      id: pregunta.id, puntos: puntaje(pregunta, valor), maximo: puntajeMaximo(pregunta)
+      id: pregunta.id, puntos: puntaje(pregunta, valor), maximo: puntajeMaximo(pregunta),
+      // Las observaciones no aciertan ni fallan: no cuentan para ofrecer ayuda.
+      fallada: acertada === false
     }]);
+    if (acertada === false && fallos >= 1) setRepasoAbierto(true);
 
     /* La pregunta ya trae de qué materia y banda es, así que no hay que
        pasárselo a este componente por otro sitio: un segundo camino para el
@@ -273,7 +315,7 @@ export default function Practica({ preguntas }) {
       ms: Date.now() - mostradaEn.current
     });
   };
-  const siguiente = () => { setIndice(indice + 1); setValor(null); setRevisada(false); };
+  const siguiente = () => { setIndice(indice + 1); setValor(null); setRevisada(false); setRepasoAbierto(false); };
 
   return (
     <section className="practica">
@@ -301,6 +343,12 @@ export default function Practica({ preguntas }) {
           {comentario(pregunta) && <p>{comentario(pregunta)}</p>}
         </div>
       )}
+
+      <Repaso
+        paginas={pregunta.repaso}
+        abierto={repasoAbierto}
+        alternar={() => setRepasoAbierto(!repasoAbierto)}
+      />
 
       <div className="practica__acciones">
         {!revisada

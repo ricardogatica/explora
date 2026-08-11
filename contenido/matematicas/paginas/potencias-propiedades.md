@@ -4,7 +4,7 @@ materia: matematicas
 categoria: Números y operaciones
 descripcion: Las propiedades con letras, exponente cero y negativo, el signo y la notación científica.
 bandas: [13-14]
-orden: 105
+orden: 106
 ---
 
 # Potencias: propiedades y notación algebraica

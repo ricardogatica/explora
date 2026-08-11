@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Palabras agudas, graves, esdrújulas y sobresdrújulas.
 bandas: [9-10]
-orden: 20
+orden: 30
 ---
 
 # Acentuación general

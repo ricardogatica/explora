@@ -66,9 +66,15 @@ export function componerFrontmatter(meta, cuerpo) {
 /* Campos que toda página declara. `bandas` es una lista porque una misma
    explicación puede servir en dos tramos de edad; `orden` coloca dentro de su
    categoría, que casi nunca es alfabético. */
-export const CAMPOS_DE_PAGINA = ["titulo", "materia", "categoria", "descripcion", "bandas", "orden"];
+export const CAMPOS_DE_PAGINA = ["titulo", "materia", "categoria", "descripcion", "bandas", "orden", "refuerzo"];
 
-export function validarPagina(pagina, { materias, bandasValidas }) {
+/* `refuerzo` dice qué hay que haber entendido antes que esta página. Es opcional
+   porque casi siempre se deduce del orden y de la banda —lo que va antes en la
+   misma categoría, y lo mismo un tramo de edad más atrás— y anotar cuarenta y
+   tantas páginas a mano para repetir lo que ya se sabe no vale la pena. Se escribe
+   solo cuando la deducción no sirve. */
+
+export function validarPagina(pagina, { materias, bandasValidas, idsDeLaMateria = null }) {
   const fallos = [];
   const añadir = (regla, mensaje) => fallos.push({ id: pagina.id ?? "(sin id)", regla, mensaje });
 
@@ -81,6 +87,16 @@ export function validarPagina(pagina, { materias, bandasValidas }) {
   for (const banda of pagina.bandas ?? []) {
     if (!bandasValidas.includes(banda)) {
       añadir("banda-desconocida", `«${pagina.id}»: la banda «${banda}» no existe`);
+    }
+  }
+  /* Un refuerzo que apunta a una página inexistente no rompe nada: deja un enlace
+     muerto donde alguien atascado esperaba ayuda, que es el peor sitio. */
+  for (const otra of pagina.refuerzo ?? []) {
+    if (otra === pagina.id) {
+      añadir("refuerzo-circular", `«${pagina.id}» se declara refuerzo de sí misma`);
+    } else if (idsDeLaMateria && !idsDeLaMateria.includes(otra)) {
+      añadir("refuerzo-inexistente",
+        `«${pagina.id}» pide reforzar con «${otra}», que no existe en ${pagina.materia}`);
     }
   }
   return fallos;

@@ -17,7 +17,7 @@ import { separarFrontmatter, validarPagina } from "@explora/contenido/paginas.js
 import { partirEnBloques } from "@explora/contenido/bloques.js";
 import { NOMBRES_DE_FIGURA } from "@explora/compartido/primitivas.js";
 import { NOMBRES_DE_ACTIVIDAD } from "../app/actividades/nombres.js";
-import { BANDAS, bandaPorId, esBandaDeRuta, IDS_VALIDOS } from "@explora/contenido/bandas.js";
+import { BANDAS, PREVIO, bandaPorId, esBandaDeRuta, IDS_VALIDOS } from "@explora/contenido/bandas.js";
 
 /* En build el proceso corre dentro de materias/, y el contenido es hermano suyo:
    vive fuera de la aplicación a propósito, porque es el activo del proyecto y no
@@ -68,8 +68,9 @@ export function paginasDe(slug) {
     })
     .sort((a, b) => a.orden - b.orden);
 
+  const idsDeLaMateria = paginas.map(p => p.id);
   const fallos = paginas.flatMap(pagina =>
-    validarPagina(pagina, { materias: MATERIAS_VALIDAS, bandasValidas: IDS_VALIDOS })
+    validarPagina(pagina, { materias: MATERIAS_VALIDAS, bandasValidas: IDS_VALIDOS, idsDeLaMateria })
   );
   if (fallos.length) {
     throw new Error(
@@ -131,6 +132,20 @@ export function todasLasPreguntas() {
       fallos.map(f => `  [${f.regla}] ${f.mensaje}`).join("\n")
     );
   }
+  /* Una pregunta puede decir a qué página pertenece, y eso es lo que hace preciso el
+     «repasa esto» cuando se atasca. Si apunta a una página que no existe no se rompe
+     nada: simplemente se cae al repaso genérico del tramo anterior, y nadie se entera
+     de que la anotación estaba mal escrita. Por eso se comprueba aquí. */
+  const paginasMal = archivos.flatMap(({ archivo, preguntas }) =>
+    preguntas.filter(p => p.pagina).flatMap(pregunta => {
+      const existe = paginasDe(pregunta.materia).some(pagina => pagina.id === pregunta.pagina);
+      return existe ? [] : [`${archivo}: «${pregunta.id}» apunta a la página «${pregunta.pagina}», que no existe en ${pregunta.materia}`];
+    })
+  );
+  if (paginasMal.length) {
+    throw new Error("Hay preguntas que apuntan a una página inexistente:\n  " + paginasMal.join("\n  "));
+  }
+
   cachePreguntas = archivos.flatMap(a => a.preguntas);
   return cachePreguntas;
 }
@@ -142,6 +157,93 @@ export const preguntasDeBanda = banda => todasLasPreguntas().filter(p => p.banda
    explicación de la tilde diacrítica sirve a los 11 y a los 12. */
 export const paginasDeBanda = banda =>
   MATERIAS.flatMap(materia => paginasDe(materia.slug)).filter(p => (p.bandas ?? []).includes(banda));
+
+/* ── El recorrido por edad dentro de una materia ─────────────────────────────
+
+   Elegir la edad, ver lo que toca, practicarlo, y cuando algo se atasca, volver a
+   lo de antes. Estas cuatro funciones son ese recorrido. */
+
+/* Lo que hay de una materia en un tramo. */
+export const paginasDeMateriaYBanda = (slug, banda) =>
+  paginasDe(slug).filter(pagina => (pagina.bandas ?? []).includes(banda));
+
+export const preguntasDeMateriaYBanda = (slug, banda) =>
+  preguntasDe(slug).filter(pregunta => pregunta.banda === banda);
+
+/* El tramo anterior. Antes del primero está «previo», que no forma parte de la
+   progresión pero sí tiene contenido: dejarlo fuera vaciaría el refuerzo justo en
+   la edad donde más se necesita volver atrás. */
+export function bandaAnterior(id) {
+  const indice = BANDAS.findIndex(banda => banda.id === id);
+  if (indice > 0) return BANDAS[indice - 1];
+  if (indice === 0) return PREVIO;
+  return null;   // «previo» no tiene nada antes
+}
+
+/* Qué repasar antes de una página.
+
+   Se declara con `refuerzo` en el frontmatter cuando hace falta afinar, y si no se
+   deduce de dos sitios que ya existen: lo anterior de su misma categoría —el campo
+   `orden` está puesto en orden pedagógico, no alfabético— y lo mismo un tramo de
+   edad más atrás. Deducirlo sale gratis y acierta casi siempre; declararlo cuarenta
+   veces a mano para repetir lo que ya se sabe, no. */
+const edadDeBanda = id => bandaPorId(id)?.desde ?? Infinity;
+
+export function refuerzoDe(slug, id, { cuantas = 3 } = {}) {
+  const paginas = paginasDe(slug);
+  const propia = paginas.find(pagina => pagina.id === id);
+  if (!propia) return [];
+
+  if (propia.refuerzo?.length) {
+    return propia.refuerzo.map(otro => paginas.find(p => p.id === otro)).filter(Boolean);
+  }
+
+  /* Reforzar es volver atrás, y «atrás» es en edad, no en la lista.
+
+     La primera versión cogía la página anterior por `orden` dentro de la categoría,
+     y eso proponía disparates: para Óptica sugería Electricidad y magnetismo, que es
+     del mismo tramo y no tiene nada que ver, y para Potencias sugería Números
+     racionales, que es dos años posterior. Solo cuenta lo que está en un tramo más
+     temprano. */
+  const suEdad = Math.min(...(propia.bandas ?? []).map(edadDeBanda));
+  /* Dos tramos hacia atrás como mucho. Reforzar es volver un poco, no al principio:
+     a quien se le atascan las potencias a los nueve años no le sirve que le
+     propongan la página de los tres. */
+  const antes = paginas.filter(p => {
+    if (p.id === id || !(p.bandas ?? []).length) return false;
+    const suya = Math.min(...p.bandas.map(edadDeBanda));
+    return suya < suEdad && suya >= suEdad - 4;
+  });
+
+  // Primero lo del mismo tema, después lo demás: lo cercano ayuda más.
+  const ordenadas = [
+    ...antes.filter(p => p.categoria === propia.categoria),
+    ...antes.filter(p => p.categoria !== propia.categoria)
+  ].sort((a, b) => Math.min(...b.bandas.map(edadDeBanda)) - Math.min(...a.bandas.map(edadDeBanda)));
+
+  const vistas = new Set();
+  return ordenadas
+    .filter(p => (vistas.has(p.id) ? false : vistas.add(p.id)))
+    .slice(0, cuantas);
+}
+
+/* Qué repasar cuando una pregunta se atasca.
+
+   Si la pregunta dice a qué página pertenece, se usa el refuerzo de esa página, que
+   es lo preciso. Si no lo dice —y hoy casi ninguna lo dice—, se cae a lo que hay de
+   su materia en el tramo anterior: menos fino, pero nunca deja a nadie sin nada a
+   lo que volver. */
+export function repasoDePregunta(pregunta, { cuantas = 3 } = {}) {
+  if (pregunta.pagina) {
+    const refuerzo = refuerzoDe(pregunta.materia, pregunta.pagina, { cuantas });
+    if (refuerzo.length) return refuerzo;
+    const propia = paginasDe(pregunta.materia).find(p => p.id === pregunta.pagina);
+    if (propia) return [propia];
+  }
+  const anterior = bandaAnterior(pregunta.banda);
+  if (!anterior) return [];
+  return paginasDeMateriaYBanda(pregunta.materia, anterior.id).slice(0, cuantas);
+}
 
 /* Las otras páginas del mismo tramo de edad, agrupadas por materia.
 

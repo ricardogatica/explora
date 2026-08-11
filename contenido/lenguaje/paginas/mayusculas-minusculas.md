@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Uso correcto de inicial mayúscula.
 bandas: [7-8]
-orden: 70
+orden: 20
 ---
 
 # Mayúsculas y minúsculas

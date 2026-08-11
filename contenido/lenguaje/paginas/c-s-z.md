@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Escritura de sonidos semejantes.
 bandas: [9-10]
-orden: 90
+orden: 50
 ---
 
 # Uso de c, s y z

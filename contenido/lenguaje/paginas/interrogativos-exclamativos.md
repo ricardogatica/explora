@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Qué, quién, cuál, cuándo, dónde, cómo y cuánto.
 bandas: [11-12]
-orden: 40
+orden: 90
 ---
 
 # Interrogativos y exclamativos

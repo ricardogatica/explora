@@ -4,7 +4,7 @@ materia: matematicas
 categoria: Números y operaciones
 descripcion: Fracciones y decimales, equivalencia, comparación y las cuatro operaciones.
 bandas: [11-12]
-orden: 102
+orden: 103
 ---
 
 # Números racionales

@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: Reglas y familias léxicas con b y v.
 bandas: [9-10]
-orden: 80
+orden: 40
 ---
 
 # Uso de b y v

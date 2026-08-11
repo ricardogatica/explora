@@ -4,7 +4,7 @@ materia: matematicas
 categoria: Números y operaciones
 descripcion: El orden de las operaciones y cómo un paréntesis cambia el resultado.
 bandas: [11-12]
-orden: 106
+orden: 105
 ---
 
 # Ejercicios combinados, con y sin paréntesis

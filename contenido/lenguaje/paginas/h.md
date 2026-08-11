@@ -4,7 +4,7 @@ materia: lenguaje
 categoria: Ortografía
 descripcion: La h muda y sus reglas más frecuentes.
 bandas: [9-10]
-orden: 110
+orden: 70
 ---
 
 # Uso de h
