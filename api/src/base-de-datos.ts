@@ -1,5 +1,6 @@
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from "@nestjs/common";
 import pg from "pg";
+import { revisarDatabaseUrl } from "../dominio/conexion.js";
 
 /* El esquema, en dos tablas y sin ORM.
 
@@ -41,6 +42,13 @@ export class BaseDeDatos implements OnModuleInit, OnModuleDestroy {
   private readonly grupo: pg.Pool;
 
   constructor() {
+    /* Antes de conectar, porque si no el error de Postgres llega primero y dice
+       otra cosa: con una llave de más en la variable, la queja es que no existe
+       una base de datos llamada «railway}}». Ese mensaje manda a buscar una base
+       que no falta. */
+    const problema = revisarDatabaseUrl(process.env.DATABASE_URL);
+    if (problema) throw new Error(problema);
+
     this.grupo = new pg.Pool({
       connectionString: process.env.DATABASE_URL,
       // Si la base no responde, que se note pronto: quien practica no debe
