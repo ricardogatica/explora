@@ -16,9 +16,10 @@ import { MATERIAS, paginasDe, preguntasDe } from "../lib/contenido.js";
    correcto igualmente, porque el destino real no es un archivo de esta app. */
 
 export const metadata = {
-  title: "Explora — Lenguaje, Matemáticas y el Universo",
+  title: "Explora — Lenguaje, Matemáticas, Física y el Universo",
   description:
-    "Tres materias para explorar: ortografía y gramática española, matemáticas por edad, y el universo en 3D."
+    "Cuatro materias para explorar: ortografía y gramática española, matemáticas por edad, " +
+    "física con experimentos de casa, y el universo en 3D."
 };
 
 /* Reparto de páginas por categoría, para la barra de segmentos de Lenguaje. Se
@@ -37,6 +38,13 @@ export default function Portada() {
   const grupos = porCategoria("lenguaje");
   const matematicas = { paginas: paginasDe("matematicas"), preguntas: preguntasDe("matematicas") };
   const diagnosticos = matematicas.preguntas.filter(p => p.familia === "diagnostico");
+  const fisica = { paginas: paginasDe("fisica"), preguntas: preguntasDe("fisica") };
+  /* Cuántas preguntas de física caen en cada tramo. Es lo que dibuja su barra, y
+     es su rasgo propio: es la única materia que llega a los seis tramos. */
+  const fisicaPorBanda = BANDAS.map(banda => ({
+    id: banda.id,
+    cuantas: fisica.preguntas.filter(p => p.banda === banda.id).length
+  }));
   const primera = BANDAS[0], ultima = BANDAS[BANDAS.length - 1];
 
   return (
@@ -47,8 +55,9 @@ export default function Portada() {
         <h1 className="title">Explora</h1>
         <p className="lede">Elige una materia y empieza a descubrir.</p>
         <p className="territories">
-          Tres territorios: <b className="is-lengua">las palabras</b>,{" "}
-          <b className="is-mate">los números</b> y <b className="is-cielo">el cielo</b>.
+          Cuatro territorios: <b className="is-lengua">las palabras</b>,{" "}
+          <b className="is-mate">los números</b>, <b className="is-fisica">las cosas que se mueven</b>{" "}
+          y <b className="is-cielo">el cielo</b>.
         </p>
       </header>
 
@@ -126,6 +135,48 @@ export default function Portada() {
               </span>
 
               <span className="plate__enter">Entrar a Matemáticas <i aria-hidden="true">→</i></span>
+            </Link>
+          </li>
+
+          <li className="plates__item">
+            <Link className="plate plate--fisica" href="/fisica/">
+              <span className="plate__mark" aria-hidden="true">Ω</span>
+              <span className="plate__head">
+                <span className="plate__kind">Materia</span>
+                <h3 className="plate__name">Física</h3>
+                <p className="plate__what">
+                  Fuerzas, calor, luz, sonido y electricidad, con experimentos que se hacen
+                  con un vaso de agua y una linterna.
+                </p>
+              </span>
+
+              <span className="scale">
+                <span className="scale__title">
+                  {fisica.paginas.length} temas, y llega a los {BANDAS.length} tramos de edad
+                </span>
+                <span className="scale__bar" aria-hidden="true">
+                  {/* La opacidad baja de forma continua de los 5 a los 17 años, en vez
+                      de usar las cuatro clases seg--a..d: con seis tramos, esas cuatro
+                      se repiten y la barra parece reiniciarse a mitad de camino. Aquí
+                      tiene que leerse en un solo sentido, como sus extremos. */}
+                  {fisicaPorBanda.map(({ id, cuantas }, i) => (
+                    <i
+                      key={id}
+                      className="seg"
+                      style={{ flex: cuantas, opacity: 1 - (i / (fisicaPorBanda.length - 1)) * 0.62 }}
+                    />
+                  ))}
+                </span>
+                <span className="scale__ends" aria-hidden="true">
+                  <b>{primera.desde} años</b><b>{ultima.hasta} años</b>
+                </span>
+                <span className="scale__note">
+                  Con {fisica.preguntas.length} ejercicios. Empieza a los {primera.desde} años
+                  empujando y tirando, y termina en las leyes de Newton.
+                </span>
+              </span>
+
+              <span className="plate__enter">Entrar a Física <i aria-hidden="true">→</i></span>
             </Link>
           </li>
 
@@ -208,6 +259,12 @@ export default function Portada() {
             <p className="adults__text">
               Lenguaje cubre ortografía, gramática y redacción con ejemplos y contraejemplos,
               pensado para consultar una regla concreta cuando surge la duda.
+            </p>
+            <p className="adults__text">
+              Física es la única materia que cubre los {BANDAS.length} tramos completos, y casi
+              todo lo que propone se comprueba en casa. Cada tema nombra los errores frecuentes
+              —«lo pesado cae más rápido», «el frío entra»— porque son las respuestas que da la
+              intuición y no se corrigen con una definición.
             </p>
           </div>
         </section>

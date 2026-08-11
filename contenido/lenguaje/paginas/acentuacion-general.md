@@ -9,7 +9,7 @@ orden: 20
 
 # Acentuación general
 
-La acentuación permite marcar la sílaba tónica de una palabra cuando corresponde según las reglas del español.
+La acentuación permite marcar la sílaba tónica[🔗](https://dle.rae.es/t%C3%B3nico) de una palabra cuando corresponde según las reglas del español.
 
 ## Conceptos clave
 

@@ -33,6 +33,11 @@ export const MATERIAS = [
     slug: "matematicas",
     nombre: "Matemáticas",
     descripcion: "Números, geometría, datos y álgebra, por edad."
+  },
+  {
+    slug: "fisica",
+    nombre: "Física",
+    descripcion: "Fuerzas, energía, calor, luz y electricidad, de los 5 a los 17 años."
   }
 ];
 

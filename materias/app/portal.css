@@ -18,6 +18,9 @@
   --lengua: #5b4bdb;
   --mate: #2563eb;
   --cielo: #0b7ea8;
+  /* Cálido a propósito: los otros tres son fríos y física necesitaba separarse
+     de un vistazo. Además le va al tema —calor, luz, energía—. */
+  --fisica: #b45309;
 
   --display: "Bricolage Grotesque", "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
   --body: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -99,6 +102,7 @@ a:focus-visible,
 .is-lengua { color: var(--lengua); }
 .is-mate { color: var(--mate); }
 .is-cielo { color: var(--cielo); }
+.is-fisica { color: var(--fisica); }
 
 /* ---------- Láminas de materia ---------- */
 
@@ -157,6 +161,19 @@ a:focus-visible,
   --p-texture:
     repeating-linear-gradient(90deg, rgba(37, 99, 235, 0.09) 0 1px, transparent 1px 1.25rem),
     repeating-linear-gradient(180deg, rgba(37, 99, 235, 0.09) 0 1px, transparent 1px 1.25rem);
+}
+
+.plate--fisica {
+  --p-bg: #fdf7ef;
+  --p-ink: var(--fisica);
+  --p-text: #2b1c0b;
+  --p-soft: #7a6449;
+  --p-rule: #e6d7c2;
+  /* ondas concéntricas: lo que se repite en sonido, luz y campos. Se distingue
+     del rayado y del cuadriculado sin pelearse con ellos. */
+  --p-texture:
+    repeating-radial-gradient(circle at 82% 12%, rgba(180, 83, 9, 0.10) 0 1px, transparent 1px 0.85rem),
+    repeating-radial-gradient(circle at 14% 88%, rgba(180, 83, 9, 0.07) 0 1px, transparent 1px 1.1rem);
 }
 
 .plate--cielo {
@@ -475,6 +492,7 @@ a:focus-visible,
   .plates__item:nth-child(1) { animation-delay: 0.16s; }
   .plates__item:nth-child(2) { animation-delay: 0.24s; }
   .plates__item:nth-child(3) { animation-delay: 0.32s; }
+  .plates__item:nth-child(4) { animation-delay: 0.40s; }
 }
 
 @keyframes rise {
