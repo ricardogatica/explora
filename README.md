@@ -66,6 +66,28 @@ Las URL del sitio anterior (`/sistema_solar/vega.html` y compañía) redirigen c
 node tools/construir-redirecciones.mjs > infra/redirecciones.conf
 ```
 
+### En Railway
+
+Tres servicios en un proyecto, los dos primeros desde este repo:
+
+| Servicio | Cómo se configura |
+|---|---|
+| `web` | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.web`, y `API_ORIGIN=http://api.railway.internal:3100`. Es el que lleva el dominio público. |
+| `api` | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.api`. Sin dominio público: solo lo llama el proxy por la red privada. |
+| Postgres | El de Railway. Se enlaza a `api` con `DATABASE_URL=${{Postgres.DATABASE_URL}}`. |
+
+Hay un Dockerfile por servicio y no uno con dos destinos porque Railway elige el
+archivo, y elegir un destino dentro de él no está documentado. La fase de
+compilación de los dos es idéntica y hay una prueba que lo vigila.
+
+`PORT` no se toca: lo pone Railway y las dos imágenes lo respetan —nginx por
+plantilla, la API leyéndolo del entorno—. Las dos escuchan también en IPv6,
+porque los nombres de la red privada resuelven a las dos familias y en
+`0.0.0.0` el servicio queda invisible para quien lo llame por IPv6.
+
+El único servicio con dominio público es `web`: la API se alcanza por `/api`
+a través suyo, así que no hace falta CORS ni exponerla.
+
 ## El progreso
 
 Al entrar por primera vez se pregunta cómo guardarlo. Hoy solo hay una respuesta

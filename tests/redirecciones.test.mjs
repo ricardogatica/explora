@@ -45,7 +45,7 @@ test("el archivo de nginx está al día con el generador", () => {
    archivo y distinguidas por ?slug=. No cabe en el mapa —nginx enruta por $uri,
    sin la query— y se resuelve con una regla propia que hay que conservar. */
 test("nginx traduce el star.html con slug en la query", () => {
-  const conf = readFileSync(join(RAIZ, "infra/nginx.conf"), "utf8");
+  const conf = readFileSync(join(RAIZ, "infra/nginx.conf.template"), "utf8");
   assert.match(conf, /location = \/sistema_solar\/star\.html/);
   assert.match(conf, /\$arg_slug.*\/universo\/estrellas\/\$arg_slug/s);
 });

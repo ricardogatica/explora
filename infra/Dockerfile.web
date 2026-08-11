@@ -1,0 +1,62 @@
+# La web: nginx con las dos aplicaciones dentro. Sin Node.
+#
+# Hay un Dockerfile por servicio y no uno multi-etapa con dos destinos, aunque
+# eso duplique la fase de compilación. El motivo es concreto: Railway elige el
+# Dockerfile con RAILWAY_DOCKERFILE_PATH y no documenta cómo elegir un destino
+# dentro de él, así que un archivo por servicio es lo que funciona en todas
+# partes sin depender de una función no documentada.
+#
+# La fase de compilación de los dos tiene que ser idéntica, y hay una prueba que
+# lo comprueba: si se cambia en uno y no en el otro, una de las dos imágenes se
+# construiría con otro código.
+
+# ── Compilación ─────────────────────────────────────────────────────────────
+FROM node:22-alpine AS construccion
+WORKDIR /repo
+
+# Los manifiestos primero y las dependencias después: mientras no cambien, Docker
+# reutiliza esta capa y no vuelve a descargar nada aunque cambie el contenido.
+COPY package.json package-lock.json ./
+COPY api/package.json           api/
+COPY contenido/package.json     contenido/
+COPY compartido/package.json    compartido/
+COPY materias/package.json      materias/
+COPY universo/package.json      universo/
+RUN npm ci
+
+COPY . .
+
+# Las pruebas corren aquí: una imagen que no pasa sus pruebas no llega a
+# construirse. Incluyen el validador del contenido, así que un .md mal etiquetado
+# —que si no desaparecería de la ruta sin avisar— para el despliegue.
+RUN node --test
+
+RUN npm run build --workspace=materias \
+ && npm run build --workspace=universo \
+ && npm run build --workspace=explora-api
+
+# ── La imagen ───────────────────────────────────────────────────────────────
+FROM nginx:1.27-alpine
+
+# La configuración es una plantilla: el puerto y la dirección de la API se
+# rellenan al arrancar. El filtro es imprescindible —ver la nota de la plantilla—
+# porque las variables de nginx se escriben igual que las del entorno.
+ENV NGINX_ENVSUBST_FILTER="^(PORT|API_ORIGIN)$" \
+    PORT=80 \
+    API_ORIGIN="http://api:3100"
+
+COPY infra/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY infra/redirecciones.conf  /etc/nginx/extra/redirecciones.conf
+COPY infra/resolver.sh         /docker-entrypoint.d/20-resolver.sh
+RUN chmod +x /docker-entrypoint.d/20-resolver.sh
+
+# Materias ocupa la raíz del dominio.
+COPY --from=construccion /repo/materias/out/ /usr/share/nginx/html/
+
+# Del build del universo solo su prefijo: en la raíz deja un index.html de
+# reserva para funcionar como SPA que taparía el portal de materias.
+COPY --from=construccion /repo/universo/build/client/universo/ /usr/share/nginx/html/universo/
+
+# Ese mismo archivo de reserva, dentro del prefijo y con otro nombre: es lo que
+# nginx sirve cuando una URL de /universo/ no corresponde a ninguna página.
+COPY --from=construccion /repo/universo/build/client/index.html /usr/share/nginx/html/universo/spa.html

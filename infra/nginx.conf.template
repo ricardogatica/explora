@@ -12,10 +12,28 @@
 # (ver universo/vite.config.js). Una petición suya a la raíz acabaría en
 # materias, que devolvería su propio 404.
 
-include /etc/nginx/conf.d/redirecciones.conf;   # map $uri $destino_heredado
+# ── Una plantilla, no un archivo terminado ──────────────────────────────────
+#
+# La imagen de nginx pasa por envsubst todo lo que hay en /etc/nginx/templates
+# al arrancar. Aquí solo se sustituyen dos cosas, y por eso el contenedor lleva
+# NGINX_ENVSUBST_FILTER: sin ese filtro, envsubst se llevaría por delante $uri,
+# $host, $arg_slug y todas las variables de nginx, que se escriben igual que las
+# del entorno y aquí no significan lo mismo.
+#
+#   PORT        el puerto que impone la plataforma. En local, 80.
+#   API_ORIGIN  dónde vive la API. En Docker, http://api:3100; en Railway, su
+#               nombre en la red privada.
+
+# Estos dos viven en /etc/nginx/extra y no en conf.d, y no es un capricho: nginx
+# incluye solo TODO lo que hay en conf.d/*.conf, así que un include explícito de
+# un archivo que está ahí lo carga dos veces. Con el resolver eso es un error
+# fatal —«resolver directive is duplicate»— y el contenedor no arranca.
+include /etc/nginx/extra/redirecciones.conf;   # map $uri $destino_heredado
+include /etc/nginx/extra/resolver.conf;        # lo escribe el arranque
 
 server {
-  listen 80;
+  listen ${PORT};
+  listen [::]:${PORT};
   server_name _;
   root /usr/share/nginx/html;
 
@@ -55,8 +73,11 @@ server {
   # variable para que nginx no se niegue a arrancar si la API todavía no está
   # levantada: el contenido tiene que servirse aunque el progreso no se guarde.
   location /api/ {
-    resolver 127.0.0.11 valid=30s;          # el DNS interno de Docker
-    set $api "http://api:3100";
+    # La dirección va en una variable a propósito: así nginx la resuelve en cada
+    # petición y no al arrancar. Con la forma literal, un arranque con la API
+    # todavía no levantada dejaría a nginx negándose a servir el sitio entero, y
+    # el contenido tiene que servirse aunque el progreso no se guarde.
+    set $api "${API_ORIGIN}";
     proxy_pass $api$request_uri;
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

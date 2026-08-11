@@ -18,8 +18,16 @@ async function arrancar() {
 
   /* Sin CORS: la interfaz vive en el mismo dominio, detrás del mismo nginx.
      Abrirlo sería invitar a que cualquier página escriba en nuestra base. */
+  /* En «::» y no en «0.0.0.0». Escuchando solo en IPv4, el servicio queda
+     invisible para quien lo llame por IPv6, y la red privada de Railway resuelve
+     los nombres internos a las dos familias: nginx podría resolver la dirección
+     IPv6 del contenedor y encontrarse con que ahí no hay nadie escuchando. La
+     doble pila acepta las dos y no cuesta nada.
+
+     El puerto viene del entorno porque las plataformas lo imponen; 3100 es solo
+     el valor para levantarlo en casa. */
   const puerto = Number(process.env.PORT ?? 3100);
-  await app.listen(puerto, "0.0.0.0");
+  await app.listen(puerto, "::");
   new Logger("Explora").log(`Escuchando en el puerto ${puerto}`);
 }
 

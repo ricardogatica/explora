@@ -9,9 +9,13 @@ services:
   explora:
     build:
       context: ..
-      dockerfile: infra/Dockerfile
-      target: web
+      dockerfile: infra/Dockerfile.web
     image: explora-web:local
+    environment:
+      # Los mismos nombres que usa la plataforma en producción, para que aquí se
+      # pruebe el mismo camino y no una variante.
+      PORT: "80"
+      API_ORIGIN: "http://api:3100"
     ports:
       - "8080:80"
     restart: unless-stopped
@@ -33,8 +37,7 @@ services:
   api:
     build:
       context: ..
-      dockerfile: infra/Dockerfile
-      target: api
+      dockerfile: infra/Dockerfile.api
     image: explora-api:local
     restart: unless-stopped
     environment:
