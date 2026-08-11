@@ -72,9 +72,22 @@ Tres servicios en un proyecto, los dos primeros desde este repo:
 
 | Servicio | Cómo se configura |
 |---|---|
-| `web` | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.web`, y `API_ORIGIN=http://api.railway.internal:3100`. Es el que lleva el dominio público. |
-| `api` | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.api`. Sin dominio público: solo lo llama el proxy por la red privada. |
-| Postgres | El de Railway. Se enlaza a `api` con `DATABASE_URL=${{Postgres.DATABASE_URL}}`. |
+| la web | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.web` y `API_ORIGIN=http://NOMBRE-DEL-SERVICIO-API.railway.internal:3100`. Es el único con dominio público. |
+| la API | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.api` y `DATABASE_URL=${{Postgres.DATABASE_URL}}`. Sin dominio público: solo la llama el proxy por la red privada. |
+| Postgres | El de Railway. |
+
+En los dos, el directorio raíz es la raíz del repo y no una subcarpeta.
+
+**`API_ORIGIN` lleva el nombre que le hayas puesto al servicio de la API**, no la
+palabra «api»: el nombre interno es `<servicio>.railway.internal`. Si se renombra
+el servicio hay que cambiar la variable con él, y el síntoma de no hacerlo es que
+la web funciona entera y solo deja de guardarse el progreso.
+
+Y **solo dos servicios salen de este repo**. Railway detecta los workspaces de npm
+y propone uno por paquete: `contenido` y `compartido` son bibliotecas sin nada que
+arrancar, y `materias` y `universo` compilan a archivos que sirve la web. Además
+las dos tienen que compartir dominio, o los enlaces entre ellas y el reparto por
+prefijo dejan de funcionar.
 
 Hay un Dockerfile por servicio y no uno con dos destinos porque Railway elige el
 archivo, y elegir un destino dentro de él no está documentado. La fase de
