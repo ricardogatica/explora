@@ -201,6 +201,14 @@ export default function Universo() {
           <strong>Línea temporal del universo y la Tierra</strong>
           <span>Big Bang → expansión cósmica → sistema solar → Tierra → hoy</span>
         </header>
+        {/* En móvil la tira de las 18 etapas se esconde —son 200 píxeles por
+            tarjeta y ocupaba media pantalla—, así que en qué etapa estamos se dice
+            aquí. En pantalla grande sobra, porque lo dice la tarjeta activa de la
+            tira, y el CSS lo oculta. */}
+        <p className="linea-temporal__actual">
+          <span>{estado.evento?.time}</span>
+          <strong>{estado.evento?.name}</strong>
+        </p>
         <MapaCosmico etapa={estado.etapa} progreso={estado.progreso} />
         <input
           className="linea-temporal__barra"

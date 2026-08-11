@@ -369,7 +369,10 @@ a.boton { text-decoration: none; display: inline-block; }
    esta medida en vez de con un número suelto en cada regla. */
 .vista { --alto-franja: 380px; }
 .tarjeta-vista--universo { width: min(460px, calc(100vw - 36px)); max-height: 42vh; }
-.ficha-flotante--universo { right: 96px; top: 18px; bottom: auto; }
+/* A la izquierda de la columna del zoom y del botón del viaje, no encima: con
+   `right: 96px` la ficha cubría el botón —que mide 148 y llega hasta 166 desde el
+   borde— y con una ficha abierta no había forma de iniciar el viaje. */
+.ficha-flotante--universo { right: 176px; top: 18px; bottom: auto; }
 
 .zoom {
   position: absolute; right: 18px; top: 96px; bottom: calc(var(--alto-franja) + 18px); width: 58px;
@@ -531,4 +534,205 @@ a.boton { text-decoration: none; display: inline-block; }
 @media (max-width: 780px) {
   .viaje { right: 88px; padding: 14px 16px 16px; }
   .viaje__texto { font-size: 14px; }
+}
+
+/* ── El universo en un teléfono ───────────────────────────────────────────────
+
+   Medido en un iPhone SE antes de tocar nada: la franja temporal ocupaba 436 de
+   los 667 píxeles de alto y la tarjeta del título otros 213. Entre las dos tapaban
+   el 97% de la pantalla, así que de la escena 3D —que es para lo que se entra— no
+   se veía nada. Los siete botones de acción, además, se apilaban en 270 píxeles y
+   desbordaban su propia tarjeta.
+
+   Así que en pantalla pequeña se queda lo que se usa y lo que orienta: los
+   controles y los títulos. Se va lo que describe, que en un teléfono se lee mal y
+   cuesta media pantalla: el párrafo de presentación, el mapa cósmico —que es una
+   figura, no un mando—, las marcas de la barra y la tira de las 18 etapas con sus
+   descripciones.
+
+   La condición lleva también el alto: un teléfono en horizontal mide 390 de alto y
+   el problema ahí es el mismo aunque quepan 844 de ancho. */
+@media (max-width: 640px), (max-height: 520px) {
+  /* La franja de abajo pasa de 380 a poco más de cien píxeles, y el mando del
+     zoom llega hasta ella por esta medida. */
+  .vista { --alto-franja: 124px; }
+
+  /* ── Títulos y acciones ── */
+  .tarjeta-vista--universo {
+    left: 12px; top: 12px; right: auto;
+    /* Ancho acotado en vez de «hasta el zoom»: en un teléfono en horizontal eso
+       eran 756 píxeles y el título cruzaba la pantalla entera, dejando a la ficha
+       de un cuerpo sin ningún sitio donde ponerse sin taparlo. */
+    width: min(calc(100vw - 88px), 420px);
+    max-height: none; padding: 12px 14px;
+    background: rgba(7,12,28,.72);
+  }
+  /* El texto crece con la pantalla en vez de saltar en el punto de corte. */
+  .tarjeta-vista h1 { font-size: clamp(17px, 5.2vw, 26px); margin: 0 0 8px; line-height: 1.15; }
+  /* Lo que describe se va; lo que nombra se queda. */
+  .tarjeta-vista--universo .eyebrow,
+  .tarjeta-vista--universo > p:not(.eyebrow) { display: none; }
+
+  /* Los siete botones en una sola línea que se arrastra, en vez de una columna de
+     270 píxeles. Sin envolver: es la diferencia entre una fila y media pantalla. */
+  .acciones-vista {
+    flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin-top: 0;
+    padding-bottom: 2px; scrollbar-width: none;
+  }
+  .acciones-vista::-webkit-scrollbar { display: none; }
+  /* El degradado del borde derecho es la única señal de que la fila sigue: sin él
+     el último botón aparece cortado a media palabra y parece un fallo. */
+  .acciones-vista {
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
+  .acciones-vista .boton {
+    flex: 0 0 auto; font-size: 12px; padding: .5rem .7rem;
+    /* 40 píxeles de alto: por debajo de eso un dedo falla. */
+    min-height: 40px; display: inline-flex; align-items: center;
+  }
+
+  /* ── El zoom ── */
+  /* Con `bottom` heredado llegaba hasta la franja y medía 513 píxeles: dominaba la
+     pantalla y parecía otra cosa. Alto acotado, que para arrastrar con el dedo
+     sobra. */
+  .zoom {
+    right: 12px; top: 12px; bottom: auto; height: min(46vh, 300px);
+    width: 48px; padding: 12px 6px; gap: 8px;
+  }
+  .zoom__etiqueta { display: none; }   /* la barra vertical ya se entiende sola */
+  .zoom input { width: 36px; }         /* dedo, no ratón */
+  .zoom__valor { font-size: 10px; }
+
+  /* ── El botón del viaje ── */
+  /* Sube al lado del zoom en escritorio; aquí baja con los demás mandos, porque
+     arriba se comería el ancho del título. */
+  .boton--viaje {
+    top: auto; right: auto; left: 12px; bottom: calc(var(--alto-franja) + 16px);
+    font-size: 12px; padding: .5rem .8rem; min-height: 40px;
+  }
+
+  /* ── La franja temporal ── */
+  .linea-temporal { left: 12px; right: 12px; bottom: 12px; padding: 10px 12px; }
+  .linea-temporal__cabecera { margin-bottom: 6px; }
+  .linea-temporal__cabecera strong { font-size: 10px; letter-spacing: .08em; }
+  .linea-temporal__cabecera span { display: none; }
+  .linea-temporal__barra { margin-bottom: 0; }
+  /* Una figura y una escala decorativa: las dos se van. */
+  .mapa-cosmico, .marcas-temporales { display: none; }
+  /* 18 tarjetas de 200 píxeles: lo que más ocupaba. Su función la cubren la barra
+     y la línea de etapa de abajo. */
+  .etapas { display: none; }
+
+  /* ── El viaje guiado ── */
+  .viaje { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px; max-height: 46vh; overflow: auto; }
+  .viaje h2 { font-size: clamp(16px, 4.6vw, 22px); }
+  .viaje__texto { font-size: 13px; }
+  .viaje__mandos { gap: 6px; }
+  .viaje__mandos .boton { font-size: 12px; padding: .5rem .7rem; min-height: 40px; }
+
+  /* ── La ficha de un cuerpo ── */
+  .ficha-flotante--universo {
+    /* Se aparta de los dos mandos en vez de taparlos: por la derecha deja libre la
+       columna del zoom, y por abajo el botón del viaje. Medido: antes cubría el
+       tercio inferior de la barra de zoom y el botón entero. */
+    left: 12px; right: 72px; top: auto; bottom: calc(var(--alto-franja) + 64px);
+    /* 38vh no llegaban en una pantalla de 667: los datos que envuelven a tres
+       líneas dejaban el botón por debajo del scroll. */
+    width: auto; max-height: min(44vh, 300px); overflow: auto;
+  }
+  .ficha-flotante h2 { font-size: clamp(16px, 4.6vw, 22px); }
+}
+
+/* Anchos intermedios —tabletas, ventanas a media pantalla— donde no caben lado a
+   lado la tarjeta del título (460) y la ficha (360) con el margen de la columna del
+   zoom: 460 + 360 + 176 + 18 pasa de 1000. Ahí la ficha baja al hueco de encima de
+   la franja en vez de solaparse con el título. */
+@media (min-width: 781px) and (max-width: 1099px) and (min-height: 521px) {
+  .ficha-flotante--universo {
+    right: 96px; top: auto; bottom: calc(var(--alto-franja) + 18px);
+  }
+}
+
+/* Un teléfono en horizontal: sobra ancho y falta alto, así que la ficha se pone al
+   lado del título en vez de debajo. Apilada se solapaba con él —medido: la ficha
+   empezaba en y=86 y el título llegaba a y=118—. */
+@media (max-height: 520px) and (min-width: 700px) {
+  /* El título se estrecha para dejarle sitio: con 420 llegaba a x=432 y la ficha
+     empezaba en x=412. */
+  .tarjeta-vista--universo { width: min(38vw, 340px); }
+  .ficha-flotante--universo {
+    left: auto; right: 72px; top: 12px; bottom: auto;
+    width: min(360px, 44vw);
+    /* Se detiene antes de la franja, que aquí está a 124 píxeles del suelo. */
+    max-height: calc(100% - 24px - var(--alto-franja));
+  }
+}
+
+/* La línea de etapa: solo tiene sentido donde la tira está escondida. */
+.linea-temporal__actual { display: none; }
+@media (max-width: 640px), (max-height: 520px) {
+  .linea-temporal__actual {
+    display: flex; align-items: baseline; gap: 8px; margin: 8px 0 0;
+  }
+  .linea-temporal__actual span {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em; color: #38bdf8;
+  }
+  .linea-temporal__actual strong { font-size: 13px; color: #e2e8f0; }
+}
+
+/* Entre 641 y 780 la franja se queda entera —hay alto de sobra en una tableta— pero
+   había dos cosas medidas que no cuadraban.
+
+   La línea larga de la cabecera envuelve por debajo de 780, y con eso la franja pasa
+   de 362 a 398 píxeles: dieciocho más de lo que declara --alto-franja, que es
+   justo lo que se metía por debajo del zoom y de la ficha. Se va la línea, que es
+   una descripción y no un mando, y la cuenta vuelve a salir.
+
+   Y la tarjeta del título llegaba hasta la columna del zoom, así que el botón del
+   viaje le caía encima. */
+@media (min-width: 641px) and (max-width: 780px) {
+  .linea-temporal__cabecera span { display: none; }
+}
+
+/* Y hasta 960, la tarjeta del título se queda en título y mandos.
+
+   El motivo es de medida, no de gusto: la ficha de un cuerpo mide 359 píxeles de
+   alto y se apoya en la franja, así que su borde superior queda en y=267. Con el
+   párrafo de presentación dentro, la tarjeta llegaba a y=401 y se pisaban. Por
+   encima de 960 no hace falta, porque ahí la ficha ya cabe a la derecha del título
+   sin cruzarse con él. */
+@media (min-width: 641px) and (max-width: 960px) and (min-height: 521px) {
+  .tarjeta-vista--universo { right: auto; width: min(calc(100vw - 88px), 420px); }
+  /* El título seguía a 30 píxeles fijos y envolvía en tres líneas: la tarjeta medía
+     186 de alto en 641 de ancho, y ahí volvía a tocar la ficha. */
+  .tarjeta-vista h1 { font-size: clamp(20px, 3.4vw, 26px); line-height: 1.15; margin: 0 0 8px; }
+  .tarjeta-vista--universo .eyebrow,
+  .tarjeta-vista--universo > p:not(.eyebrow) { display: none; }
+  .acciones-vista {
+    flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin-top: 0; padding-bottom: 2px;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
+  .acciones-vista::-webkit-scrollbar { display: none; }
+  .acciones-vista .boton { flex: 0 0 auto; min-height: 40px; display: inline-flex; align-items: center; }
+  /* Sin acotar, la ficha mide 359 y su borde superior quedaba a once píxeles del
+     título: demasiado poco para fiarse de que el texto no crezca. */
+  .ficha-flotante--universo { max-height: min(44vh, 280px); overflow: auto; }
+}
+
+/* Cuatro datos en vez de seis en pantalla pequeña.
+
+   Con seis, el botón que lleva a la ficha completa —que es la acción principal de
+   este panel— quedaba por debajo del scroll y no se veía. Los otros dos datos están
+   en esa misma ficha, a un toque. */
+@media (max-width: 640px), (max-height: 520px) {
+  .ficha-flotante--universo .datos--compactos > div:nth-child(n+5) { display: none; }
+}
+
+/* En los teléfonos más cortos —375×667 y parecidos— ni con cuatro datos cabe el
+   botón sin scroll, porque «Distancia al Sol · 149,6 millones km» envuelve en tres
+   líneas. Se quedan dos. Preferir dos datos visibles y el botón a la vista antes que
+   cuatro datos y una acción escondida: la ficha completa está a un toque. */
+@media (max-width: 640px) and (max-height: 700px) {
+  .ficha-flotante--universo .datos--compactos > div:nth-child(n+3) { display: none; }
 }
