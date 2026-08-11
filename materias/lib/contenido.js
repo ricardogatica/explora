@@ -16,6 +16,7 @@ import { validarCorpus, MATERIAS as MATERIAS_VALIDAS } from "@explora/contenido/
 import { separarFrontmatter, validarPagina } from "@explora/contenido/paginas.js";
 import { partirEnBloques } from "@explora/contenido/bloques.js";
 import { NOMBRES_DE_FIGURA } from "@explora/compartido/primitivas.js";
+import { NOMBRES_DE_ACTIVIDAD } from "../app/actividades/nombres.js";
 import { BANDAS, bandaPorId, IDS_VALIDOS } from "@explora/contenido/bandas.js";
 
 /* En build el proceso corre dentro de materias/, y el contenido es hermano suyo:
@@ -92,14 +93,20 @@ export function paginaDe(slug, id) {
     bloque.tipo === "markdown" ? { ...bloque, html: marked.parse(bloque.texto) } : bloque
   );
 
-  /* Una figura mal escrita rompe el build en vez de dejar un hueco: el nombre se
-     teclea a mano dentro del markdown y equivocarse es cuestión de tiempo. */
+  /* Una figura o una actividad mal escritas rompen el build en vez de dejar un
+     hueco: el nombre se teclea a mano dentro del markdown y equivocarse es
+     cuestión de tiempo. */
   for (const bloque of bloques) {
-    if (bloque.tipo !== "figura") continue;
-    if (!NOMBRES_DE_FIGURA.includes(bloque.figura)) {
+    if (bloque.tipo === "figura" && !NOMBRES_DE_FIGURA.includes(bloque.figura)) {
       throw new Error(
         `contenido/${slug}/paginas/${id}.md pide la figura «${bloque.figura}», que no existe. ` +
         `Las que hay: ${NOMBRES_DE_FIGURA.join(", ")}.`
+      );
+    }
+    if (bloque.tipo === "actividad" && !NOMBRES_DE_ACTIVIDAD.includes(bloque.actividad)) {
+      throw new Error(
+        `contenido/${slug}/paginas/${id}.md pide la actividad «${bloque.actividad}», que no existe. ` +
+        `Las que hay: ${NOMBRES_DE_ACTIVIDAD.join(", ")}.`
       );
     }
   }

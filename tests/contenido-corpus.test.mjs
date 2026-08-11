@@ -5,6 +5,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validarCorpus, MATERIAS } from "../contenido/esquema.js";
 import { separarFrontmatter, validarPagina } from "../contenido/paginas.js";
+import { actividadesDe } from "../contenido/bloques.js";
+import { NOMBRES_DE_ACTIVIDAD } from "../materias/app/actividades/nombres.js";
 import { IDS_VALIDOS, BANDAS } from "../contenido/bandas.js";
 
 /* Estos tests corren contra el contenido REAL, no contra ejemplos. Es la
@@ -145,4 +147,58 @@ test("ninguna banda de la ruta se queda sin preguntas", () => {
   const vacias = BANDAS.filter(banda => !TODAS.some(p => p.banda === banda.id));
   assert.deepEqual(vacias.map(b => b.id), [],
     "hay tramos de edad sin una sola pregunta: su página de ruta se abre vacía");
+});
+
+test("dos páginas de la misma categoría no comparten el orden", () => {
+  /* El campo `orden` coloca cada página dentro de su categoría, y con dos iguales
+     el desempate lo decide el sistema de archivos: la misma página aparece en un
+     sitio distinto según la máquina que construya el sitio. No rompe nada, y por
+     eso hay que vigilarlo. */
+  const choques = [];
+  for (const materia of MATERIAS_CON_CONTENIDO) {
+    const vistos = new Map();
+    const carpeta = join(RAIZ, "contenido", materia, "paginas");
+    for (const nombre of readdirSync(carpeta).filter(n => n.endsWith(".md"))) {
+      const { meta } = separarFrontmatter(readFileSync(join(carpeta, nombre), "utf8"));
+      const clave = `${materia}/${meta.categoria}/${meta.orden}`;
+      if (vistos.has(clave)) choques.push(`${clave}: ${vistos.get(clave)} y ${nombre}`);
+      else vistos.set(clave, nombre);
+    }
+  }
+  assert.deepEqual(choques, [], "hay páginas que comparten categoría y orden");
+});
+
+test("las actividades declaradas existen como componente, y al revés", () => {
+  /* La lista de nombres vive separada de los componentes porque el lector de
+     contenido la necesita en el build y no puede importar JSX. El precio es que
+     son dos verdades, y esto las ata: un nombre sin componente deja un hueco en la
+     página, y un componente sin nombre es código inalcanzable. */
+  const carpeta = join(RAIZ, "materias/app/actividades");
+  const componentes = readdirSync(carpeta)
+    .filter(n => n.endsWith(".jsx"))
+    .map(n => n.replace(/\.jsx$/, ""))
+    .sort();
+
+  assert.deepEqual([...NOMBRES_DE_ACTIVIDAD].sort(), componentes,
+    "la lista de actividades y los componentes de la carpeta no coinciden");
+});
+
+test("toda actividad que pide una página existe", () => {
+  /* El build ya lo comprueba, pero solo de las páginas que llega a construir. Esto
+     lo comprueba de todas, y sin arrancar Next. */
+  const pedidas = [];
+  for (const materia of MATERIAS_CON_CONTENIDO) {
+    const carpeta = join(RAIZ, "contenido", materia, "paginas");
+    for (const nombre of readdirSync(carpeta).filter(n => n.endsWith(".md"))) {
+      const { cuerpo } = separarFrontmatter(readFileSync(join(carpeta, nombre), "utf8"));
+      for (const bloque of actividadesDe(cuerpo)) {
+        pedidas.push({ donde: `${materia}/${nombre}`, nombre: bloque.actividad });
+      }
+    }
+  }
+  assert.ok(pedidas.length > 0, "ninguna página usa una actividad: el bloque no se está leyendo");
+
+  const huerfanas = pedidas.filter(p => !NOMBRES_DE_ACTIVIDAD.includes(p.nombre));
+  assert.deepEqual(huerfanas.map(p => `${p.donde} → ${p.nombre}`), [],
+    "hay páginas que piden una actividad que no existe");
 });
