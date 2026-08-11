@@ -2,7 +2,7 @@ import Link from "next/link";
 import Migas from "../../migas.jsx";
 import Figura from "../../figura.jsx";
 import Actividad from "../../actividad.jsx";
-import { MATERIAS, materiaPorSlug, paginaDe, paginasDe } from "../../../lib/contenido.js";
+import { MATERIAS, materiaPorSlug, paginaDe, paginasDe, hermanasDeTramo } from "../../../lib/contenido.js";
 
 /* Con output: "export" hay que enumerar TODAS las rutas dinámicas: no existe la
    generación bajo demanda. Para un sitio hecho de archivos es lo natural. */
@@ -22,6 +22,7 @@ export default async function Pagina({ params }) {
   const { materia: slug, pagina: id } = await params;
   const materia = materiaPorSlug(slug);
   const ficha = paginaDe(slug, id);
+  const tramo = hermanasDeTramo(slug, id);
 
   return (
     <main className="pagina">
@@ -46,6 +47,40 @@ export default async function Pagina({ params }) {
           return <div key={indice} dangerouslySetInnerHTML={{ __html: bloque.html }} />;
         })}
       </article>
+
+      {/* Lo que más falta hacía en las páginas de nivel: describían un tramo de edad
+          y no llevaban a ninguna parte. Sale en toda página con banda, porque la
+          pregunta «¿y qué más le toca a esta edad?» es la misma en todas. */}
+      {tramo.materias.length > 0 && (
+        <section className="tramo">
+          <h2 className="tramo__titulo">Contenidos de este tramo</h2>
+          {tramo.bandas.length > 0 && (
+            <p className="tramo__pie">
+              {tramo.bandas.map(banda => (
+                <Link key={banda.id} className="boton boton--suave" href={`/ruta/${banda.id}/`}>
+                  Ver la ruta de {banda.titulo}
+                </Link>
+              ))}
+            </p>
+          )}
+          {tramo.materias.map(materia => (
+            <div key={materia.slug} className="tramo__materia">
+              <h3 className="tramo__nombre">{materia.nombre}</h3>
+              {/* Las mismas clases que usa el buscador: la tarjeta de una página se
+                  ve igual en todo el sitio y no hay una segunda hoja de estilos que
+                  mantener. */}
+              <div className="rejilla">
+                {materia.paginas.map(pagina => (
+                  <Link key={pagina.id} className="tarjeta" href={`/${materia.slug}/${pagina.id}/`}>
+                    <strong>{pagina.titulo}</strong>
+                    <span>{pagina.descripcion}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
     </main>
   );
 }

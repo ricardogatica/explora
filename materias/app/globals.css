@@ -394,3 +394,23 @@ a.boton { text-decoration: none; display: inline-block; }
 /* El escalón actual, para no perderse al mover el mando. */
 .escalon--aqui { border-color: var(--mate); background: rgba(37, 99, 235, .07); }
 .escalon--aqui b { color: var(--mate); }
+
+/* ── Los contenidos del mismo tramo de edad ───────────────────────────────────
+
+   Va al final de una página de contenido y responde a «¿y qué más le toca a esta
+   edad?». Las páginas de nivel —«Nivel 9 a 11 años»— describían un tramo y no
+   llevaban a ninguna parte: quien entraba tenía que volver atrás y buscar a mano.
+
+   Las tarjetas son las del buscador, así que aquí solo va el marco. */
+.tramo {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--rule);
+}
+.tramo__titulo { font-family: var(--display); font-size: clamp(20px, 3.4vw, 26px); margin: 0 0 1rem; }
+.tramo__pie { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 1.75rem; }
+.tramo__materia + .tramo__materia { margin-top: 1.75rem; }
+.tramo__nombre {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-soft); margin: 0 0 .75rem;
+}

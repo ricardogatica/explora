@@ -17,7 +17,7 @@ import { separarFrontmatter, validarPagina } from "@explora/contenido/paginas.js
 import { partirEnBloques } from "@explora/contenido/bloques.js";
 import { NOMBRES_DE_FIGURA } from "@explora/compartido/primitivas.js";
 import { NOMBRES_DE_ACTIVIDAD } from "../app/actividades/nombres.js";
-import { BANDAS, bandaPorId, IDS_VALIDOS } from "@explora/contenido/bandas.js";
+import { BANDAS, bandaPorId, esBandaDeRuta, IDS_VALIDOS } from "@explora/contenido/bandas.js";
 
 /* En build el proceso corre dentro de materias/, y el contenido es hermano suyo:
    vive fuera de la aplicación a propósito, porque es el activo del proyecto y no
@@ -142,6 +142,41 @@ export const preguntasDeBanda = banda => todasLasPreguntas().filter(p => p.banda
    explicación de la tilde diacrítica sirve a los 11 y a los 12. */
 export const paginasDeBanda = banda =>
   MATERIAS.flatMap(materia => paginasDe(materia.slug)).filter(p => (p.bandas ?? []).includes(banda));
+
+/* Las otras páginas del mismo tramo de edad, agrupadas por materia.
+
+   Es lo que convierte una página de nivel —«Nivel 9 a 11 años»— en algo por donde
+   se puede seguir: describía el tramo y no llevaba a ninguna parte, así que quien
+   entraba tenía que volver atrás y buscar a mano.
+
+   Se resuelve por las bandas del frontmatter y no por el nombre del archivo. Los
+   `nivel-*` son de matemáticas y de una época anterior a las bandas; física y
+   lenguaje no tienen ninguno, y aun así sus páginas pertenecen a un tramo. Lo que
+   define «este tramo» es el dato, no cómo se llama el archivo.
+
+   Una página que está en dos bandas aparece una vez, no dos. */
+export function hermanasDeTramo(slug, id) {
+  const propia = paginasDe(slug).find(pagina => pagina.id === id);
+  const bandas = propia?.bandas ?? [];
+  // Siempre la misma forma: quien lo pinta no tiene que distinguir dos casos.
+  if (!bandas.length) return { bandas: [], materias: [] };
+
+  const vistas = new Set([`${slug}/${id}`]);
+  const porMateria = MATERIAS.map(materia => ({
+    ...materia,
+    paginas: paginasDe(materia.slug).filter(pagina => {
+      const clave = `${materia.slug}/${pagina.id}`;
+      if (vistas.has(clave)) return false;
+      if (!(pagina.bandas ?? []).some(banda => bandas.includes(banda))) return false;
+      vistas.add(clave);
+      return true;
+    })
+  })).filter(materia => materia.paginas.length > 0);
+
+  /* Solo los tramos de la ruta tienen página propia; «previo» no está en la
+     progresión y enlazar a /ruta/previo/ daría un 404. */
+  return { bandas: bandas.filter(esBandaDeRuta).map(bandaPorId), materias: porMateria };
+}
 
 /* La ruta de aprendizaje: qué hay en cada tramo, atravesando materias. Se arma
    por banda y no por asignatura porque es lo que recorre quien acompaña. */
