@@ -72,16 +72,22 @@ Tres servicios en un proyecto, los dos primeros desde este repo:
 
 | Servicio | Cómo se configura |
 |---|---|
-| la web | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.web` y `API_ORIGIN=http://NOMBRE-DEL-SERVICIO-API.railway.internal:3100`. Es el único con dominio público. |
+| la web | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.web` y `API_ORIGIN=http://api.railway.internal:3100`. Es el único con dominio público. |
 | la API | `RAILWAY_DOCKERFILE_PATH=infra/Dockerfile.api` y `DATABASE_URL=${{Postgres.DATABASE_URL}}`. Sin dominio público: solo la llama el proxy por la red privada. |
 | Postgres | El de Railway. |
 
 En los dos, el directorio raíz es la raíz del repo y no una subcarpeta.
 
-**`API_ORIGIN` lleva el nombre que le hayas puesto al servicio de la API**, no la
-palabra «api»: el nombre interno es `<servicio>.railway.internal`. Si se renombra
-el servicio hay que cambiar la variable con él, y el síntoma de no hacerlo es que
-la web funciona entera y solo deja de guardarse el progreso.
+**`API_ORIGIN` lleva el nombre real del servicio de la API**: el nombre interno es
+`<servicio>.railway.internal`, así que el ejemplo de arriba vale si el servicio se
+llama `api` y hay que cambiarlo si se llama de otra forma. Renombrar el servicio y
+no tocar la variable da el fallo más difícil de ver: la web funciona entera y solo
+deja de guardarse el progreso.
+
+El sufijo `.railway.internal` no se puede omitir. El Dockerfile trae por defecto
+`http://api:3100`, que es el nombre que resuelve en Docker Compose; en la red
+privada de Railway el nombre completo es otro, así que la variable hay que ponerla
+aunque el servicio se llame igual.
 
 Y **solo dos servicios salen de este repo**. Railway detecta los workspaces de npm
 y propone uno por paquete: `contenido` y `compartido` son bibliotecas sin nada que
