@@ -3,7 +3,6 @@ titulo: Nivel 3 a 5 años
 materia: matematicas
 categoria: Niveles por edad
 descripcion: Conteo inicial, correspondencia uno a uno, figuras, patrones y comparación.
-bandas: [previo]
 orden: 50
 ---
 

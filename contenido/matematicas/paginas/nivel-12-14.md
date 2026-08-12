@@ -3,7 +3,6 @@ titulo: Nivel 12 a 14 años
 materia: matematicas
 categoria: Niveles por edad
 descripcion: Números racionales, proporcionalidad, porcentajes, ecuaciones, geometría y estadística.
-bandas: [13-14]
 orden: 80
 ---
 

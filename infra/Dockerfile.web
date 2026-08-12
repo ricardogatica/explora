@@ -35,6 +35,11 @@ RUN npm run build --workspace=materias \
  && npm run build --workspace=universo \
  && npm run build --workspace=explora-api
 
+# Un enlace interno roto no rompe el build de Next: la página se genera, el enlace se
+# pinta y solo falla cuando alguien lo pulsa. Pasó con /ruta/previo/, que existía como
+# enlace y no como página. Aquí sí rompe.
+RUN node tools/enlaces-rotos.mjs
+
 # ── La imagen ───────────────────────────────────────────────────────────────
 FROM nginx:1.27-alpine
 

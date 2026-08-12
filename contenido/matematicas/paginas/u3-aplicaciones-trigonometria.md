@@ -1,7 +1,7 @@
 ---
 titulo: Aplicaciones de las razones trigonométricas
 materia: matematicas
-categoria: Unidad 3 · Geometría
+categoria: (Segundo medio) Unidad 3 · Geometría
 descripcion: Ángulos de elevación y depresión, descomposición de vectores y cómo atacar un problema.
 bandas: [15-17]
 orden: 420

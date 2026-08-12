@@ -3,7 +3,6 @@ titulo: Nivel 15 a 17 años
 materia: matematicas
 categoria: Niveles por edad
 descripcion: Álgebra, funciones, geometría analítica, probabilidad, estadística y modelamiento.
-bandas: [15-17]
 orden: 90
 ---
 

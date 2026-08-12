@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Migas from "../migas.jsx";
 import Buscador from "../buscador.jsx";
-import { MATERIAS, materiaPorSlug, paginasDe, preguntasDe, paginasDeMateriaYBanda, preguntasDeMateriaYBanda } from "../../lib/contenido.js";
-import { BANDAS } from "@explora/contenido/bandas.js";
+import { MATERIAS, materiaPorSlug, paginasDe, preguntasDe, paginasDeMateriaYBanda, preguntasDeMateriaYBanda, tramosDeMateria } from "../../lib/contenido.js";
+
 
 export function generateStaticParams() {
   return MATERIAS.map(materia => ({ materia: materia.slug }));
@@ -22,7 +22,7 @@ export default async function Materia({ params }) {
 
   /* Los tramos con su recuento: uno vacío se dice, no se esconde. Un botón que
      lleva a una página en blanco gasta más confianza que una etiqueta que avisa. */
-  const tramos = BANDAS.map(banda => ({
+  const tramos = tramosDeMateria(slug).map(banda => ({
     ...banda,
     temas: paginasDeMateriaYBanda(slug, banda.id).length,
     ejercicios: preguntasDeMateriaYBanda(slug, banda.id).filter(p => p.familia === "practica").length
@@ -61,12 +61,6 @@ export default async function Materia({ params }) {
         </div>
       </section>
 
-      <p className="acciones">
-        <Link className="boton" href={`/${slug}/practicar/`}>Practicar {materia.nombre}</Link>
-        {preguntas.some(p => p.familia === "diagnostico") && (
-          <Link className="boton boton--suave" href={`/${slug}/diagnostico/`}>Diagnóstico</Link>
-        )}
-      </p>
 
       {/* La agrupación por categoría y el filtrado viven en el buscador, que es
           cliente: el resto de la página se sirve como HTML ya hecho. */}

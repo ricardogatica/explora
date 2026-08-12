@@ -3,7 +3,6 @@ titulo: Nivel 6 a 8 años
 materia: matematicas
 categoria: Niveles por edad
 descripcion: Valor posicional, suma, resta, medición, problemas y geometría básica.
-bandas: [7-8]
 orden: 60
 ---
 

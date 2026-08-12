@@ -34,17 +34,17 @@ const hermanas = pagina => PAGINAS.filter(otra =>
   otra.bandas.some(banda => pagina.bandas.includes(banda))
 );
 
-test("las páginas de nivel tienen a dónde llevar", () => {
-  /* Es el motivo de esta función: describían un tramo de edad y no enlazaban a
-     nada, así que quien entraba tenía que volver atrás y buscar a mano. */
+test("las páginas de nivel son informativas y no entran en la vista por edad", () => {
+  /* Son tablas de referencia sobre qué se espera a cada edad, escritas antes de que
+     existieran las bandas. Quien lleva a los contenidos de un tramo es la vista por
+     edad —/materia/edad/9-10/—, no ellas, así que no declaran banda: si la
+     declararan, cada tramo empezaría con una tabla en vez de con su contenido. */
   const niveles = PAGINAS.filter(p => p.id.startsWith("nivel-"));
   assert.ok(niveles.length >= 6, `esperaba las páginas de nivel, encontré ${niveles.length}`);
 
-  for (const nivel of niveles) {
-    assert.ok(nivel.bandas.length > 0, `${nivel.materia}/${nivel.id} no declara banda`);
-    assert.ok(hermanas(nivel).length > 0,
-      `${nivel.materia}/${nivel.id} no tiene ninguna página hermana: su bloque saldría vacío`);
-  }
+  const conBanda = niveles.filter(n => n.bandas.length);
+  assert.deepEqual(conBanda.map(n => `${n.materia}/${n.id} [${n.bandas}]`), [],
+    "una página de nivel volvió a declarar banda");
 });
 
 test("una página nunca se enlaza a sí misma", () => {
@@ -63,23 +63,24 @@ test("una página en dos tramos aparece una sola vez", () => {
   }
 });
 
-test("el tramo cruza materias, que es para lo que sirve", () => {
+test("un tramo cruza materias, que es para lo que sirve", () => {
   /* Una banda de edad atraviesa el sitio: si las hermanas de una página de
      matemáticas fueran solo de matemáticas, esto no aportaría nada sobre el
-     buscador de la propia materia. */
-  const nivel = PAGINAS.find(p => p.id === "nivel-9-11");
-  assert.ok(nivel, "falta contenido/matematicas/paginas/nivel-9-11.md");
-  const materias = new Set(hermanas(nivel).map(o => o.materia));
+     buscador de la propia materia. Se mira el tramo, no una página concreta: atarlo
+     a un archivo lo rompe cuando ese archivo cambia, que es lo que pasó. */
+  const materias = new Set(PAGINAS.filter(p => p.bandas.includes("9-10")).map(p => p.materia));
   assert.ok(materias.size >= 3,
-    `el tramo de nivel-9-11 solo toca ${[...materias].join(", ")}`);
+    `el tramo 9-10 solo toca ${[...materias].join(", ")}`);
 });
 
 test("solo se enlaza la ruta de los tramos que tienen página", () => {
   /* «previo» no está en la progresión y no tiene página propia: enlazar a
      /ruta/previo/ daría un 404 en un sitio que se sirve como archivos. */
   assert.equal(esBandaDeRuta("previo"), false);
+  /* Hoy no hay páginas en «previo» —las de nivel dejaron de declarar banda— pero sí
+     preguntas, así que la regla tiene que seguir vigente para cuando vuelva a
+     haberlas. */
   const previas = PAGINAS.filter(p => p.bandas.includes("previo"));
-  assert.ok(previas.length > 0, "esperaba páginas en el tramo previo");
   for (const pagina of previas) {
     const conRuta = pagina.bandas.filter(esBandaDeRuta);
     assert.ok(!conRuta.includes("previo"), `${pagina.id} enlazaría /ruta/previo/`);

@@ -3,7 +3,6 @@ titulo: Nivel 9 a 11 años
 materia: matematicas
 categoria: Niveles por edad
 descripcion: Multiplicación, división, fracciones, decimales, perímetro, área y datos.
-bandas: [9-10]
 orden: 70
 ---
 

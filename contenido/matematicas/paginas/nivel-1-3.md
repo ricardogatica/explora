@@ -3,7 +3,6 @@ titulo: Nivel 1 a 3 años
 materia: matematicas
 categoria: Niveles por edad
 descripcion: Primer contacto con cantidad, forma, comparación, ubicación y patrones simples.
-bandas: [previo]
 orden: 40
 ---
 

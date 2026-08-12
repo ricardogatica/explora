@@ -2,7 +2,7 @@ import Link from "next/link";
 import Migas from "../../../../migas.jsx";
 import Practica from "../../../../practica.jsx";
 import {
-  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, repasoDePregunta, bandaAnterior
+  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, repasoDePregunta, tramoAnteriorDeMateria, tramosDeMateria
 } from "../../../../../lib/contenido.js";
 import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
 
@@ -15,7 +15,7 @@ import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
 
 export function generateStaticParams() {
   return MATERIAS.flatMap(materia =>
-    BANDAS.map(banda => ({ materia: materia.slug, banda: banda.id }))
+    tramosDeMateria(materia.slug).map(banda => ({ materia: materia.slug, banda: banda.id }))
   );
 }
 
@@ -28,7 +28,7 @@ export default async function PracticarPorEdad({ params }) {
   const { materia: slug, banda: id } = await params;
   const materia = materiaPorSlug(slug);
   const tramo = bandaPorId(id);
-  const anterior = bandaAnterior(id);
+  const anterior = tramoAnteriorDeMateria(slug, id);
 
   /* Solo la práctica: los diagnósticos los responde un adulto observando, y
      mezclarlos convertiría un rato de ejercicios en una evaluación sin avisar. */

@@ -170,6 +170,23 @@ export const paginasDeMateriaYBanda = (slug, banda) =>
 export const preguntasDeMateriaYBanda = (slug, banda) =>
   preguntasDe(slug).filter(pregunta => pregunta.banda === banda);
 
+/* Los tramos que esta materia tiene sentido ofrecer.
+
+   Los seis de la ruta siempre, aunque alguno esté vacío: decirlo es mejor que
+   esconderlo, porque un tramo que no aparece parece que no existe. Y «previo»
+   —lo anterior a los 5 años— solo cuando esa materia tenga algo ahí: matemáticas
+   tiene diez diagnósticos y física ninguno, y ofrecer una puerta vacía en física
+   sería peor que no ofrecerla.
+
+   Sin esto, esos diez diagnósticos quedarían inalcanzables al mudar las pruebas
+   dentro de las edades, porque «previo» no está en BANDAS. */
+export function tramosDeMateria(slug) {
+  const hayEnPrevio =
+    paginasDeMateriaYBanda(slug, PREVIO.id).length > 0 ||
+    preguntasDeMateriaYBanda(slug, PREVIO.id).length > 0;
+  return hayEnPrevio ? [PREVIO, ...BANDAS] : [...BANDAS];
+}
+
 /* El tramo anterior. Antes del primero está «previo», que no forma parte de la
    progresión pero sí tiene contenido: dejarlo fuera vaciaría el refuerzo justo en
    la edad donde más se necesita volver atrás. */
@@ -178,6 +195,18 @@ export function bandaAnterior(id) {
   if (indice > 0) return BANDAS[indice - 1];
   if (indice === 0) return PREVIO;
   return null;   // «previo» no tiene nada antes
+}
+
+/* El tramo anterior DE ESTA MATERIA.
+
+   `bandaAnterior` responde por la escala de edades y da «previo» antes de 5-6. Pero
+   «previo» solo existe como página en las materias que tienen algo ahí, así que
+   enlazarlo desde física o lenguaje daba un 404. Para navegar hay que preguntar por
+   la lista de esa materia, no por la escala. */
+export function tramoAnteriorDeMateria(slug, id) {
+  const suyos = tramosDeMateria(slug);
+  const indice = suyos.findIndex(tramo => tramo.id === id);
+  return indice > 0 ? suyos[indice - 1] : null;
 }
 
 /* Qué repasar antes de una página.

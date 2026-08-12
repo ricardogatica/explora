@@ -1,7 +1,7 @@
 ---
 titulo: Potencias, raíces y logaritmos
 materia: matematicas
-categoria: Unidad 1 · Números
+categoria: (Segundo medio) Unidad 1 · Números
 descripcion: Exponente racional, propiedades, y el logaritmo como la pregunta inversa de la potencia.
 bandas: [15-17]
 orden: 220

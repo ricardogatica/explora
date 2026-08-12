@@ -1,7 +1,7 @@
 ---
 titulo: Números reales
 materia: matematicas
-categoria: Unidad 1 · Números
+categoria: (Segundo medio) Unidad 1 · Números
 descripcion: Qué hay en ℝ, dónde aparecen los irracionales, raíces, aproximación y operaciones.
 bandas: [15-17]
 orden: 210

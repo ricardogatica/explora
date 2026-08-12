@@ -1,7 +1,7 @@
 ---
 titulo: Función inversa
 materia: matematicas
-categoria: Unidad 2 · Álgebra y funciones
+categoria: (Segundo medio) Unidad 2 · Álgebra y funciones
 descripcion: Deshacer una función, cuándo se puede, y las inversas de la lineal, la afín y la cuadrática.
 bandas: [15-17]
 orden: 320

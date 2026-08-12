@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Migas from "../../../migas.jsx";
 import {
-  MATERIAS, materiaPorSlug, paginasDeMateriaYBanda, preguntasDeMateriaYBanda, bandaAnterior
+  MATERIAS, materiaPorSlug, paginasDeMateriaYBanda, preguntasDeMateriaYBanda, tramoAnteriorDeMateria, tramosDeMateria
 } from "../../../../lib/contenido.js";
-import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
+import { bandaPorId, esBandaDeRuta } from "@explora/contenido/bandas.js";
 
 /* Una materia a una edad concreta.
 
@@ -19,7 +19,7 @@ import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
 
 export function generateStaticParams() {
   return MATERIAS.flatMap(materia =>
-    BANDAS.map(banda => ({ materia: materia.slug, banda: banda.id }))
+    tramosDeMateria(materia.slug).map(banda => ({ materia: materia.slug, banda: banda.id }))
   );
 }
 
@@ -48,12 +48,16 @@ export default async function MateriaPorEdad({ params }) {
     grupos.get(pagina.categoria).push(pagina);
     return grupos;
   }, new Map())];
-  const practica = preguntasDeMateriaYBanda(slug, id).filter(p => p.familia === "practica");
-  const anterior = bandaAnterior(id);
+  const preguntas = preguntasDeMateriaYBanda(slug, id);
+  const practica = preguntas.filter(p => p.familia === "practica");
+  /* El diagnóstico vive dentro de la edad, no en la portada de la materia: así se
+     comprueba un tramo concreto en vez de recorrer los seis de una sentada. */
+  const diagnostico = preguntas.filter(p => p.familia === "diagnostico");
+  const anterior = tramoAnteriorDeMateria(slug, id);
 
   /* Los otros tramos, para poder cambiar de edad sin volver atrás: quien acompaña a
      dos hijos de edades distintas hace justo eso. */
-  const otros = BANDAS.filter(banda => banda.id !== id);
+  const otros = tramosDeMateria(slug).filter(banda => banda.id !== id);
 
   return (
     <main className="pagina">
@@ -64,16 +68,27 @@ export default async function MateriaPorEdad({ params }) {
         {paginas.length === 0
           ? `Todavía no hay contenido de ${materia.nombre.toLowerCase()} para esta edad.`
           : `${paginas.length} ${paginas.length === 1 ? "tema" : "temas"} y ${practica.length} ${practica.length === 1 ? "ejercicio" : "ejercicios"}.`}
+        {paginas.length === 0 && diagnostico.length > 0 &&
+          ` Hay ${diagnostico.length} preguntas de diagnóstico para el adulto que acompaña.`}
       </p>
 
-      {(paginas.length > 0 || practica.length > 0) && (
+      {(paginas.length > 0 || practica.length > 0 || diagnostico.length > 0) && (
         <p className="acciones">
           {practica.length > 0 && (
             <Link className="boton" href={`/${slug}/edad/${id}/practicar/`}>
               Practicar {tramo.titulo}
             </Link>
           )}
-          <Link className="boton boton--suave" href={`/ruta/${id}/`}>Ver todas las materias de esta edad</Link>
+          {diagnostico.length > 0 && (
+            <Link className="boton boton--suave" href={`/${slug}/edad/${id}/diagnostico/`}>
+              Diagnóstico ({diagnostico.length})
+            </Link>
+          )}
+          {/* «previo» no está en la progresión y no tiene página de ruta: enlazarla
+              daba un 404 en un sitio que se sirve como archivos. */}
+          {esBandaDeRuta(id) && (
+            <Link className="boton boton--suave" href={`/ruta/${id}/`}>Ver todas las materias de esta edad</Link>
+          )}
         </p>
       )}
 

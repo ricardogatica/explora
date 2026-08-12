@@ -1,7 +1,7 @@
 ---
 titulo: Síntesis · Unidad 4 · Probabilidad y estadística
 materia: matematicas
-categoria: Unidad 4 · Probabilidad y estadística
+categoria: (Segundo medio) Unidad 4 · Probabilidad y estadística
 descripcion: Lo esencial del conteo y la probabilidad, y por qué aquí la intuición falla tanto.
 bandas: [15-17]
 orden: 530

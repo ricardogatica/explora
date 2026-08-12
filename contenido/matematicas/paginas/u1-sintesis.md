@@ -1,7 +1,7 @@
 ---
 titulo: Síntesis · Unidad 1 · Números
 materia: matematicas
-categoria: Unidad 1 · Números
+categoria: (Segundo medio) Unidad 1 · Números
 descripcion: Lo esencial de la unidad, cómo saber si se entendió y los errores que más cuestan.
 bandas: [15-17]
 orden: 230
