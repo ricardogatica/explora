@@ -256,22 +256,65 @@ export function refuerzoDe(slug, id, { cuantas = 3 } = {}) {
     .slice(0, cuantas);
 }
 
-/* Qué repasar cuando una pregunta se atasca.
+/* Los tramos de al lado, para lo que se dice al terminar una tanda.
 
-   Si la pregunta dice a qué página pertenece, se usa el refuerzo de esa página, que
-   es lo preciso. Si no lo dice —y hoy casi ninguna lo dice—, se cae a lo que hay de
-   su materia en el tramo anterior: menos fino, pero nunca deja a nadie sin nada a
-   lo que volver. */
+   Se calcula aquí y no en el componente porque saber qué tramo va antes y cuál
+   después es cosa del contenido: depende de qué tenga cada materia, y «previo» solo
+   existe en algunas. El componente solo pinta lo que recibe.
+
+   El segundo enlace apunta a lo mismo que se acaba de hacer —ejercicios o
+   diagnóstico— en el tramo de al lado, que es lo que se quiere repetir. */
+export function vecindadDelTramo(slug, id, que) {
+  const suyos = tramosDeMateria(slug);
+  const indice = suyos.findIndex(tramo => tramo.id === id);
+  const enlace = tramo => tramo && {
+    titulo: tramo.titulo,
+    ruta: `/${slug}/edad/${tramo.id}/`,
+    rutaDeLoMismo: preguntasDeMateriaYBanda(slug, tramo.id)
+      .some(p => p.familia === (que === "diagnostico" ? "diagnostico" : "practica"))
+      ? `/${slug}/edad/${tramo.id}/${que}/`
+      : null
+  };
+  return {
+    esDiagnostico: que === "diagnostico",
+    anterior: indice > 0 ? enlace(suyos[indice - 1]) : null,
+    siguiente: indice >= 0 && indice < suyos.length - 1 ? enlace(suyos[indice + 1]) : null
+  };
+}
+
+/* Qué ofrecerle a quien se atasca en una pregunta.
+
+   Son dos cosas distintas y por eso se devuelven aparte, en vez de una lista
+   mezclada:
+
+   `explica` es la lección de la que sale la pregunta. Es lo que sirve cuando hay
+   una duda concreta: releer lo que la explica. Viene del campo `pagina`, que es la
+   asociación que cada pregunta declara.
+
+   `antes` es lo anterior en edad. Es lo que sirve cuando el problema no es esa
+   pregunta sino el tramo entero, y sale de la banda: no hace falta anotar nada.
+
+   Una pregunta sin `pagina` —una observación de las primeras edades, por ejemplo—
+   se queda sin `explica`, y está bien: no hay ninguna lección que releer cuando lo
+   que se observa es si un niño de tres años entrega un objeto. */
 export function repasoDePregunta(pregunta, { cuantas = 3 } = {}) {
-  if (pregunta.pagina) {
-    const refuerzo = refuerzoDe(pregunta.materia, pregunta.pagina, { cuantas });
-    if (refuerzo.length) return refuerzo;
-    const propia = paginasDe(pregunta.materia).find(p => p.id === pregunta.pagina);
-    if (propia) return [propia];
-  }
+  const deLaMateria = paginasDe(pregunta.materia);
+  const explica = pregunta.pagina
+    ? deLaMateria.find(pagina => pagina.id === pregunta.pagina) ?? null
+    : null;
+
+  /* Lo anterior sale de la propia lección cuando la hay —su cadena de refuerzo ya
+     está pensada— y si no, del tramo de edad anterior. */
+  const antes = explica
+    ? refuerzoDe(pregunta.materia, explica.id, { cuantas })
+    : [];
+  if (antes.length) return { explica, antes };
+
   const anterior = bandaAnterior(pregunta.banda);
-  if (!anterior) return [];
-  return paginasDeMateriaYBanda(pregunta.materia, anterior.id).slice(0, cuantas);
+  return {
+    explica,
+    antes: anterior ? paginasDeMateriaYBanda(pregunta.materia, anterior.id).slice(0, cuantas) : []
+  };
 }
 
 /* Las otras páginas del mismo tramo de edad, agrupadas por materia.

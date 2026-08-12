@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { esCorrecta, puntaje, puntajeMaximo, comentario } from "@explora/contenido/corregir.js";
 import { anotarRespuesta } from "./sesion.js";
+import { consejoDeTanda } from "./consejo.js";
 
 /* El visor de preguntas: uno para los cinco tipos y las dos materias.
 
@@ -218,8 +219,11 @@ const CUERPOS = {
    El enlace es un enlace de verdad y no un panel que explica aquí mismo: repasar es
    leer una página entera, no un párrafo de consuelo. Se abre en la misma pestaña
    porque volver es el botón de atrás, que todo el mundo sabe usar. */
-function Repaso({ paginas, abierto, alternar }) {
-  if (!paginas?.length) return null;
+function Repaso({ repaso, abierto, alternar }) {
+  const explica = repaso?.explica;
+  const antes = repaso?.antes ?? [];
+  if (!explica && !antes.length) return null;
+
   return (
     <div className={`repaso${abierto ? " es-abierto" : ""}`}>
       <button type="button" className="repaso__llave" onClick={alternar} aria-expanded={abierto}>
@@ -227,21 +231,80 @@ function Repaso({ paginas, abierto, alternar }) {
       </button>
       {abierto && (
         <div className="repaso__cuerpo">
-          <p className="repaso__intro">Vuelve a esto y prueba otra vez:</p>
-          <ul className="repaso__lista">
-            {paginas.map(pagina => (
-              <li key={pagina.ruta}>
-                <a href={pagina.ruta}>{pagina.titulo}</a>
-              </li>
-            ))}
-          </ul>
+          {explica && (
+            <p className="repaso__intro">
+              Esta pregunta sale de <a href={explica.ruta}><b>{explica.titulo}</b></a>.
+            </p>
+          )}
+          {antes.length > 0 && (
+            <>
+              <p className="repaso__intro">Y antes de esto va:</p>
+              <ul className="repaso__lista">
+                {antes.map(pagina => (
+                  <li key={pagina.ruta}><a href={pagina.ruta}>{pagina.titulo}</a></li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-export default function Practica({ preguntas }) {
+/* Lo que se dice al terminar.
+
+   Es la otra mitad de lo que pidió quien lo va a usar: una duda suelta se resuelve
+   con la lección de la pregunta, pero equivocarse mucho no es una duda, es que el
+   tramo no está afianzado. Eso no se ve pregunta a pregunta —se ve al final— y la
+   respuesta tampoco es una página: es volver una edad atrás entera.
+
+   El umbral es la mitad. Por debajo se propone retroceder; por encima del 85 % en un
+   diagnóstico, seguir. En medio no se dice nada, porque no hay nada seguro que
+   decir y un consejo dudoso es peor que ninguno. */
+function Veredicto({ puntos, maximo, tramo }) {
+  /* Los umbrales viven en consejo.js, donde se pueden probar: mandar a alguien
+     hacia atrás sin motivo, o dejarlo atascado sin avisar, son las dos formas de
+     equivocarse aquí. */
+  const consejo = consejoDeTanda(puntos, maximo, tramo);
+  if (!consejo) return null;
+  const proporcion = consejo.proporcion;
+
+  if (consejo.tipo === "atras") {
+    return (
+      <div className="cierre cierre--atras">
+        <strong>Este tramo se está atragantando</strong>
+        <p>
+          Menos de la mitad. No pasa nada y no hay que insistir aquí: casi siempre falta
+          algo de antes. Vuelve a {tramo.anterior.titulo} y prueba otra vez.
+        </p>
+        <p className="acciones">
+          <a className="boton" href={tramo.anterior.ruta}>Ir a {tramo.anterior.titulo}</a>
+          {tramo.anterior.rutaDeLoMismo && (
+            <a className="boton boton--suave" href={tramo.anterior.rutaDeLoMismo}>
+              {tramo.esDiagnostico ? "Su diagnóstico" : "Sus ejercicios"}
+            </a>
+          )}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="cierre cierre--adelante">
+      <strong>Este tramo está afianzado</strong>
+      <p>
+        {Math.round(proporcion * 100)} de cada 100. Se puede seguir con{" "}
+        {tramo.siguiente.titulo}.
+      </p>
+      <p className="acciones">
+        <a className="boton" href={tramo.siguiente.ruta}>Ir a {tramo.siguiente.titulo}</a>
+      </p>
+    </div>
+  );
+}
+
+export default function Practica({ preguntas, tramo }) {
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState(null);
   const [revisada, setRevisada] = useState(false);
@@ -272,6 +335,7 @@ export default function Practica({ preguntas }) {
           {puntos} de {maximo} puntos en {resultados.length} preguntas.
           {" "}Equivocarse es parte de aprender: puedes repetir cuando quieras.
         </p>
+        <Veredicto puntos={puntos} maximo={maximo} tramo={tramo} />
         <button
           type="button"
           className="boton"
@@ -345,7 +409,7 @@ export default function Practica({ preguntas }) {
       )}
 
       <Repaso
-        paginas={pregunta.repaso}
+        repaso={pregunta.repaso}
         abierto={repasoAbierto}
         alternar={() => setRepasoAbierto(!repasoAbierto)}
       />

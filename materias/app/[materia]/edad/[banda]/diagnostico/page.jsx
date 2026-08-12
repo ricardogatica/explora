@@ -2,7 +2,7 @@ import Link from "next/link";
 import Migas from "../../../../migas.jsx";
 import Practica from "../../../../practica.jsx";
 import {
-  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, tramosDeMateria, tramoAnteriorDeMateria
+  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, tramosDeMateria, tramoAnteriorDeMateria, vecindadDelTramo, repasoDePregunta
 } from "../../../../../lib/contenido.js";
 import { bandaPorId } from "@explora/contenido/bandas.js";
 
@@ -34,7 +34,22 @@ export default async function DiagnosticoPorEdad({ params }) {
   const tramo = bandaPorId(id);
   const anterior = tramoAnteriorDeMateria(slug, id);
 
-  const preguntas = preguntasDeMateriaYBanda(slug, id).filter(p => p.familia === "diagnostico");
+  /* El diagnóstico también lleva el repaso de cada pregunta. Se quedó sin él al
+     nacer esta ruta, y es justo donde más falta hace: quien lo responde está
+     buscando por dónde empezar. */
+  const preguntas = preguntasDeMateriaYBanda(slug, id)
+    .filter(p => p.familia === "diagnostico")
+    .map(pregunta => ({
+      ...pregunta,
+      repaso: (() => {
+        const { explica, antes } = repasoDePregunta(pregunta);
+        return {
+          explica: explica && { titulo: explica.titulo, ruta: `/${slug}/${explica.id}/` },
+          antes: antes.map(pagina => ({ titulo: pagina.titulo, ruta: `/${slug}/${pagina.id}/` }))
+        };
+      })()
+    }));
+  const vecindad = vecindadDelTramo(slug, id, "diagnostico");
   const observaciones = preguntas.filter(p => p.tipo === "observation").length;
 
   return (
@@ -57,7 +72,7 @@ export default async function DiagnosticoPorEdad({ params }) {
               observaciones: no tienen respuesta correcta, se anota lo que se ve.</>
             )}
           </p>
-          <Practica preguntas={preguntas} />
+          <Practica preguntas={preguntas} tramo={vecindad} />
           {anterior && (
             <p className="acciones acciones--sueltas">
               <Link className="boton boton--suave" href={`/${slug}/edad/${anterior.id}/diagnostico/`}>

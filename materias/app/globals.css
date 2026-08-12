@@ -482,3 +482,23 @@ a.boton { text-decoration: none; display: inline-block; }
 
 .notas { margin: 1.25rem 0 0; padding-left: 1.1rem; display: grid; gap: 6px; font-size: 14px; }
 .notas b { font-family: var(--mono); }
+
+/* ── Lo que se dice al terminar una tanda ─────────────────────────────────────
+
+   Una duda suelta se resuelve con la lección de la pregunta. Equivocarse mucho no es
+   una duda: es que el tramo no está afianzado, y eso solo se ve al final. Por eso
+   este bloque pesa más que el resto de la pantalla de cierre. */
+.cierre {
+  margin: 1.5rem 0 0;
+  padding: 1.1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  border-left-width: 4px;
+}
+.cierre strong { display: block; font-size: 17px; margin-bottom: .4rem; }
+.cierre p { margin: 0 0 .5rem; font-size: 15px; }
+.cierre .acciones { margin: .9rem 0 0; }
+/* Ámbar y no rojo: no se ha hecho nada mal. Volver atrás es la jugada correcta, y
+   pintarla de error diría lo contrario. */
+.cierre--atras { border-color: #d9a441; border-left-color: #b8860b; background: #fdf7ea; }
+.cierre--adelante { border-color: #7fb996; border-left-color: #2f855a; background: #f0f8f3; }

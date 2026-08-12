@@ -2,7 +2,7 @@ import Link from "next/link";
 import Migas from "../../../../migas.jsx";
 import Practica from "../../../../practica.jsx";
 import {
-  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, repasoDePregunta, tramoAnteriorDeMateria, tramosDeMateria
+  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, repasoDePregunta, tramoAnteriorDeMateria, tramosDeMateria, vecindadDelTramo
 } from "../../../../../lib/contenido.js";
 import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
 
@@ -29,6 +29,7 @@ export default async function PracticarPorEdad({ params }) {
   const materia = materiaPorSlug(slug);
   const tramo = bandaPorId(id);
   const anterior = tramoAnteriorDeMateria(slug, id);
+  const vecindad = vecindadDelTramo(slug, id, "practicar");
 
   /* Solo la práctica: los diagnósticos los responde un adulto observando, y
      mezclarlos convertiría un rato de ejercicios en una evaluación sin avisar. */
@@ -36,9 +37,13 @@ export default async function PracticarPorEdad({ params }) {
     .filter(pregunta => pregunta.familia === "practica")
     .map(pregunta => ({
       ...pregunta,
-      repaso: repasoDePregunta(pregunta).map(pagina => ({
-        titulo: pagina.titulo, ruta: `/${slug}/${pagina.id}/`
-      }))
+      repaso: (() => {
+        const { explica, antes } = repasoDePregunta(pregunta);
+        return {
+          explica: explica && { titulo: explica.titulo, ruta: `/${slug}/${explica.id}/` },
+          antes: antes.map(pagina => ({ titulo: pagina.titulo, ruta: `/${slug}/${pagina.id}/` }))
+        };
+      })()
     }));
 
   return (
@@ -57,7 +62,7 @@ export default async function PracticarPorEdad({ params }) {
       </p>
 
       {preguntas.length > 0 ? (
-        <Practica preguntas={preguntas} />
+        <Practica preguntas={preguntas} tramo={vecindad} />
       ) : (
         <p className="acciones">
           <Link className="boton boton--suave" href={`/${slug}/edad/${id}/`}>Ver los temas de esta edad</Link>
