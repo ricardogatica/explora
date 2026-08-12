@@ -3,7 +3,7 @@ titulo: Empujar, tirar y rodar
 materia: fisica
 categoria: Ejes de la física
 descripcion: Las primeras fuerzas, con las manos: empujar, tirar, soltar y mirar qué pasa.
-bandas: [5-6]
+bandas: [6-7]
 orden: 30
 ---
 

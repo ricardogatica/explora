@@ -3,7 +3,7 @@ titulo: Preposiciones
 materia: lenguaje
 categoria: Gramática
 descripcion: Uso preciso de a, de, en, por, para y otras.
-bandas: [11-12]
+bandas: [12-13]
 orden: 150
 ---
 

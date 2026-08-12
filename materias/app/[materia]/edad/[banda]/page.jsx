@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Migas from "../../../migas.jsx";
 import {
-  MATERIAS, materiaPorSlug, paginasDeMateriaYBanda, preguntasDeMateriaYBanda, tramoAnteriorDeMateria, tramosDeMateria
+  MATERIAS, materiaPorSlug, paginasDeMateriaYBanda, preguntasDeMateriaYBanda
 } from "../../../../lib/contenido.js";
-import { bandaPorId, esBandaDeRuta } from "@explora/contenido/bandas.js";
+import { BANDAS, bandaPorId, bandaAnteriorA } from "@explora/contenido/bandas.js";
 
 /* Una materia a una edad concreta.
 
@@ -19,7 +19,7 @@ import { bandaPorId, esBandaDeRuta } from "@explora/contenido/bandas.js";
 
 export function generateStaticParams() {
   return MATERIAS.flatMap(materia =>
-    tramosDeMateria(materia.slug).map(banda => ({ materia: materia.slug, banda: banda.id }))
+    BANDAS.map(banda => ({ materia: materia.slug, banda: banda.id }))
   );
 }
 
@@ -53,17 +53,27 @@ export default async function MateriaPorEdad({ params }) {
   /* El diagnóstico vive dentro de la edad, no en la portada de la materia: así se
      comprueba un tramo concreto en vez de recorrer los seis de una sentada. */
   const diagnostico = preguntas.filter(p => p.familia === "diagnostico");
-  const anterior = tramoAnteriorDeMateria(slug, id);
+  const anterior = bandaAnteriorA(id);
 
   /* Los otros tramos, para poder cambiar de edad sin volver atrás: quien acompaña a
      dos hijos de edades distintas hace justo eso. */
-  const otros = tramosDeMateria(slug).filter(banda => banda.id !== id);
+  const otros = BANDAS.filter(banda => banda.id !== id);
 
   return (
     <main className="pagina">
       <Migas tramos={[{ texto: materia.nombre, href: `/${slug}/` }, { texto: tramo.titulo }]} />
       <p className="eyebrow">{materia.nombre} · {tramo.etapa}</p>
       <h1>{materia.nombre} de {tramo.titulo}</h1>
+
+      {/* El primer tramo va dirigido a otra persona, y decirlo antes de nada evita
+          que un adulto busque ejercicios en pantalla donde no los hay. */}
+      {tramo.paraAdultos && (
+        <p className="aviso-tramo">
+          A esta edad quien usa Explora es el adulto que enseña, no quien aprende. Lo que hay
+          aquí es material para acompañar: cosas que hacer juntos y observaciones para anotar.
+        </p>
+      )}
+
       <p className="subtitle">
         {paginas.length === 0
           ? `Todavía no hay contenido de ${materia.nombre.toLowerCase()} para esta edad.`
@@ -76,19 +86,15 @@ export default async function MateriaPorEdad({ params }) {
         <p className="acciones">
           {practica.length > 0 && (
             <Link className="boton" href={`/${slug}/edad/${id}/practicar/`}>
-              Practicar {tramo.titulo}
+              {tramo.paraAdultos ? "Ejercicios para hacer juntos" : `Practicar ${tramo.titulo}`}
             </Link>
           )}
           {diagnostico.length > 0 && (
             <Link className="boton boton--suave" href={`/${slug}/edad/${id}/diagnostico/`}>
-              Diagnóstico ({diagnostico.length})
+              {tramo.paraAdultos ? `Qué observar (${diagnostico.length})` : `Diagnóstico (${diagnostico.length})`}
             </Link>
           )}
-          {/* «previo» no está en la progresión y no tiene página de ruta: enlazarla
-              daba un 404 en un sitio que se sirve como archivos. */}
-          {esBandaDeRuta(id) && (
-            <Link className="boton boton--suave" href={`/ruta/${id}/`}>Ver todas las materias de esta edad</Link>
-          )}
+          <Link className="boton boton--suave" href={`/ruta/${id}/`}>Ver todas las materias de esta edad</Link>
         </p>
       )}
 

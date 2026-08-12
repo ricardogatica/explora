@@ -2,7 +2,7 @@
   {
     "id": "fis-p-1",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "practica",
     "pagina": "empujar-tirar-rodar",
     "tipo": "multiple-choice",
@@ -19,7 +19,7 @@
   {
     "id": "fis-p-2",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "practica",
     "pagina": "empujar-tirar-rodar",
     "tipo": "multiple-choice",
@@ -37,7 +37,7 @@
   {
     "id": "fis-p-3",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "practica",
     "pagina": "empujar-tirar-rodar",
     "tipo": "multiple-choice",
@@ -54,7 +54,7 @@
   {
     "id": "fis-p-4",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "practica",
     "pagina": "luz-y-sombra",
     "tipo": "multiple-choice",
@@ -71,7 +71,7 @@
   {
     "id": "fis-d-5-6-1",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Al pedirle que empuje y después que tire de un objeto, ¿hace dos cosas distintas?",
@@ -93,7 +93,7 @@
   {
     "id": "fis-d-5-6-2",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Con una linterna, ¿se da cuenta de que la sombra se agranda al acercar la mano a la luz?",
@@ -115,7 +115,7 @@
   {
     "id": "fis-d-5-6-3",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "diagnostico",
     "tipo": "drag-match",
     "pregunta": "Arrastra cada acción a lo que haces con las manos. Un adulto puede leer las cajas.",
@@ -155,7 +155,7 @@
   {
     "id": "fis-d-5-6-4",
     "materia": "fisica",
-    "banda": "5-6",
+    "banda": "6-7",
     "familia": "diagnostico",
     "tipo": "drag-match",
     "pregunta": "Arrastra cada objeto según si la luz lo atraviesa o no.",
@@ -200,7 +200,7 @@
   {
     "id": "fis-p-5",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "practica",
     "pagina": "flotar-y-hundirse",
     "tipo": "multiple-choice",
@@ -217,7 +217,7 @@
   {
     "id": "fis-p-6",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "practica",
     "pagina": "calor-y-temperatura",
     "tipo": "multiple-choice",
@@ -234,7 +234,7 @@
   {
     "id": "fis-p-7",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "practica",
     "pagina": "calor-y-temperatura",
     "tipo": "multiple-choice",
@@ -251,7 +251,7 @@
   {
     "id": "fis-p-8",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "practica",
     "pagina": "calor-y-temperatura",
     "tipo": "fill",
@@ -268,7 +268,7 @@
   {
     "id": "fis-d-7-8-1",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "¿Predice si un objeto va a flotar antes de echarlo al agua, y explica por qué?",
@@ -290,7 +290,7 @@
   {
     "id": "fis-d-7-8-2",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "diagnostico",
     "tipo": "drag-order",
     "pregunta": "Ordena de más frío a más caliente.",
@@ -325,7 +325,7 @@
   {
     "id": "fis-d-7-8-3",
     "materia": "fisica",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Al medir dos vasos de agua, uno al sol y otro a la sombra, ¿anota los números y los compara?",
@@ -347,7 +347,7 @@
   {
     "id": "fis-p-9",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "fuerzas-y-movimiento",
     "tipo": "fill",
@@ -363,7 +363,7 @@
   {
     "id": "fis-p-10",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "fuerzas-y-movimiento",
     "tipo": "multiple-choice",
@@ -380,7 +380,7 @@
   {
     "id": "fis-p-11",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "sonido-y-ondas",
     "tipo": "multiple-choice",
@@ -397,7 +397,7 @@
   {
     "id": "fis-p-12",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "sonido-y-ondas",
     "tipo": "multiple-choice",
@@ -415,7 +415,7 @@
   {
     "id": "fis-d-9-10-1",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "diagnostico",
     "tipo": "drag-match",
     "pregunta": "Arrastra cada instrumento a lo que mide.",
@@ -467,7 +467,7 @@
   {
     "id": "fis-d-9-10-2",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "diagnostico",
     "tipo": "drag-order",
     "pregunta": "Ordena de más rápido a más lento.",
@@ -502,7 +502,7 @@
   {
     "id": "fis-d-9-10-3",
     "materia": "fisica",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Al medir cuánto tarda alguien en recorrer 10 metros, ¿repite la medida más de una vez?",
@@ -522,7 +522,7 @@
   {
     "id": "fis-p-13",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "gravedad-masa-peso",
     "tipo": "multiple-choice",
@@ -539,7 +539,7 @@
   {
     "id": "fis-p-14",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "gravedad-masa-peso",
     "tipo": "multiple-choice",
@@ -556,7 +556,7 @@
   {
     "id": "fis-p-15",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "gravedad-masa-peso",
     "tipo": "fill",
@@ -572,7 +572,7 @@
   {
     "id": "fis-p-16",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "energia",
     "tipo": "multiple-choice",
@@ -589,7 +589,7 @@
   {
     "id": "fis-d-11-12-1",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Al preguntarle la diferencia entre masa y peso, ¿la explica con un ejemplo propio?",
@@ -611,7 +611,7 @@
   {
     "id": "fis-d-11-12-2",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "diagnostico",
     "tipo": "drag-match",
     "pregunta": "Arrastra cada ejemplo a la forma de energía que se ve en él.",
@@ -663,7 +663,7 @@
   {
     "id": "fis-d-11-12-3",
     "materia": "fisica",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "¿Reconoce que envolver un hielo en una toalla lo mantiene helado más tiempo, y explica por qué?",
@@ -685,7 +685,7 @@
   {
     "id": "fis-p-17",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "electricidad-magnetismo",
     "tipo": "multiple-choice",
@@ -702,7 +702,7 @@
   {
     "id": "fis-p-18",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "electricidad-magnetismo",
     "tipo": "multiple-choice",
@@ -719,7 +719,7 @@
   {
     "id": "fis-p-19",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "electricidad-magnetismo",
     "tipo": "multiple-choice",
@@ -737,7 +737,7 @@
   {
     "id": "fis-p-20",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "optica",
     "tipo": "multiple-choice",
@@ -754,7 +754,7 @@
   {
     "id": "fis-p-21",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "electricidad-magnetismo",
     "tipo": "fill",
@@ -770,7 +770,7 @@
   {
     "id": "fis-d-13-14-1",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "diagnostico",
     "tipo": "drag-match",
     "pregunta": "Arrastra cada situación al fenómeno que la explica.",
@@ -815,7 +815,7 @@
   {
     "id": "fis-d-13-14-2",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Con una pila, cables y una bombilla, ¿consigue montar un circuito que encienda?",
@@ -839,7 +839,7 @@
   {
     "id": "fis-d-13-14-3",
     "materia": "fisica",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "diagnostico",
     "tipo": "drag-order",
     "pregunta": "Ordena los pasos para hacer un electroimán.",
@@ -873,7 +873,7 @@
   {
     "id": "fis-p-22",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "practica",
     "pagina": "cinematica",
     "tipo": "multiple-choice",
@@ -890,7 +890,7 @@
   {
     "id": "fis-p-23",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "practica",
     "pagina": "cinematica",
     "tipo": "multiple-choice",
@@ -907,7 +907,7 @@
   {
     "id": "fis-p-24",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "practica",
     "pagina": "leyes-de-newton",
     "tipo": "fill",
@@ -923,7 +923,7 @@
   {
     "id": "fis-p-25",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "practica",
     "pagina": "leyes-de-newton",
     "tipo": "multiple-choice",
@@ -940,7 +940,7 @@
   {
     "id": "fis-p-26",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "practica",
     "pagina": "medir-e-incertidumbre",
     "tipo": "multiple-choice",
@@ -957,7 +957,7 @@
   {
     "id": "fis-p-27",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "practica",
     "pagina": "medir-e-incertidumbre",
     "tipo": "multiple-choice",
@@ -974,7 +974,7 @@
   {
     "id": "fis-d-15-17-1",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "diagnostico",
     "tipo": "drag-match",
     "pregunta": "Arrastra cada magnitud a su unidad del sistema internacional.",
@@ -1026,7 +1026,7 @@
   {
     "id": "fis-d-15-17-2",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Al terminar un problema, ¿comprueba que las unidades del resultado tienen sentido?",
@@ -1048,7 +1048,7 @@
   {
     "id": "fis-d-15-17-3",
     "materia": "fisica",
-    "banda": "15-17",
+    "banda": "16-17",
     "familia": "diagnostico",
     "tipo": "observation",
     "pregunta": "Ante un resultado absurdo —una piedra que cae de una mesa a 5 000 km/h— ¿se extraña y lo revisa?",

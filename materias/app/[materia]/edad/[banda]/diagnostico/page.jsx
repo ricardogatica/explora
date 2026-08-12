@@ -2,9 +2,9 @@ import Link from "next/link";
 import Migas from "../../../../migas.jsx";
 import Practica from "../../../../practica.jsx";
 import {
-  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, tramosDeMateria, tramoAnteriorDeMateria, vecindadDelTramo, repasoDePregunta
+  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, vecindadDelTramo, repasoDePregunta
 } from "../../../../../lib/contenido.js";
-import { bandaPorId } from "@explora/contenido/bandas.js";
+import { BANDAS, bandaPorId, bandaAnteriorA } from "@explora/contenido/bandas.js";
 
 /* El diagnóstico de una materia a una edad.
 
@@ -19,7 +19,7 @@ import { bandaPorId } from "@explora/contenido/bandas.js";
 
 export function generateStaticParams() {
   return MATERIAS.flatMap(materia =>
-    tramosDeMateria(materia.slug).map(banda => ({ materia: materia.slug, banda: banda.id }))
+    BANDAS.map(banda => ({ materia: materia.slug, banda: banda.id }))
   );
 }
 
@@ -32,7 +32,7 @@ export default async function DiagnosticoPorEdad({ params }) {
   const { materia: slug, banda: id } = await params;
   const materia = materiaPorSlug(slug);
   const tramo = bandaPorId(id);
-  const anterior = tramoAnteriorDeMateria(slug, id);
+  const anterior = bandaAnteriorA(id);
 
   /* El diagnóstico también lleva el repaso de cada pregunta. Se quedó sin él al
      nacer esta ruta, y es justo donde más falta hace: quien lo responde está

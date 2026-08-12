@@ -3,7 +3,7 @@ titulo: Función cuadrática
 materia: matematicas
 categoria: (Segundo medio) Unidad 2 · Álgebra y funciones
 descripcion: La ecuación de segundo grado, la parábola y cómo se mueve al cambiar sus números.
-bandas: [15-17]
+bandas: [14-15, 16-17]
 orden: 310
 refuerzo: [patrones-algebra, u1-numeros-reales]
 ---

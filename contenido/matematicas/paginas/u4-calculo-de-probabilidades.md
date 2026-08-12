@@ -3,7 +3,7 @@ titulo: Cálculo de probabilidades
 materia: matematicas
 categoria: (Segundo medio) Unidad 4 · Probabilidad y estadística
 descripcion: Unión, intersección, complemento e independencia, y cómo se usan las probabilidades fuera de clase.
-bandas: [15-17]
+bandas: [14-15, 16-17]
 orden: 520
 refuerzo: [u4-tecnicas-de-conteo, regla-de-laplace]
 ---

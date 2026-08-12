@@ -3,7 +3,7 @@ titulo: Patrones y álgebra
 materia: matematicas
 categoria: Ejes matemáticos
 descripcion: Patrones, regularidades, variables, ecuaciones y funciones.
-bandas: [13-14]
+bandas: [14-15]
 orden: 120
 ---
 

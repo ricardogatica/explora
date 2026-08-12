@@ -3,7 +3,7 @@ titulo: Técnicas de conteo
 materia: matematicas
 categoria: (Segundo medio) Unidad 4 · Probabilidad y estadística
 descripcion: Contar sin enumerar: principio multiplicativo, permutaciones, variaciones y combinaciones.
-bandas: [15-17]
+bandas: [14-15, 16-17]
 orden: 510
 refuerzo: [regla-de-laplace, datos-probabilidad]
 ---

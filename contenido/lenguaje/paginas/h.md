@@ -3,7 +3,7 @@ titulo: Uso de h
 materia: lenguaje
 categoria: Ortografía
 descripcion: La h muda y sus reglas más frecuentes.
-bandas: [9-10]
+bandas: [10-11]
 orden: 70
 ---
 

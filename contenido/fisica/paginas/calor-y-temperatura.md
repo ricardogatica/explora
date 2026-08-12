@@ -3,7 +3,7 @@ titulo: Calor y temperatura
 materia: fisica
 categoria: Ejes de la física
 descripcion: Medir con termómetro, por qué el metal parece más frío que la madera, y qué aísla.
-bandas: [7-8]
+bandas: [8-9]
 orden: 60
 ---
 

@@ -3,7 +3,7 @@ titulo: Luz y sombra
 materia: fisica
 categoria: Ejes de la física
 descripcion: Con una linterna: de dónde viene la luz, por qué hay sombra y cómo cambia de tamaño.
-bandas: [5-6]
+bandas: [6-7]
 orden: 40
 ---
 

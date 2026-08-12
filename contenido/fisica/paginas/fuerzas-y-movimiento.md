@@ -3,7 +3,7 @@ titulo: Fuerzas y movimiento
 materia: fisica
 categoria: Ejes de la física
 descripcion: Medir rapidez, entender el roce y descubrir que moverse no gasta fuerza.
-bandas: [9-10]
+bandas: [10-11]
 orden: 70
 ---
 

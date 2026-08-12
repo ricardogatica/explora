@@ -37,7 +37,7 @@ const cuentaPorBanda = preguntas => {
    lista funciona en los dos sentidos: si aparece un hueco nuevo, el test falla; y
    si alguien escribe el contenido que falta y no borra la entrada, también. Así
    la deuda no se queda escrita para siempre. */
-const HUECOS_DECLARADOS = ["5-6"];
+const HUECOS_DECLARADOS = ["6-7"];
 
 test("los huecos de la ruta son exactamente los declarados", () => {
   const cuenta = cuentaPorBanda(PREGUNTAS);
@@ -65,7 +65,7 @@ test("el reparto por banda y materia queda a la vista", () => {
     );
     return `  ${banda.id.padEnd(6)} ${porMateria.join("  ")}`;
   });
-  const previo = PREGUNTAS.filter(p => p.banda === "previo").length;
+  const previo = PREGUNTAS.filter(p => p.banda === "4-5").length;
   console.log(`\nreparto de las ${PREGUNTAS.length} preguntas por banda:\n${filas.join("\n")}` +
     `\n  previo ${previo} (fuera de la ruta)\n`);
 

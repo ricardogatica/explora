@@ -3,7 +3,7 @@ titulo: Números racionales
 materia: matematicas
 categoria: Números y operaciones
 descripcion: Fracciones y decimales, equivalencia, comparación y las cuatro operaciones.
-bandas: [11-12]
+bandas: [12-13]
 orden: 103
 ---
 

@@ -3,7 +3,7 @@ titulo: Verbos y tiempos verbales
 materia: lenguaje
 categoria: Gramática
 descripcion: Usos básicos de tiempos, modos y formas verbales.
-bandas: [11-12]
+bandas: [12-13]
 orden: 130
 ---
 

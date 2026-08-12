@@ -17,7 +17,7 @@ import { separarFrontmatter, validarPagina } from "@explora/contenido/paginas.js
 import { partirEnBloques } from "@explora/contenido/bloques.js";
 import { NOMBRES_DE_FIGURA } from "@explora/compartido/primitivas.js";
 import { NOMBRES_DE_ACTIVIDAD } from "../app/actividades/nombres.js";
-import { BANDAS, PREVIO, bandaPorId, esBandaDeRuta, IDS_VALIDOS } from "@explora/contenido/bandas.js";
+import { BANDAS, bandaPorId, bandaAnteriorA, bandaSiguienteA, IDS_VALIDOS } from "@explora/contenido/bandas.js";
 
 /* En build el proceso corre dentro de materias/, y el contenido es hermano suyo:
    vive fuera de la aplicación a propósito, porque es el activo del proyecto y no
@@ -170,45 +170,6 @@ export const paginasDeMateriaYBanda = (slug, banda) =>
 export const preguntasDeMateriaYBanda = (slug, banda) =>
   preguntasDe(slug).filter(pregunta => pregunta.banda === banda);
 
-/* Los tramos que esta materia tiene sentido ofrecer.
-
-   Los seis de la ruta siempre, aunque alguno esté vacío: decirlo es mejor que
-   esconderlo, porque un tramo que no aparece parece que no existe. Y «previo»
-   —lo anterior a los 5 años— solo cuando esa materia tenga algo ahí: matemáticas
-   tiene diez diagnósticos y física ninguno, y ofrecer una puerta vacía en física
-   sería peor que no ofrecerla.
-
-   Sin esto, esos diez diagnósticos quedarían inalcanzables al mudar las pruebas
-   dentro de las edades, porque «previo» no está en BANDAS. */
-export function tramosDeMateria(slug) {
-  const hayEnPrevio =
-    paginasDeMateriaYBanda(slug, PREVIO.id).length > 0 ||
-    preguntasDeMateriaYBanda(slug, PREVIO.id).length > 0;
-  return hayEnPrevio ? [PREVIO, ...BANDAS] : [...BANDAS];
-}
-
-/* El tramo anterior. Antes del primero está «previo», que no forma parte de la
-   progresión pero sí tiene contenido: dejarlo fuera vaciaría el refuerzo justo en
-   la edad donde más se necesita volver atrás. */
-export function bandaAnterior(id) {
-  const indice = BANDAS.findIndex(banda => banda.id === id);
-  if (indice > 0) return BANDAS[indice - 1];
-  if (indice === 0) return PREVIO;
-  return null;   // «previo» no tiene nada antes
-}
-
-/* El tramo anterior DE ESTA MATERIA.
-
-   `bandaAnterior` responde por la escala de edades y da «previo» antes de 5-6. Pero
-   «previo» solo existe como página en las materias que tienen algo ahí, así que
-   enlazarlo desde física o lenguaje daba un 404. Para navegar hay que preguntar por
-   la lista de esa materia, no por la escala. */
-export function tramoAnteriorDeMateria(slug, id) {
-  const suyos = tramosDeMateria(slug);
-  const indice = suyos.findIndex(tramo => tramo.id === id);
-  return indice > 0 ? suyos[indice - 1] : null;
-}
-
 /* Qué repasar antes de una página.
 
    Se declara con `refuerzo` en el frontmatter cuando hace falta afinar, y si no se
@@ -259,14 +220,11 @@ export function refuerzoDe(slug, id, { cuantas = 3 } = {}) {
 /* Los tramos de al lado, para lo que se dice al terminar una tanda.
 
    Se calcula aquí y no en el componente porque saber qué tramo va antes y cuál
-   después es cosa del contenido: depende de qué tenga cada materia, y «previo» solo
-   existe en algunas. El componente solo pinta lo que recibe.
+   después es cosa del contenido, no del componente, que solo pinta lo que recibe.
 
    El segundo enlace apunta a lo mismo que se acaba de hacer —ejercicios o
    diagnóstico— en el tramo de al lado, que es lo que se quiere repetir. */
 export function vecindadDelTramo(slug, id, que) {
-  const suyos = tramosDeMateria(slug);
-  const indice = suyos.findIndex(tramo => tramo.id === id);
   const enlace = tramo => tramo && {
     titulo: tramo.titulo,
     ruta: `/${slug}/edad/${tramo.id}/`,
@@ -277,8 +235,8 @@ export function vecindadDelTramo(slug, id, que) {
   };
   return {
     esDiagnostico: que === "diagnostico",
-    anterior: indice > 0 ? enlace(suyos[indice - 1]) : null,
-    siguiente: indice >= 0 && indice < suyos.length - 1 ? enlace(suyos[indice + 1]) : null
+    anterior: enlace(bandaAnteriorA(id)),
+    siguiente: enlace(bandaSiguienteA(id))
   };
 }
 
@@ -310,7 +268,7 @@ export function repasoDePregunta(pregunta, { cuantas = 3 } = {}) {
     : [];
   if (antes.length) return { explica, antes };
 
-  const anterior = bandaAnterior(pregunta.banda);
+  const anterior = bandaAnteriorA(pregunta.banda);
   return {
     explica,
     antes: anterior ? paginasDeMateriaYBanda(pregunta.materia, anterior.id).slice(0, cuantas) : []
@@ -354,9 +312,7 @@ export function hermanasDeTramo(slug, id, { porMateria: cuantas = 6 } = {}) {
     }).slice(0, cuantas)
   })).filter(materia => materia.paginas.length > 0);
 
-  /* Solo los tramos de la ruta tienen página propia; «previo» no está en la
-     progresión y enlazar a /ruta/previo/ daría un 404. */
-  return { bandas: bandas.filter(esBandaDeRuta).map(bandaPorId), materias: porMateria };
+  return { bandas: bandas.map(bandaPorId).filter(Boolean), materias: porMateria };
 }
 
 /* La ruta de aprendizaje: qué hay en cada tramo, atravesando materias. Se arma

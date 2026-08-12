@@ -3,7 +3,7 @@ titulo: Medir: unidades e incertidumbre
 materia: fisica
 categoria: Método
 descripcion: El sistema internacional, cifras significativas y por qué toda medida lleva un margen.
-bandas: [15-17]
+bandas: [16-17]
 orden: 150
 ---
 

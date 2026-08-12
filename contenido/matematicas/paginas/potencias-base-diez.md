@@ -3,7 +3,7 @@ titulo: Potencias de base 10
 materia: matematicas
 categoria: Números y operaciones
 descripcion: El patrón de los ceros, el valor posicional y cómo se escriben números muy grandes.
-bandas: [11-12]
+bandas: [12-13]
 orden: 104
 ---
 

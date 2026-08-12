@@ -3,7 +3,7 @@ titulo: Geometría y medición
 materia: matematicas
 categoria: Ejes matemáticos
 descripcion: Figuras, cuerpos, ubicación espacial, perímetro, área, volumen y medidas.
-bandas: [9-10]
+bandas: [10-11]
 orden: 110
 ---
 

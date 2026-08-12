@@ -3,7 +3,7 @@ titulo: Leyes de Newton
 materia: fisica
 categoria: Ejes de la física
 descripcion: Las tres leyes del movimiento, qué explica cada una y dónde se aplican mal.
-bandas: [15-17]
+bandas: [16-17]
 orden: 140
 ---
 

@@ -502,3 +502,16 @@ a.boton { text-decoration: none; display: inline-block; }
    pintarla de error diría lo contrario. */
 .cierre--atras { border-color: #d9a441; border-left-color: #b8860b; background: #fdf7ea; }
 .cierre--adelante { border-color: #7fb996; border-left-color: #2f855a; background: #f0f8f3; }
+
+/* El primer tramo va dirigido al adulto que enseña, no a quien aprende. Se distingue
+   con el mismo ámbar que el consejo de volver atrás —es información, no error— para
+   que no parezca un tramo más de la progresión. */
+.edad--adultos { background: #fdf7ea; border-color: #e3cfa4; }
+.aviso-tramo {
+  margin: 0 0 1.25rem;
+  padding: .85rem 1rem;
+  border-left: 3px solid #b8860b;
+  border-radius: 10px;
+  background: #fdf7ea;
+  font-size: 15px;
+}

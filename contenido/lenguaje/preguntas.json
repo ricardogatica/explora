@@ -2,7 +2,7 @@
   {
     "id": "acentuacion-1",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "acentuacion-general",
     "tipo": "multiple-choice",
@@ -20,7 +20,7 @@
   {
     "id": "acentuacion-2",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "acentuacion-general",
     "tipo": "multiple-choice",
@@ -38,7 +38,7 @@
   {
     "id": "diacritica-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "tilde-diacritica",
     "tipo": "fill",
@@ -54,7 +54,7 @@
   {
     "id": "interrogativos-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "interrogativos-exclamativos",
     "tipo": "fill",
@@ -69,7 +69,7 @@
   {
     "id": "hiato-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "hiatos-diptongos",
     "tipo": "multiple-choice",
@@ -87,7 +87,7 @@
   {
     "id": "puntuacion-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "puntuacion",
     "tipo": "multiple-choice",
@@ -105,7 +105,7 @@
   {
     "id": "mayusculas-1",
     "materia": "lenguaje",
-    "banda": "7-8",
+    "banda": "8-9",
     "familia": "practica",
     "pagina": "mayusculas-minusculas",
     "tipo": "multiple-choice",
@@ -123,7 +123,7 @@
   {
     "id": "bv-1",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "b-v",
     "tipo": "multiple-choice",
@@ -141,7 +141,7 @@
   {
     "id": "csz-1",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "c-s-z",
     "tipo": "fill",
@@ -156,7 +156,7 @@
   {
     "id": "gj-1",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "g-j",
     "tipo": "multiple-choice",
@@ -174,7 +174,7 @@
   {
     "id": "h-1",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "h",
     "tipo": "multiple-choice",
@@ -192,7 +192,7 @@
   {
     "id": "concordancia-1",
     "materia": "lenguaje",
-    "banda": "9-10",
+    "banda": "10-11",
     "familia": "practica",
     "pagina": "concordancia",
     "tipo": "multiple-choice",
@@ -210,7 +210,7 @@
   {
     "id": "verbos-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "verbos",
     "tipo": "multiple-choice",
@@ -228,7 +228,7 @@
   {
     "id": "pronombres-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "pronombres",
     "tipo": "multiple-choice",
@@ -246,7 +246,7 @@
   {
     "id": "preposiciones-1",
     "materia": "lenguaje",
-    "banda": "11-12",
+    "banda": "12-13",
     "familia": "practica",
     "pagina": "preposiciones",
     "tipo": "multiple-choice",
@@ -264,7 +264,7 @@
   {
     "id": "conectores-1",
     "materia": "lenguaje",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "conectores",
     "tipo": "multiple-choice",
@@ -282,7 +282,7 @@
   {
     "id": "redaccion-1",
     "materia": "lenguaje",
-    "banda": "13-14",
+    "banda": "14-15",
     "familia": "practica",
     "pagina": "redaccion-clara",
     "tipo": "multiple-choice",

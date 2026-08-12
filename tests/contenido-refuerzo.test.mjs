@@ -4,7 +4,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { separarFrontmatter, validarPagina } from "../contenido/paginas.js";
-import { BANDAS, PREVIO, bandaPorId } from "../contenido/bandas.js";
+import { BANDAS, bandaPorId } from "../contenido/bandas.js";
 import { MATERIAS as MATERIAS_VALIDAS } from "../contenido/esquema.js";
 
 /* «Si algo se te hace difícil, vuelve a lo de antes.»
@@ -76,11 +76,15 @@ test("no se manda a nadie más de dos tramos atrás", () => {
 test("el primer tramo de cada materia no propone nada, y eso está bien", () => {
   /* Antes del principio no hay nada, y un bloque vacío diciendo «repasa» sería peor
      que no mostrarlo. La interfaz lo oculta cuando la lista viene vacía. */
-  const primeras = PAGINAS.filter(p => p.bandas.includes(BANDAS[0].id));
-  assert.ok(primeras.length > 0, "esperaba páginas en el primer tramo");
+  /* Hoy el primer tramo —4 a 5 años, el de acompañar con un adulto— no tiene páginas,
+     solo observaciones para anotar. La regla se comprueba igualmente sobre el primer
+     tramo que tenga alguna, que es lo que se quiere proteger. */
+  const conPagina = BANDAS.find(banda => PAGINAS.some(p => p.bandas.includes(banda.id)));
+  const primeras = PAGINAS.filter(p => p.bandas.includes(conPagina.id));
+  assert.ok(primeras.length > 0, "ninguna banda tiene páginas");
   for (const pagina of primeras.filter(p => !p.refuerzo?.length)) {
-    const previas = refuerzo(pagina).filter(o => !o.bandas.includes(PREVIO.id));
-    assert.deepEqual(previas, [], `${pagina.id} propone repasar algo del mismo tramo o posterior`);
+    assert.deepEqual(refuerzo(pagina), [],
+      `${pagina.id} está en el primer tramo y propone repasar algo: antes no hay nada`);
   }
 });
 
@@ -122,7 +126,7 @@ test("un refuerzo declarado tiene que existir y no puede ser circular", () => {
     for (const pagina of PAGINAS.filter(p => p.materia === materia)) {
       const fallos = validarPagina(pagina, {
         materias: MATERIAS_VALIDAS,
-        bandasValidas: [...BANDAS.map(b => b.id), PREVIO.id],
+        bandasValidas: BANDAS.map(b => b.id),
         idsDeLaMateria: ids
       });
       assert.deepEqual(fallos.map(f => f.mensaje), [], `${materia}/${pagina.id}`);
@@ -133,7 +137,7 @@ test("un refuerzo declarado tiene que existir y no puede ser circular", () => {
 test("el validador caza un refuerzo inventado y uno circular", () => {
   // Mutación: sin esto, las dos reglas de arriba podrían no comprobar nada.
   const base = { id: "x", titulo: "X", materia: "matematicas", categoria: "C", bandas: [] };
-  const contexto = { materias: MATERIAS_VALIDAS, bandasValidas: ["9-10"], idsDeLaMateria: ["x", "y"] };
+  const contexto = { materias: MATERIAS_VALIDAS, bandasValidas: ["10-11"], idsDeLaMateria: ["x", "y"] };
 
   const inventado = validarPagina({ ...base, refuerzo: ["no-existe"] }, contexto);
   assert.equal(inventado.length, 1);

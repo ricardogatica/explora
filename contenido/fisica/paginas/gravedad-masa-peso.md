@@ -3,7 +3,7 @@ titulo: Gravedad, masa y peso
 materia: fisica
 categoria: Ejes de la física
 descripcion: Por qué masa y peso no son lo mismo, y por qué dos objetos distintos caen igual.
-bandas: [11-12]
+bandas: [12-13]
 orden: 100
 ---
 

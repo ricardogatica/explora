@@ -3,7 +3,7 @@ titulo: Redacción clara
 materia: lenguaje
 categoria: Redacción
 descripcion: Criterios para escribir textos precisos y comprensibles.
-bandas: [13-14]
+bandas: [14-15]
 orden: 170
 ---
 

@@ -10,7 +10,7 @@ import { validarRespuesta, validarSesion, LARGO_MAXIMO_DE_RESPUESTA } from "../a
 const VALIDA = {
   sesion: "8f14e45f-ceea-467a-9d1a-3f2e1c4b5a60",
   materia: "matematicas",
-  banda: "9-10",
+  banda: "10-11",
   familia: "practica",
   pregunta: "mat-9-10-fracciones-01",
   correcta: true,

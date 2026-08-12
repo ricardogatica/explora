@@ -3,7 +3,7 @@ titulo: Energía y su conservación
 materia: fisica
 categoria: Ejes de la física
 descripcion: Las formas de la energía, cómo se transforma y por qué no se gasta nunca.
-bandas: [11-12]
+bandas: [12-13]
 orden: 90
 ---
 

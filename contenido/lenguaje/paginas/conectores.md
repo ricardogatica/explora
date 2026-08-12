@@ -3,7 +3,7 @@ titulo: Conectores discursivos
 materia: lenguaje
 categoria: Redacción
 descripcion: Organización lógica de ideas.
-bandas: [13-14]
+bandas: [14-15]
 orden: 160
 ---
 

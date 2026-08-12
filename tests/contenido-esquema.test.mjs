@@ -12,7 +12,7 @@ import { validarPregunta, validarCorpus, TIPOS, FAMILIAS } from "../contenido/es
    responde «hay 3 errores» obliga a buscarlos a mano entre 57 archivos. */
 
 const BASE = {
-  id: "x-1", materia: "lenguaje", banda: "9-10", familia: "practica",
+  id: "x-1", materia: "lenguaje", banda: "10-11", familia: "practica",
   tipo: "multiple-choice", pregunta: "¿Cuál lleva tilde?",
   opciones: ["cancion", "canción"], respuesta: "canción",
   categoria: "Acentuación", explicacion: "Aguda terminada en n."
@@ -41,7 +41,7 @@ test("la banda tiene que existir", () => {
   assert.ok(errores({ ...BASE, banda: "nivel-9-11" }).includes("banda-desconocida"),
     "los identificadores de bandas viejos ya no valen");
   assert.ok(errores({ ...BASE, banda: "18-20" }).includes("banda-desconocida"));
-  assert.deepEqual(errores({ ...BASE, banda: "previo" }), [],
+  assert.deepEqual(errores({ ...BASE, banda: "4-5" }), [],
     "previo es una banda válida aunque quede fuera de la ruta");
 });
 
@@ -65,7 +65,7 @@ test("opción múltiple: hacen falta al menos dos opciones y sin repetir", () =>
 
 test("completar: respuesta no vacía y `aceptadas` que aporten algo", () => {
   const completar = {
-    id: "f-1", materia: "matematicas", banda: "7-8", familia: "practica",
+    id: "f-1", materia: "matematicas", banda: "8-9", familia: "practica",
     tipo: "fill", pregunta: "45 + 36 =", respuesta: "81",
     categoria: "Suma", explicacion: "Se suman decenas y unidades."
   };
@@ -77,7 +77,7 @@ test("completar: respuesta no vacía y `aceptadas` que aporten algo", () => {
 
 test("observación: los puntajes cubren exactamente las opciones", () => {
   const observacion = {
-    id: "o-1", materia: "matematicas", banda: "previo", familia: "diagnostico",
+    id: "o-1", materia: "matematicas", banda: "4-5", familia: "diagnostico",
     tipo: "observation", habilidad: "Cantidad inicial",
     pregunta: "¿Puede entregar solo un objeto?",
     opciones: ["Sí", "No"], puntaje: { "Sí": 2, "No": 0 },
@@ -92,7 +92,7 @@ test("observación: los puntajes cubren exactamente las opciones", () => {
 
 test("arrastrar y emparejar: cada elemento va a un destino que existe", () => {
   const emparejar = {
-    id: "m-1", materia: "matematicas", banda: "5-6", familia: "diagnostico",
+    id: "m-1", materia: "matematicas", banda: "6-7", familia: "diagnostico",
     tipo: "drag-match", habilidad: "Clasificación",
     pregunta: "Arrastra cada objeto a su caja.",
     /* Los arrastrables llevan id y etiqueta por separado: la etiqueta puede ser
@@ -117,7 +117,7 @@ test("arrastrar y emparejar: cada elemento va a un destino que existe", () => {
 
 test("arrastrar y ordenar: la respuesta es una permutación de los elementos", () => {
   const ordenar = {
-    id: "r-1", materia: "matematicas", banda: "7-8", familia: "diagnostico",
+    id: "r-1", materia: "matematicas", banda: "8-9", familia: "diagnostico",
     tipo: "drag-order", habilidad: "Orden",
     pregunta: "Ordena de menor a mayor.",
     elementos: [{ id: "25", etiqueta: "25" }, { id: "18", etiqueta: "18" }, { id: "36", etiqueta: "36" }],

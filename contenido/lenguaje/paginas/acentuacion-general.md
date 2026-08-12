@@ -3,7 +3,7 @@ titulo: Acentuación general
 materia: lenguaje
 categoria: Ortografía
 descripcion: Palabras agudas, graves, esdrújulas y sobresdrújulas.
-bandas: [9-10]
+bandas: [10-11]
 orden: 30
 ---
 

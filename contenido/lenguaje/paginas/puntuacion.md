@@ -3,7 +3,7 @@ titulo: Puntuación
 materia: lenguaje
 categoria: Ortografía
 descripcion: Coma, punto, punto y coma, dos puntos y signos dobles.
-bandas: [11-12]
+bandas: [12-13]
 orden: 110
 ---
 

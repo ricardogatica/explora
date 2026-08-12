@@ -3,7 +3,7 @@ titulo: Mayúsculas y minúsculas
 materia: lenguaje
 categoria: Ortografía
 descripcion: Uso correcto de inicial mayúscula.
-bandas: [7-8]
+bandas: [8-9]
 orden: 20
 ---
 

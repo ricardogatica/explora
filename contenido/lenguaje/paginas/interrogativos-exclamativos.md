@@ -3,7 +3,7 @@ titulo: Interrogativos y exclamativos
 materia: lenguaje
 categoria: Ortografía
 descripcion: Qué, quién, cuál, cuándo, dónde, cómo y cuánto.
-bandas: [11-12]
+bandas: [12-13]
 orden: 90
 ---
 

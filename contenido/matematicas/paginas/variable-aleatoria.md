@@ -3,7 +3,7 @@ titulo: Variable aleatoria
 materia: matematicas
 categoria: Datos y probabilidad
 descripcion: Poner números a los resultados del azar, su distribución y el valor esperado.
-bandas: [15-17]
+bandas: [16-17]
 orden: 135
 ---
 

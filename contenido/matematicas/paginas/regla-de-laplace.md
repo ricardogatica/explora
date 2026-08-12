@@ -3,7 +3,7 @@ titulo: Regla de Laplace
 materia: matematicas
 categoria: Datos y probabilidad
 descripcion: Calcular probabilidades contando casos, y saber cuándo la regla no se puede aplicar.
-bandas: [15-17]
+bandas: [16-17]
 orden: 136
 ---
 

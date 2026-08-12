@@ -3,7 +3,7 @@ titulo: Síntesis · Unidad 3 · Geometría
 materia: matematicas
 categoria: (Segundo medio) Unidad 3 · Geometría
 descripcion: Lo esencial de la trigonometría del triángulo rectángulo y sus aplicaciones.
-bandas: [15-17]
+bandas: [14-15, 16-17]
 orden: 430
 refuerzo: [u3-razones-trigonometricas, u3-aplicaciones-trigonometria]
 ---

@@ -3,7 +3,7 @@ titulo: Síntesis · Unidad 2 · Álgebra y funciones
 materia: matematicas
 categoria: (Segundo medio) Unidad 2 · Álgebra y funciones
 descripcion: Lo esencial de la cuadrática y la inversa, con las preguntas que revelan si se entendió.
-bandas: [15-17]
+bandas: [14-15, 16-17]
 orden: 330
 refuerzo: [u2-funcion-cuadratica, u2-funcion-inversa]
 ---

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Migas from "../../migas.jsx";
 import {
-  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, tramosDeMateria
+  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda
 } from "../../../lib/contenido.js";
+import { BANDAS } from "@explora/contenido/bandas.js";
 
 /* Practicar va por edad, igual que el diagnóstico.
 
@@ -27,7 +28,7 @@ export default async function Practicar({ params }) {
   const { materia: slug } = await params;
   const materia = materiaPorSlug(slug);
 
-  const tramos = tramosDeMateria(slug).map(banda => ({
+  const tramos = BANDAS.map(banda => ({
     ...banda,
     cuantas: preguntasDeMateriaYBanda(slug, banda.id).filter(p => p.familia === "practica").length
   }));

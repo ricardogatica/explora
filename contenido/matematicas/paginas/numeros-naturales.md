@@ -3,7 +3,7 @@ titulo: Números naturales
 materia: matematicas
 categoria: Números y operaciones
 descripcion: Los números para contar, su orden, las cuatro operaciones, divisibilidad y primos.
-bandas: [7-8]
+bandas: [8-9]
 orden: 101
 ---
 

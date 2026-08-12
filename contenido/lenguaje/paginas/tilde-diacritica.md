@@ -3,7 +3,7 @@ titulo: Tilde diacrítica
 materia: lenguaje
 categoria: Ortografía
 descripcion: Diferencia palabras iguales con funciones distintas.
-bandas: [11-12]
+bandas: [12-13]
 orden: 80
 ---
 

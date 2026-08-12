@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Migas from "../migas.jsx";
 import Buscador from "../buscador.jsx";
-import { MATERIAS, materiaPorSlug, paginasDe, preguntasDe, paginasDeMateriaYBanda, preguntasDeMateriaYBanda, tramosDeMateria } from "../../lib/contenido.js";
+import { BANDAS } from "@explora/contenido/bandas.js";
+import { MATERIAS, materiaPorSlug, paginasDe, preguntasDe, paginasDeMateriaYBanda, preguntasDeMateriaYBanda } from "../../lib/contenido.js";
 
 
 export function generateStaticParams() {
@@ -22,7 +23,7 @@ export default async function Materia({ params }) {
 
   /* Los tramos con su recuento: uno vacío se dice, no se esconde. Un botón que
      lleva a una página en blanco gasta más confianza que una etiqueta que avisa. */
-  const tramos = tramosDeMateria(slug).map(banda => ({
+  const tramos = BANDAS.map(banda => ({
     ...banda,
     temas: paginasDeMateriaYBanda(slug, banda.id).length,
     ejercicios: preguntasDeMateriaYBanda(slug, banda.id).filter(p => p.familia === "practica").length
@@ -46,7 +47,7 @@ export default async function Materia({ params }) {
           {tramos.map(tramo => (
             <Link
               key={tramo.id}
-              className={`edad${tramo.temas + tramo.ejercicios === 0 ? " edad--vacia" : ""}`}
+              className={`edad${tramo.temas + tramo.ejercicios === 0 ? " edad--vacia" : ""}${tramo.paraAdultos ? " edad--adultos" : ""}`}
               href={`/${slug}/edad/${tramo.id}/`}
             >
               <strong>{tramo.titulo}</strong>

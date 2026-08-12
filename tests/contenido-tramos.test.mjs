@@ -68,23 +68,22 @@ test("un tramo cruza materias, que es para lo que sirve", () => {
      matemáticas fueran solo de matemáticas, esto no aportaría nada sobre el
      buscador de la propia materia. Se mira el tramo, no una página concreta: atarlo
      a un archivo lo rompe cuando ese archivo cambia, que es lo que pasó. */
-  const materias = new Set(PAGINAS.filter(p => p.bandas.includes("9-10")).map(p => p.materia));
+  const materias = new Set(PAGINAS.filter(p => p.bandas.includes("10-11")).map(p => p.materia));
   assert.ok(materias.size >= 3,
     `el tramo 9-10 solo toca ${[...materias].join(", ")}`);
 });
 
-test("solo se enlaza la ruta de los tramos que tienen página", () => {
-  /* «previo» no está en la progresión y no tiene página propia: enlazar a
-     /ruta/previo/ daría un 404 en un sitio que se sirve como archivos. */
-  assert.equal(esBandaDeRuta("previo"), false);
-  /* Hoy no hay páginas en «previo» —las de nivel dejaron de declarar banda— pero sí
-     preguntas, así que la regla tiene que seguir vigente para cuando vuelva a
-     haberlas. */
-  const previas = PAGINAS.filter(p => p.bandas.includes("previo"));
-  for (const pagina of previas) {
-    const conRuta = pagina.bandas.filter(esBandaDeRuta);
-    assert.ok(!conRuta.includes("previo"), `${pagina.id} enlazaría /ruta/previo/`);
+test("toda banda que declara una página tiene página de ruta", () => {
+  /* La regla nació con «previo», que llevaba contenido y no tenía /ruta/<id>/: quien
+     pintaba ese enlace daba un 404. Ahora las siete bandas son de la ruta, así que lo
+     que hay que vigilar es que ninguna página se etiquete con algo que no lo sea. */
+  const invalidas = [];
+  for (const pagina of PAGINAS) {
+    for (const banda of pagina.bandas) {
+      if (!esBandaDeRuta(banda)) invalidas.push(`${pagina.materia}/${pagina.id} → ${banda}`);
+    }
   }
+  assert.deepEqual(invalidas, [], "hay páginas etiquetadas con una banda que no existe");
 });
 
 test("toda página con banda tiene descripción, que es lo que se lee en la tarjeta", () => {

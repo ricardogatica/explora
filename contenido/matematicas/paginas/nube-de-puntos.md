@@ -3,7 +3,7 @@ titulo: Nube de puntos (diagrama de dispersión)
 materia: matematicas
 categoria: Datos y probabilidad
 descripcion: Representar dos variables numéricas, leer la correlación y no confundirla con causa.
-bandas: [15-17]
+bandas: [16-17]
 orden: 134
 ---
 

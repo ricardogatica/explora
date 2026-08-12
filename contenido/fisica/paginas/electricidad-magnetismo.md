@@ -3,7 +3,7 @@ titulo: Electricidad y magnetismo
 materia: fisica
 categoria: Ejes de la física
 descripcion: Circuitos abiertos y cerrados, serie y paralelo, imanes y el electroimán.
-bandas: [13-14]
+bandas: [14-15]
 orden: 110
 ---
 

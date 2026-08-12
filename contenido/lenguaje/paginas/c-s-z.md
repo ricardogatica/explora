@@ -3,7 +3,7 @@ titulo: Uso de c, s y z
 materia: lenguaje
 categoria: Ortografía
 descripcion: Escritura de sonidos semejantes.
-bandas: [9-10]
+bandas: [10-11]
 orden: 50
 ---
 

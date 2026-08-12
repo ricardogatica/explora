@@ -31,7 +31,7 @@ export default async function Pagina({ params }) {
         <span className="etiqueta">{ficha.categoria}</span>
         {(ficha.bandas ?? []).map(banda => (
           <Link key={banda} className="etiqueta etiqueta--banda" href={`/ruta/${banda}/`}>
-            {banda === "previo" ? "Antes de los 5" : `${banda} años`}
+            {`${banda} años`}
           </Link>
         ))}
       </p>

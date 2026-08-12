@@ -3,7 +3,7 @@ titulo: Tabla de contingencia (doble entrada)
 materia: matematicas
 categoria: Datos y probabilidad
 descripcion: Cruzar dos variables, leer los totales marginales y comparar con porcentajes.
-bandas: [15-17]
+bandas: [16-17]
 orden: 133
 ---
 

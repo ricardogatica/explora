@@ -3,7 +3,7 @@ titulo: Ejercicios combinados, con y sin paréntesis
 materia: matematicas
 categoria: Números y operaciones
 descripcion: El orden de las operaciones y cómo un paréntesis cambia el resultado.
-bandas: [11-12]
+bandas: [12-13]
 orden: 105
 ---
 

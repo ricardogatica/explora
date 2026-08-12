@@ -3,7 +3,7 @@ titulo: Hiatos, diptongos y triptongos
 materia: lenguaje
 categoria: Ortografía
 descripcion: Combinaciones vocálicas y uso de tilde.
-bandas: [11-12]
+bandas: [12-13]
 orden: 100
 ---
 

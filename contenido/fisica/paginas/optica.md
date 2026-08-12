@@ -3,7 +3,7 @@ titulo: Óptica: reflexión y refracción
 materia: fisica
 categoria: Ejes de la física
 descripcion: Por qué el lápiz parece roto en el vaso, cómo funciona un espejo y qué hace una lente.
-bandas: [13-14]
+bandas: [14-15]
 orden: 120
 ---
 

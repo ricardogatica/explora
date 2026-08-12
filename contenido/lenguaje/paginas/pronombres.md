@@ -3,7 +3,7 @@ titulo: Pronombres
 materia: lenguaje
 categoria: Gramática
 descripcion: Personales, posesivos, demostrativos, relativos y átonos.
-bandas: [11-12]
+bandas: [12-13]
 orden: 140
 ---
 

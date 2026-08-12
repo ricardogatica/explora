@@ -3,7 +3,7 @@ titulo: Potencias: propiedades y notación algebraica
 materia: matematicas
 categoria: Números y operaciones
 descripcion: Las propiedades con letras, exponente cero y negativo, el signo y la notación científica.
-bandas: [13-14]
+bandas: [14-15]
 orden: 106
 ---
 

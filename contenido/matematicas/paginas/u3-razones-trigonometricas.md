@@ -3,7 +3,7 @@ titulo: Razones trigonométricas
 materia: matematicas
 categoria: (Segundo medio) Unidad 3 · Geometría
 descripcion: Seno, coseno y tangente en el triángulo rectángulo, sus valores y de dónde salen.
-bandas: [15-17]
+bandas: [14-15, 16-17]
 orden: 410
 refuerzo: [geometria-medicion, u1-numeros-reales]
 ---

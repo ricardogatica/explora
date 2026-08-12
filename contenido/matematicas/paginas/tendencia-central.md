@@ -3,7 +3,7 @@ titulo: Medidas de tendencia central
 materia: matematicas
 categoria: Datos y probabilidad
 descripcion: Media, mediana y moda: cómo se calculan y cuándo cada una engaña.
-bandas: [13-14]
+bandas: [14-15]
 orden: 132
 ---
 

@@ -3,7 +3,7 @@ titulo: Sonido y ondas
 materia: fisica
 categoria: Ejes de la física
 descripcion: Qué vibra cuando algo suena, por qué el sonido necesita aire y por qué el trueno llega tarde.
-bandas: [9-10]
+bandas: [10-11]
 orden: 80
 ---
 

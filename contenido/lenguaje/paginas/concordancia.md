@@ -3,7 +3,7 @@ titulo: Concordancia
 materia: lenguaje
 categoria: Gramática
 descripcion: Relación entre género, número, sujeto y verbo.
-bandas: [9-10]
+bandas: [10-11]
 orden: 120
 ---
 

@@ -3,7 +3,7 @@ titulo: Potencias
 materia: matematicas
 categoria: Números y operaciones
 descripcion: Qué es una potencia, base y exponente, y de dónde vienen los nombres cuadrado y cubo.
-bandas: [9-10]
+bandas: [10-11]
 orden: 102
 ---
 

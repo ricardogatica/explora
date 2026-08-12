@@ -3,7 +3,7 @@ titulo: Conceptos básicos de estadística
 materia: matematicas
 categoria: Datos y probabilidad
 descripcion: Población y muestra, tipos de variable, frecuencias y tablas.
-bandas: [13-14]
+bandas: [14-15]
 orden: 131
 ---
 

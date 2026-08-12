@@ -3,7 +3,7 @@ titulo: Uso de b y v
 materia: lenguaje
 categoria: Ortografía
 descripcion: Reglas y familias léxicas con b y v.
-bandas: [9-10]
+bandas: [10-11]
 orden: 40
 ---
 

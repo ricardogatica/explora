@@ -2,9 +2,9 @@ import Link from "next/link";
 import Migas from "../../../../migas.jsx";
 import Practica from "../../../../practica.jsx";
 import {
-  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, repasoDePregunta, tramoAnteriorDeMateria, tramosDeMateria, vecindadDelTramo
+  MATERIAS, materiaPorSlug, preguntasDeMateriaYBanda, repasoDePregunta, vecindadDelTramo
 } from "../../../../../lib/contenido.js";
-import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
+import { BANDAS, bandaPorId, bandaAnteriorA } from "@explora/contenido/bandas.js";
 
 /* Practicar una materia a una edad.
 
@@ -15,7 +15,7 @@ import { BANDAS, bandaPorId } from "@explora/contenido/bandas.js";
 
 export function generateStaticParams() {
   return MATERIAS.flatMap(materia =>
-    tramosDeMateria(materia.slug).map(banda => ({ materia: materia.slug, banda: banda.id }))
+    BANDAS.map(banda => ({ materia: materia.slug, banda: banda.id }))
   );
 }
 
@@ -28,7 +28,7 @@ export default async function PracticarPorEdad({ params }) {
   const { materia: slug, banda: id } = await params;
   const materia = materiaPorSlug(slug);
   const tramo = bandaPorId(id);
-  const anterior = tramoAnteriorDeMateria(slug, id);
+  const anterior = bandaAnteriorA(id);
   const vecindad = vecindadDelTramo(slug, id, "practicar");
 
   /* Solo la práctica: los diagnósticos los responde un adulto observando, y

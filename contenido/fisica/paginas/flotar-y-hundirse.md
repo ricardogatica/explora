@@ -3,7 +3,7 @@ titulo: Flotar y hundirse
 materia: fisica
 categoria: Ejes de la física
 descripcion: Por qué un barco de acero flota y un clavo se hunde. Con un balde de agua.
-bandas: [7-8]
+bandas: [8-9]
 orden: 50
 ---
 

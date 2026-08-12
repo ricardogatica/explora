@@ -3,7 +3,7 @@ titulo: Cinemática: describir el movimiento
 materia: fisica
 categoria: Ejes de la física
 descripcion: Posición, velocidad y aceleración, con las fórmulas del movimiento uniforme y acelerado.
-bandas: [15-17]
+bandas: [16-17]
 orden: 130
 ---
 
