@@ -74,7 +74,12 @@ entero; se simplifica antes.
   7!            7!
 ```
 
-## Permutaciones
+## Permutaciones y variaciones
+
+Las dos ordenan, y por eso van juntas: la diferencia es si se usan todos los
+elementos o solo algunos.
+
+### Permutaciones: ordenar todos
 
 Ordenar **todos** los elementos:
 
@@ -96,7 +101,7 @@ P = ─────────────────────────�
 
 Las letras de CASA: 4!/2! = **12**, no 24, porque las dos aes son indistinguibles.
 
-## Variaciones
+### Variaciones: ordenar algunos
 
 Ordenar **algunos** de los elementos, cuando el orden importa:
 
