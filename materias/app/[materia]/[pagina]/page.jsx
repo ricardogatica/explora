@@ -65,7 +65,14 @@ export default async function Pagina({ params }) {
           )}
           {tramo.materias.map(materia => (
             <div key={materia.slug} className="tramo__materia">
-              <h3 className="tramo__nombre">{materia.nombre}</h3>
+              <h3 className="tramo__nombre">
+                {materia.nombre}
+                {materia.todas > materia.paginas.length && (
+                  <> · <Link href={`/${materia.slug}/edad/${tramo.bandas[0]?.id ?? (ficha.bandas ?? [])[0]}/`}>
+                    ver los {materia.todas}
+                  </Link></>
+                )}
+              </h3>
               {/* Las mismas clases que usa el buscador: la tarjeta de una página se
                   ve igual en todo el sitio y no hay una segunda hoja de estilos que
                   mantener. */}

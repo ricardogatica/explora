@@ -38,6 +38,16 @@ export default async function MateriaPorEdad({ params }) {
   const materia = materiaPorSlug(slug);
   const tramo = bandaPorId(id);
   const paginas = paginasDeMateriaYBanda(slug, id);
+
+  /* Agrupadas por categoría, que es donde viven las unidades. En plano, los 15-17 de
+     matemáticas son diecisiete tarjetas seguidas y no se ve dónde empieza cada
+     unidad. El orden de los grupos lo da la primera página de cada uno, que ya viene
+     ordenada por `orden`. */
+  const porCategoria = [...paginas.reduce((grupos, pagina) => {
+    if (!grupos.has(pagina.categoria)) grupos.set(pagina.categoria, []);
+    grupos.get(pagina.categoria).push(pagina);
+    return grupos;
+  }, new Map())];
   const practica = preguntasDeMateriaYBanda(slug, id).filter(p => p.familia === "practica");
   const anterior = bandaAnterior(id);
 
@@ -70,14 +80,19 @@ export default async function MateriaPorEdad({ params }) {
       {paginas.length > 0 && (
         <>
           <h2>Para leer</h2>
-          <div className="rejilla">
-            {paginas.map(pagina => (
-              <Link key={pagina.id} className="tarjeta" href={`/${slug}/${pagina.id}/`}>
-                <strong>{pagina.titulo}</strong>
-                <span>{pagina.descripcion}</span>
-              </Link>
-            ))}
-          </div>
+          {porCategoria.map(([categoria, suyas]) => (
+            <section key={categoria} className="tramo__materia">
+              <h3 className="tramo__nombre">{categoria}</h3>
+              <div className="rejilla">
+                {suyas.map(pagina => (
+                  <Link key={pagina.id} className="tarjeta" href={`/${slug}/${pagina.id}/`}>
+                    <strong>{pagina.titulo}</strong>
+                    <span>{pagina.descripcion}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
         </>
       )}
 

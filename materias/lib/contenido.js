@@ -257,7 +257,7 @@ export function repasoDePregunta(pregunta, { cuantas = 3 } = {}) {
    define «este tramo» es el dato, no cómo se llama el archivo.
 
    Una página que está en dos bandas aparece una vez, no dos. */
-export function hermanasDeTramo(slug, id) {
+export function hermanasDeTramo(slug, id, { porMateria: cuantas = 6 } = {}) {
   const propia = paginasDe(slug).find(pagina => pagina.id === id);
   const bandas = propia?.bandas ?? [];
   // Siempre la misma forma: quien lo pinta no tiene que distinguir dos casos.
@@ -266,13 +266,20 @@ export function hermanasDeTramo(slug, id) {
   const vistas = new Set([`${slug}/${id}`]);
   const porMateria = MATERIAS.map(materia => ({
     ...materia,
+    /* Acotadas: con las cuatro unidades de segundo medio, el tramo de 15-17 tiene
+       diecinueve páginas y al pie de cada lección salía un muro de tarjetas. Las
+       primeras y un enlace al índice por edad, que es donde están todas. */
+    todas: paginasDe(materia.slug).filter(pagina =>
+      (pagina.bandas ?? []).some(banda => bandas.includes(banda)) &&
+      !(materia.slug === slug && pagina.id === id)
+    ).length,
     paginas: paginasDe(materia.slug).filter(pagina => {
       const clave = `${materia.slug}/${pagina.id}`;
       if (vistas.has(clave)) return false;
       if (!(pagina.bandas ?? []).some(banda => bandas.includes(banda))) return false;
       vistas.add(clave);
       return true;
-    })
+    }).slice(0, cuantas)
   })).filter(materia => materia.paginas.length > 0);
 
   /* Solo los tramos de la ruta tienen página propia; «previo» no está en la
